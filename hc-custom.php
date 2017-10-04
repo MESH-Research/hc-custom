@@ -11,3 +11,5 @@
  *
  * @package         Hc_Custom
  */
+
+require_once trailingslashit( __DIR__ ) . 'includes/elasticpress-buddypress.php';
