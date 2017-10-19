@@ -23,3 +23,24 @@ function hcommons_allow_society_group_admins_ham() {
 }
 // Priority 0 to run before the actions that might be removed by this function.
 add_action( 'bbp_new_topic_pre_insert', 'hcommons_allow_society_group_admins_ham', 0 );
+
+/**
+ * Make sure the_permalink() ends in /forum when posting a new topic so that
+ * authors see their post and any errors after submission.
+ *
+ * @param string $url the permalink.
+ * @return string filtered permalink ending in '/forum' (if applicable).
+ */
+function hcommons_fix_group_forum_permalinks( $url ) {
+	if (
+		bp_is_group() &&
+		bp_is_current_action( 'forum' ) &&
+		0 === preg_match( '#/forum#i', $url )
+	) {
+		$url = trailingslashit( $url ) . 'forum';
+	}
+
+	return $url;
+}
+// Priority 20 to run after CBox_BBP_Autoload->override_the_permalink_with_group_permalink().
+add_filter( 'the_permalink', 'hcommons_fix_group_forum_permalinks', 20 );
