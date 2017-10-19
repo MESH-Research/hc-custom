@@ -21,5 +21,5 @@ function hcommons_allow_society_group_admins_ham() {
 		}
 	}
 }
-// Priority 1 to run before the actions that might be removed by this function.
+// Priority 0 to run before the actions that might be removed by this function.
 add_action( 'bbp_new_topic_pre_insert', 'hcommons_allow_society_group_admins_ham', 0 );
