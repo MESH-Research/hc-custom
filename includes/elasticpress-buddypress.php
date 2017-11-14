@@ -17,7 +17,7 @@ function hcommons_filter_ep_prepare_meta_allowed_protected_keys( array $keys = [
 	if ( 'humcore_deposit' === $post->post_type ) {
 		$keys = array_merge(
 			$keys, [
-				'_deposit_metadata',
+				'_deposit_file_metadata',
 			]
 		);
 	}
