@@ -6,20 +6,25 @@
  */
 
 /**
- * Add HC taxonomies to elasticsearch index.
+
+/**
+ * add core deposit metadata to index
  *
- * @param array $taxonomies Taxonomies to be synced.
+ * @param array $keys Array of index-able private meta keys.
+ * @param WP_Post $post The current post to be indexed.
  */
-function hcommons_filter_ep_sync_taxonomies( array $taxonomies ) {
-	return array_merge(
-		$taxonomies, [
-			get_taxonomy( 'mla_academic_interests' ),
-			get_taxonomy( 'humcore_deposit_subject' ),
-			get_taxonomy( 'humcore_deposit_tag' ),
-		]
-	);
+function hcommons_filter_ep_prepare_meta_allowed_protected_keys( array $keys = [], WP_Post $post ) {
+	if ( 'humcore_deposit' === $post->post_type ) {
+		$keys = array_merge(
+			$keys, [
+				'_deposit_metadata',
+			]
+		);
+	}
+
+	return $keys;
 }
-add_filter( 'ep_sync_taxonomies', 'hcommons_filter_ep_sync_taxonomies' );
+add_filter( 'ep_prepare_meta_allowed_protected_keys', 'hcommons_filter_ep_prepare_meta_allowed_protected_keys', 10, 2 );
 
 /**
  * Add custom taxonomies to elasticsearch queries.
