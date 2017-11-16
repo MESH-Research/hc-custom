@@ -69,11 +69,13 @@ class MLA_Groups {
 
 			});
 			</script>
-		<?php }
+		<?php
+		}
 	}
 
 	function type_filter_js() {
-		if ( wp_script_is( 'jquery', 'done' ) ) { ?>
+		if ( wp_script_is( 'jquery', 'done' ) ) {
+		?>
 		<script>
 			if (jq.cookie('bp-groups-status')) {
 				jq('.filter-type select').val(jq.cookie('bp-groups-type'));
@@ -103,7 +105,8 @@ class MLA_Groups {
 
 			});
 		</script>
-		<?php }
+		<?php
+		}
 	}
 
 	function filter_bp_before_has_groups_parse_args( $args ) {
@@ -111,20 +114,20 @@ class MLA_Groups {
 
 		if ( bp_is_groups_directory() && ! empty( $type ) ) {
 			switch ( $type ) {
-			case 'committees':
-				$value = '^M';
-				break;
-			case 'forums':
-				$value = '^(D|G)';
-				break;
-			case 'prospective_forums':
-				$value = '^F';
-				break;
-			case 'other':
-				$value = '^U';
-				break;
+				case 'committees':
+					$value = '^M';
+					break;
+				case 'forums':
+					$value = '^(D|G)';
+					break;
+				case 'prospective_forums':
+					$value = '^F';
+					break;
+				case 'other':
+					$value = '^U';
+					break;
 			}
-		} else if ( bp_is_user() && false !== strpos( $_SERVER['REQUEST_URI'], 'invite-anyone' ) ) {
+		} elseif ( bp_is_user() && false !== strpos( $_SERVER['REQUEST_URI'], 'invite-anyone' ) ) {
 			$value = '^U'; // exclude committees on member invite-anyone
 		}
 
@@ -134,8 +137,8 @@ class MLA_Groups {
 			}
 
 			$args['meta_query'][] = [
-				'key' => 'mla_oid',
-				'value' => $value,
+				'key'     => 'mla_oid',
+				'value'   => $value,
 				'compare' => 'RLIKE',
 			];
 		}
@@ -148,20 +151,20 @@ class MLA_Groups {
 
 		if ( bp_is_groups_directory() && ! empty( $status ) ) {
 			switch ( $status ) {
-			case 'private':
-			case 'public':
-				$value = $status;
-				break;
-			case 'hidden':
-				if ( is_admin() || is_super_admin() ) {
+				case 'private':
+				case 'public':
 					$value = $status;
-				}
-				break;
+					break;
+				case 'hidden':
+					if ( is_admin() || is_super_admin() ) {
+						$value = $status;
+					}
+					break;
 			}
 
 			if ( ! empty( $value ) ) {
 				$sql_arr['where'] = ( ( isset( $sql_arr['where'] ) ) ? $sql_arr['where'] . ' AND ' : '' ) . "g.status = '$value'";
-				$sql_str = "{$sql_arr['select']} FROM {$sql_arr['from']} WHERE {$sql_arr['where']} {$sql_arr['orderby']} {$sql_arr['pagination']}";
+				$sql_str          = "{$sql_arr['select']} FROM {$sql_arr['from']} WHERE {$sql_arr['where']} {$sql_arr['orderby']} {$sql_arr['pagination']}";
 			}
 		}
 
@@ -178,42 +181,44 @@ function hcommons_init_mla_groups() {
 add_action( 'bp_init', 'hcommons_init_mla_groups' );
 
 if ( 'CBOX-MLA' != wp_get_theme() ) :
-function mla_filter_gettext( $translated, $original, $domain ) {
-        // This is an array of original strings
-        // and what they should be replaced with
-        $strings = array(
-                'Username' => 'User name', // per MLA house style
-                'login' => 'log-in', // per MLA house style
-                'Group Blog' => 'Site', // bp-groupblog textdomain fix
-                'Blogs' => 'Sites', // bp-groupblog textdomain fix
-                'Blog' => 'Site', // bp-groupblog textdomain fix
-                'Friends' => 'Contacts', // it's a formality thing
-                'Friend' => 'Contact',
-                'Friendships' => 'Contacts',
-                'Howdy' => 'Hello',
-                // Add some more strings here
-        );
+	function mla_filter_gettext( $translated, $original, $domain ) {
+		// This is an array of original strings
+		// and what they should be replaced with
+		$strings = array(
+			'Username'    => 'User name', // per MLA house style
+			'login'       => 'log-in', // per MLA house style
+			'Group Blog'  => 'Site', // bp-groupblog textdomain fix
+			'Blogs'       => 'Sites', // bp-groupblog textdomain fix
+			'Blog'        => 'Site', // bp-groupblog textdomain fix
+			'Friends'     => 'Contacts', // it's a formality thing
+			'Friend'      => 'Contact',
+			'Friendships' => 'Contacts',
+			'Howdy'       => 'Hello',
+				// Add some more strings here
+		);
 
-        // See if the current string is in the $strings array
-        // If so, replace it's translation
-        if ( ! empty( $strings[ $original ] ) ) {
-                // This accomplishes the same thing as __()
-                // but without running it through the filter again
-                $translations = get_translations_for_domain( $domain );
-                $translated = $translations->translate( $strings[ $original ] );
-        }
+			// See if the current string is in the $strings array
+			// If so, replace it's translation
+		if ( ! empty( $strings[ $original ] ) ) {
+			// This accomplishes the same thing as __()
+			// but without running it through the filter again
+			$translations = get_translations_for_domain( $domain );
+			$translated   = $translations->translate( $strings[ $original ] );
+		}
 
-        return $translated;
-}
-add_filter( 'gettext', 'mla_filter_gettext', 10, 3 );
+			return $translated;
+	}
+	add_filter( 'gettext', 'mla_filter_gettext', 10, 3 );
 
-function mla_is_group_committee( $group_id = 0 ) {
-        // use the current group if we're not passed one.
-        if ( 0 == $group_id ) $group_id = bp_get_current_group_id();
+	function mla_is_group_committee( $group_id = 0 ) {
+		// use the current group if we're not passed one.
+		if ( 0 == $group_id ) {
+			$group_id = bp_get_current_group_id();
+		}
 
-        // if mla_oid starts with "M," it's a committee
-        return ('M' == substr( groups_get_groupmeta( $group_id, 'mla_oid' ), 0, 1 ) ) ? true : false;
-}
+		// if mla_oid starts with "M," it's a committee
+		return ( 'M' == substr( groups_get_groupmeta( $group_id, 'mla_oid' ), 0, 1 ) ) ? true : false;
+	}
 endif;
 
 function hcommons_filter_bp_get_group_type( $type, $group ) {

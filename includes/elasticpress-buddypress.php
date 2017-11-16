@@ -8,7 +8,7 @@
 /**
  * add core deposit metadata to index
  *
- * @param array $keys Array of index-able private meta keys.
+ * @param array   $keys Array of index-able private meta keys.
  * @param WP_Post $post The current post to be indexed.
  */
 function hcommons_filter_ep_prepare_meta_allowed_protected_keys( array $keys = [], WP_Post $post ) {
@@ -66,7 +66,7 @@ add_action( 'pre_get_posts', 'hcommons_add_terms_to_search_query', 20 );
  */
 function hcommons_filter_ep_search_results_array( array $results, array $response, array $args, string $scope ) {
 	$abbreviate_match = function( $str, $pos ) {
-		$strlen = strlen( get_search_query() );
+		$strlen  = strlen( get_search_query() );
 		$padding = 20 * $strlen; // Max characters to include on either side of the matched text.
 		return substr( strip_tags( $str ), ( $pos - $padding > 0 ) ? $pos - $padding : 0, 2 * $padding );
 	};
@@ -100,7 +100,7 @@ function hcommons_filter_ep_search_results_array( array $results, array $respons
 		 */
 		foreach ( $matched_text as $i => $match ) {
 			// Adjust comparison for different filtering.
-			$clean_match = preg_replace( '/\s+/', ' ', strip_tags( $match ) );
+			$clean_match   = preg_replace( '/\s+/', ' ', strip_tags( $match ) );
 			$clean_excerpt = preg_replace( '/\s+/', ' ', strip_tags( $post['post_excerpt'] ) );
 
 			if ( false !== strpos( $clean_excerpt, $clean_match ) ) {

@@ -5,4 +5,4 @@
  * @package Hc_Custom
  */
 
-load_plugin_textdomain( 'bp-rbe', false, dirname( basename( __FILE__ ) ). '/languages/' );
+load_plugin_textdomain( 'bp-rbe', false, dirname( basename( __FILE__ ) ) . '/languages/' );

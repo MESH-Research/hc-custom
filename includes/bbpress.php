@@ -9,8 +9,8 @@
  * Ensure forum posts by group admins who are society members are never marked as spam.
  */
 function hcommons_allow_society_group_admins_ham( $topic_data ) {
-	$user_id = get_current_user_id();
-	$group_ids = bbp_get_forum_group_ids( $_REQUEST['bbp_forum_id'] );
+	$user_id                        = get_current_user_id();
+	$group_ids                      = bbp_get_forum_group_ids( $_REQUEST['bbp_forum_id'] );
 	$current_user_is_society_member = ( 1 < count( Humanities_Commons::hcommons_get_user_memberships() ) );
 
 	foreach ( $group_ids as $group_id ) {
