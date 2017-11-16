@@ -6,8 +6,6 @@
  */
 
 /**
-
-/**
  * add core deposit metadata to index
  *
  * @param array $keys Array of index-able private meta keys.
