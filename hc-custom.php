@@ -13,6 +13,5 @@
  */
 
 require_once trailingslashit( __DIR__ ) . 'includes/bbpress.php';
-require_once trailingslashit( __DIR__ ) . 'includes/bp-reply-by-email.php';
 require_once trailingslashit( __DIR__ ) . 'includes/elasticpress-buddypress.php';
 require_once trailingslashit( __DIR__ ) . 'includes/mla-groups.php';
