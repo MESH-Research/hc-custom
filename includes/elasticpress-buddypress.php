@@ -25,6 +25,27 @@ function hcommons_filter_ep_prepare_meta_allowed_protected_keys( array $keys = [
 add_filter( 'ep_prepare_meta_allowed_protected_keys', 'hcommons_filter_ep_prepare_meta_allowed_protected_keys', 10, 2 );
 
 /**
+ * Ensure $post->permalink is used rather than the_permalink() to handle cross-network results.
+ *
+ * @param string $post_link permalink
+ * @return string
+ */
+function hcommons_filter_post_type_link( string $post_link = '' ) {
+	global $post;
+
+	if (
+		is_search() &&
+		get_query_var( 'ep_integrate' ) &&
+		'humcore_deposit' === $post->post_type
+	) {
+		$post_link = $post->permalink;
+	}
+
+	return $post_link;
+}
+add_filter( 'post_type_link', 'hcommons_filter_post_type_link', 20 );
+
+/**
  * Add custom taxonomies to elasticsearch queries.
  *
  * @param WP_Query $query Search query.
