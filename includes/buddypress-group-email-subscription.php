@@ -143,3 +143,20 @@ function hcommons_filter_ass_digest_format_item_group( $group_message, $group_id
 	return $group_message;
 };
 add_filter( 'ass_digest_format_item_group', 'hcommons_filter_ass_digest_format_item_group', 10, 5 );
+
+
+/**
+ * Remove activity items that don't belong to the current network from digest emails
+ */
+function hcommons_filter_ass_digest_group_activity_ids( $group_activity_ids ) {
+	$network_activity_ids = [];
+
+	foreach ( $group_activity_ids as $group_id => $activity_ids ) {
+		if ( Humanities_Commons::$society_id === bp_groups_get_group_type( $group_id ) ) {
+			$network_activity_ids[ $group_id ] = $activity_ids;
+		}
+	}
+
+	return $network_activity_ids;
+}
+add_action( 'ass_digest_group_activity_ids', 'hcommons_filter_ass_digest_group_activity_ids' );
