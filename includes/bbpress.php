@@ -46,3 +46,20 @@ function hcommons_fix_group_forum_permalinks( $url ) {
 }
 // Priority 20 to run after CBox_BBP_Autoload->override_the_permalink_with_group_permalink().
 add_filter( 'the_permalink', 'hcommons_fix_group_forum_permalinks', 20 );
+
+/**
+   * Disables the forum subscription link
+   *
+   * A custom wrapper for bbp_get_user_subscribe_link()
+   *
+   * @uses bbp_parse_args()
+   * @uses bbp_get_user_subscribe_link()
+   */
+function hcommons_get_forum_subscribe_link( $args = array() ) {
+    
+    //No link
+    $retval = false;
+
+    return $retval;
+}
+add_filter( 'bbp_get_forum_subscribe_link', 'hcommons_get_forum_subscribe_link' );
