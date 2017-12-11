@@ -160,3 +160,20 @@ function hcommons_filter_ass_digest_group_activity_ids( $group_activity_ids ) {
 	return $network_activity_ids;
 }
 add_action( 'ass_digest_group_activity_ids', 'hcommons_filter_ass_digest_group_activity_ids' );
+
+/**
+ * attempt to catch and prevent any "blank" digest emails from going out
+ */
+function hcommons_filter_ass_digest_summary_full( $summary ) {
+	// start with a clean slate, handle below if we need to kill this particular email
+	remove_filter( 'ass_send_email_args', '__return_false' );
+
+	// this should contain the name of at least one group. otherwise it's a problem, kill it
+	if ( 'Group Summary:' === trim( strip_tags( $summary ) ) ) {
+		error_log( 'DIGEST: killed empty digest with summary: ' . $summary );
+		add_filter( 'ass_send_email_args', '__return_false' );
+	}
+
+	return $summary;
+}
+add_filter( 'ass_digest_summary_full', 'hcommons_filter_ass_digest_summary_full' );
