@@ -5,6 +5,29 @@
  * @package Hc_Custom
  */
 
+/**
+ * Add a line break after "Replying to this email will not..."
+ * Assumes HTML email, plaintext not supported.
+ *
+ * @param string $notice Non-RBE notice.
+ * @return string
+ */
+function hcommons_filter_bp_rbe_get_nonrbe_notice( string $notice ) {
+	return $notice . '<br>';
+}
+add_action( 'bp_rbe_get_nonrbe_notice', 'hcommons_filter_bp_rbe_get_nonrbe_notice' );
+
+/**
+ * Add nested reply formatting to digests.
+ *
+ * @param string $group_message
+ * @param int    $group_id
+ * @param string $type
+ * @param array  $activity_ids
+ * @param int    $user_id
+ *
+ * @return string Filtered group message
+ */
 function hcommons_filter_ass_digest_format_item_group( $group_message, $group_id, $type, $activity_ids, $user_id ) {
 	global $bp, $ass_email_css;
 
@@ -144,9 +167,13 @@ function hcommons_filter_ass_digest_format_item_group( $group_message, $group_id
 };
 add_filter( 'ass_digest_format_item_group', 'hcommons_filter_ass_digest_format_item_group', 10, 5 );
 
-
 /**
  * Remove activity items that don't belong to the current network from digest emails
+ *
+ * @uses Humanities_Commons
+ *
+ * @param array $group_activity_ids List of activities keyed by group ID
+ * @return array Only those activity IDs belonging to the current network
  */
 function hcommons_filter_ass_digest_group_activity_ids( $group_activity_ids ) {
 	$network_activity_ids = [];
@@ -155,6 +182,18 @@ function hcommons_filter_ass_digest_group_activity_ids( $group_activity_ids ) {
 		if ( Humanities_Commons::$society_id === bp_groups_get_group_type( $group_id ) ) {
 			$network_activity_ids[ $group_id ] = $activity_ids;
 		}
+
+		// Sanity check for activity age - very old items should not be sent.
+		// Allow for weekly digests to include one prior week of potentially delayed items.
+		// Beyond that, consider the inclusion of this activity a bug and remove it.
+		foreach ( $activity_ids as $i => $activity_id ) {
+			$activity = new BP_Activity_Activity( $activity_id );
+			$activity_age = time() - strtotime( $activity->date_recorded );
+
+			if ( $activity_age > 2 * WEEK_IN_SECONDS ) {
+				unset( $activity_ids[ $i ] );
+			}
+		}
 	}
 
 	return $network_activity_ids;
@@ -162,30 +201,45 @@ function hcommons_filter_ass_digest_group_activity_ids( $group_activity_ids ) {
 add_action( 'ass_digest_group_activity_ids', 'hcommons_filter_ass_digest_group_activity_ids' );
 
 /**
- * attempt to catch and prevent any "blank" digest emails from going out
+ * Sanity checks for email digests:
+ * * Number of items should be reasonably small
+ * * Age of items should be reasonably recent
+ * * Origin network should be consistent per-digest (no cross-network activities)
+ *
+ * @uses Humanities_Commons
+ *
+ * @param string $summary
+ * @return string summary
  */
-function hcommons_filter_ass_digest_summary_full( $summary ) {
+function hcommons_filter_ass_digest_summary_full( string $summary ) {
 	// start with a clean slate, handle below if we need to kill this particular email
 	remove_filter( 'ass_send_email_args', '__return_false' );
 
-	// this should contain the name of at least one group. otherwise it's a problem, kill it
-	if ( 'Group Summary:' === trim( strip_tags( $summary ) ) ) {
-		error_log( 'DIGEST: killed empty digest with summary: ' . $summary );
+	/**
+	 * Prevent this digest from being sent to the current user.
+	 */
+	$skip_current_user_digest = function() use ( $summary ) {
+		error_log( 'DIGEST: killed digest with summary: ' . $summary );
 		add_filter( 'ass_send_email_args', '__return_false' );
+	};
+
+	/**
+	 * This is intended to prevent very large digest emails from being sent,
+	 * whether due to lots of legitimate activity or erroneous filtering.
+	 */
+	preg_match_all( '/\((\d+) items\)/', $summary, $matches, PREG_PATTERN_ORDER );
+	foreach ( $matches[1] as $num_items ) {
+		if ( $num_items > 50 ) {
+			$skip_current_user_digest();
+		}
+	}
+
+	// This should contain the name of at least one group.
+	if ( 'Group Summary:' === trim( strip_tags( $summary ) ) ) {
+		$skip_current_user_digest();
 	}
 
 	return $summary;
 }
 add_filter( 'ass_digest_summary_full', 'hcommons_filter_ass_digest_summary_full' );
 
-/**
- * Add a line break after "Replying to this email will not..."
- * Assumes HTML email, plaintext not supported.
- *
- * @param string $notice Non-RBE notice.
- * @return string
- */
-function hcommons_filter_bp_rbe_get_nonrbe_notice( string $notice ) {
-	return $notice . '<br>';
-}
-add_action( 'bp_rbe_get_nonrbe_notice', 'hcommons_filter_bp_rbe_get_nonrbe_notice' );
