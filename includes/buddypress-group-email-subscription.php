@@ -177,3 +177,15 @@ function hcommons_filter_ass_digest_summary_full( $summary ) {
 	return $summary;
 }
 add_filter( 'ass_digest_summary_full', 'hcommons_filter_ass_digest_summary_full' );
+
+/**
+ * Add a line break after "Replying to this email will not..."
+ * Assumes HTML email, plaintext not supported.
+ *
+ * @param string $notice Non-RBE notice.
+ * @return string
+ */
+function hcommons_filter_bp_rbe_get_nonrbe_notice( string $notice ) {
+	return $notice . '<br>';
+}
+add_action( 'bp_rbe_get_nonrbe_notice', 'hcommons_filter_bp_rbe_get_nonrbe_notice' );
