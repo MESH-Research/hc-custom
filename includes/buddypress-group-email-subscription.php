@@ -6,6 +6,15 @@
  */
 
 /**
+ * Remove BPGES actions since we use crontab instead of WP cron.
+ */
+function hcommons_remove_bpges_actions() {
+	remove_action( 'ass_digest_event', 'ass_daily_digest_fire' );
+	remove_action( 'ass_digest_event_weekly', 'ass_weekly_digest_fire' );
+}
+add_action( 'bp_init', 'hcommons_remove_bpges_actions' );
+
+/**
  * Add a line break after "Replying to this email will not..."
  * Assumes HTML email, plaintext not supported.
  *
