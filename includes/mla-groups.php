@@ -215,6 +215,11 @@ function mla_is_group_committee( $group_id = 0 ) {
 		$group_id = bp_get_current_group_id();
 	}
 
+	// 2018 MLA Convention is a committee according to the OID but is not in fact a committee.
+	if ( 1001221 === $group_id ) {
+		return false;
+	}
+
 	// if mla_oid starts with "M," it's a committee
 	return ( 'M' == substr( groups_get_groupmeta( $group_id, 'mla_oid' ), 0, 1 ) ) ? true : false;
 }
