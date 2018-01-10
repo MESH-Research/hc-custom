@@ -14,6 +14,9 @@ function hc_add_login_redirect_script() {
 		shibboleth_get_option( 'shibboleth_login_url' )
 	);
 
-	echo "<script>window.location = '$redirect_url'</script>";
+	// Only add redirect script if password-protected is not active, otherwise this causes a loop.
+	if ( ! class_exists( 'Password_Protected' ) ) {
+		echo "<script>window.location = '$redirect_url'</script>";
+	}
 }
 add_action( 'login_enqueue_scripts', 'hc_add_login_redirect_script' );
