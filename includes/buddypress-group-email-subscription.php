@@ -195,7 +195,6 @@ function hcommons_filter_ass_digest_format_item_group( $group_message, $group_id
 
 					$view_link = $activity_item->primary_link;
 
-
 					$group_message .= ' - <a class="digest-item-view-link" href="' . ass_get_login_redirect_url( $view_link ) .'">' . __( 'View', 'bp-ass' ) . '</a>';
 
 					$group_message .= "</div>\n\n";
