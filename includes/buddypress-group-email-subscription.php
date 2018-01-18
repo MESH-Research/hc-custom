@@ -63,6 +63,7 @@ function hcommons_filter_ass_digest_format_item_group( $group_message, $group_id
 	$group_message .= "</div>\n\n";
 
 	$group_message = apply_filters( 'ass_digest_group_message_title', $group_message, $group_id, $type );
+	
 	// Sort activity items and group by forum topic, where possible.
 	$grouped_activity_ids = array(
 		'topics' => array(),
