@@ -174,10 +174,11 @@ function hcommons_filter_ass_digest_format_item_group( $group_message, $group_id
 
 					$occurrences = eo_get_the_occurrences_of( $event_id );
 
-	        		if($occurrences)
-	        		{
-	            		$occurence_ids = array_keys( $occurrences );
+	        		if($occurrences) {
+	                	$occurence_ids = array_keys( $occurrences );
 	                    $occurence_id = $occurence_ids[0];
+	                } else {
+	                	continue;
 	                }
 
 					$event_date = eo_get_the_start( 'g:i a jS M Y' , $event_id, $occurence_id );
