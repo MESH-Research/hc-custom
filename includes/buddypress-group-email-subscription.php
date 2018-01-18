@@ -169,41 +169,41 @@ function hcommons_filter_ass_digest_format_item_group( $group_message, $group_id
 
 		if ( ! empty( $activity_item ) ) {
 
-			if( 'bpeo_create_event' === $activity_item->type ) {
-					$event_id = $activity_item->secondary_item_id;
+		    if( 'bpeo_create_event' === $activity_item->type ) {
+				$event_id = $activity_item->secondary_item_id;
 
-					$occurrences = eo_get_the_occurrences_of( $event_id );
+				$occurrences = eo_get_the_occurrences_of( $event_id );
 
-	        		if($occurrences) {
-	                	$occurence_ids = array_keys( $occurrences );
-	                    $occurence_id = $occurence_ids[0];
-	                } else {
-	                	continue;
-	                }
+        		if($occurrences) {
+                	$occurence_ids = array_keys( $occurrences );
+                    $occurence_id = $occurence_ids[0];
+                } else {
+                	continue;
+                }
 
-					$event_date = eo_get_the_start( 'g:i a jS M Y' , $event_id, $occurence_id );
+				$event_date = eo_get_the_start( 'g:i a jS M Y' , $event_id, $occurence_id );
 
-					$group_message .=  "<div class=\"digest-item\" {$ass_email_css['item_div']}>";
-					$group_message .=  "<span class=\"digest-item-action\" {$ass_email_css['item_action']}>" . $activity_item->action . ": ";
-					$group_message .= "<span class=\"digest-item-timestamp\" {$ass_email_css['item_date']}>" . sprintf( __('at %s', 'bp-ass'), $event_date)  ."</span>";
-					$group_message .=  "</span>\n";
+				$group_message .=  "<div class=\"digest-item\" {$ass_email_css['item_div']}>";
+				$group_message .=  "<span class=\"digest-item-action\" {$ass_email_css['item_action']}>" . $activity_item->action . ": ";
+				$group_message .= "<span class=\"digest-item-timestamp\" {$ass_email_css['item_date']}>" . sprintf( __('at %s', 'bp-ass'), $event_date)  ."</span>";
+				$group_message .=  "</span>\n";
 
-					// activity content
-					if ( ! empty( $activity_item->content ) ) {
-						$item_message .= "<br><span class=\"digest-item-content\" {$ass_email_css['item_content']}>" . apply_filters( 'ass_digest_content', $activity_item->content, $activity_item, $type ) . "</span>";
-					}
-
-					$view_link = $activity_item->primary_link;
-
-					$group_message .= ' - <a class="digest-item-view-link" href="' . ass_get_login_redirect_url( $view_link ) .'">' . __( 'View', 'bp-ass' ) . '</a>';
-
-					$group_message .= "</div>\n\n";
-
-				} else {
-					$group_message .= ass_digest_format_item( $activity_item, $type );
+				// activity content
+				if ( ! empty( $activity_item->content ) ) {
+					$item_message .= "<br><span class=\"digest-item-content\" {$ass_email_css['item_content']}>" . apply_filters( 'ass_digest_content', $activity_item->content, $activity_item, $type ) . "</span>";
 				}
+
+				$view_link = $activity_item->primary_link;
+
+				$group_message .= ' - <a class="digest-item-view-link" href="' . ass_get_login_redirect_url( $view_link ) .'">' . __( 'View', 'bp-ass' ) . '</a>';
+
+				$group_message .= "</div>\n\n";
+
+			} else {
+				$group_message .= ass_digest_format_item( $activity_item, $type );
 			}
 		}
+	}
 
 	return $group_message;
 };
