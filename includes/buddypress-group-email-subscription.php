@@ -193,7 +193,7 @@ function hcommons_filter_ass_digest_format_item_group( $group_message, $group_id
 						$item_message .= "<br><span class=\"digest-item-content\" {$ass_email_css['item_content']}>" . apply_filters( 'ass_digest_content', $activity_item->content, $activity_item, $type ) . "</span>";
 					}
 
-					$view_link = $actitem->primary_link;
+					$view_link = $activity_item->primary_link;
 
 
 					$group_message .= ' - <a class="digest-item-view-link" href="' . ass_get_login_redirect_url( $view_link ) .'">' . __( 'View', 'bp-ass' ) . '</a>';
