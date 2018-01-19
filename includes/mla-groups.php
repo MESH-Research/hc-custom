@@ -110,7 +110,7 @@ class MLA_Groups {
 	}
 
 	function filter_bp_before_has_groups_parse_args( $args ) {
-		$type = $_COOKIE['bp-groups-type'];
+		$type = ( isset( $_COOKIE['bp-groups-type'] ) ) ? $_COOKIE['bp-groups-type'] : false;
 
 		if ( bp_is_groups_directory() && ! empty( $type ) ) {
 			switch ( $type ) {
