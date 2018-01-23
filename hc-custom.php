@@ -17,3 +17,4 @@ require_once trailingslashit( __DIR__ ) . 'includes/bbpress.php';
 require_once trailingslashit( __DIR__ ) . 'includes/elasticpress-buddypress.php';
 require_once trailingslashit( __DIR__ ) . 'includes/mla-groups.php';
 require_once trailingslashit( __DIR__ ) . 'includes/buddypress-group-email-subscription.php';
+require_once trailingslashit( __DIR__ ) . 'includes/siteorigin-panels.php';
