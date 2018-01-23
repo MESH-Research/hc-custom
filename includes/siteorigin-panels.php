@@ -15,3 +15,10 @@ function hc_remove_siteorigin_register_widgets_on_docs() {
 	}
 }
 add_action( 'widgets_init', 'hc_remove_siteorigin_register_widgets_on_docs' );
+
+/**
+ * Unless this is disabled, admin pages perform poorly due to all the widget initialization on every page.
+ */
+if ( is_admin() ) {
+	add_filter( 'siteorigin_panels_filter_content_enabled', '__return_false' );
+}
