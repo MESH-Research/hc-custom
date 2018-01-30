@@ -93,7 +93,6 @@ add_filter( 'bbp_get_forum_subscribe_link', 'hcommons_get_forum_subscribe_link' 
 /**
    * Disables "followers" menu item on the top right
    *
-   *
    * @uses $wp_admin_bar
    */
 function hcommons_admin_bar_remove_this() {
