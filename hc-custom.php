@@ -19,3 +19,5 @@ require_once trailingslashit( __DIR__ ) . 'includes/humcore.php';
 require_once trailingslashit( __DIR__ ) . 'includes/mla-groups.php';
 require_once trailingslashit( __DIR__ ) . 'includes/buddypress-group-email-subscription.php';
 require_once trailingslashit( __DIR__ ) . 'includes/siteorigin-panels.php';
+require_once trailingslashit( __DIR__ ) . 'includes/buddypress-followers.php';
+
