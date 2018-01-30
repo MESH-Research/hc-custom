@@ -51,7 +51,6 @@ function filter_bp_xprofile_add_xprofile_query_to_user_query( BP_User_Query $q )
 
         $members_search =  !empty($_REQUEST['members_search']) ? sanitize_text_field($_REQUEST['members_search']) : sanitize_text_field($_REQUEST['search_terms']);
 
-
         if(isset($members_search) && !empty($members_search)) {
 
            $args = array('xprofile_query' => array('relation' => 'AND',
