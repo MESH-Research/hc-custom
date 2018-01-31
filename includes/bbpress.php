@@ -49,18 +49,17 @@ add_filter( 'the_permalink', 'hcommons_fix_group_forum_permalinks', 20 );
 
 function filter_bp_xprofile_add_xprofile_query_to_user_query( BP_User_Query $q ) {
 
-        $members_search =  !empty($_REQUEST['members_search']) ? sanitize_text_field($_REQUEST['members_search']) : sanitize_text_field($_REQUEST['search_terms']); 
-               
-                             
+        $members_search =  !empty($_REQUEST['members_search']) ? sanitize_text_field($_REQUEST['members_search']) : sanitize_text_field($_REQUEST['search_terms']);
+
         if(isset($members_search) && !empty($members_search)) {
-            
+
            $args = array('xprofile_query' => array('relation' => 'AND',
                     array(
                        'field' => 'Name',
                        'value' => $members_search,
                        'compare' => 'LIKE',
                      )));
-       
+
             $xprofile_query = new BP_XProfile_Query( $args );
             $sql            = $xprofile_query->get_sql( 'u', $q->uid_name );
 
@@ -68,7 +67,7 @@ function filter_bp_xprofile_add_xprofile_query_to_user_query( BP_User_Query $q )
                 $q->uid_clauses['select'] .= $sql['join'];
                 $q->uid_clauses['where'] .= $sql['where'];
             }
-        }   
+        }
 }
 
 add_action( 'bp_pre_user_query', 'filter_bp_xprofile_add_xprofile_query_to_user_query' );
@@ -82,10 +81,11 @@ add_action( 'bp_pre_user_query', 'filter_bp_xprofile_add_xprofile_query_to_user_
    * @uses bbp_get_user_subscribe_link()
    */
 function hcommons_get_forum_subscribe_link( $args = array() ) {
-    
+
     //No link
     $retval = false;
 
     return $retval;
 }
 add_filter( 'bbp_get_forum_subscribe_link', 'hcommons_get_forum_subscribe_link' );
+
