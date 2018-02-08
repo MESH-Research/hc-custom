@@ -13,7 +13,7 @@
  * @param mixed  $default  Default value.
  * @return mixed Property value or default value.
  */
-function get_object_property( $obj, string $property, $default ) {
+function get_object_property( $obj, $property, $default ) {
 	return ( property_exists( $obj, $property ) ) ? $obj->$property : $default;
 }
 
@@ -58,20 +58,22 @@ function hide_join_button( $group ) {
 		return;
 	}
 
-	return \bp_group_join_button( $group );
+	if ( class_exists( 'Humanities_Commons' ) && 'mla' !== Humanities_Commons::$society_id ) {
+		return \bp_group_join_button( $group );
+	}
 }
 
-add_action( 'bp_group_header_actions', 'hide_join_button', 1 );
-add_action( 'bp_directory_groups_actions', 'hide_join_button', 1 );
+add_action( 'bp_group_header_actions', 'hide_join_button', 1);
+add_action( 'bp_directory_groups_actions', 'hide_join_button', 1);
 
 /**
  * Hide the request membership tab for committees.
  *
  * @param string $string Unchanged filter string.
  */
-function hide_request_membership_tab( string $string ) {
+function hide_request_membership_tab ( $string ) {
 	return ( 'committee' === get_group_type() ) ? null : $string;
 }
 
-add_filter( 'bp_get_options_nav_request-membership', 'hide_request_membership_tab' );
+add_filter( 'bp_get_options_nav_request-membership', 'hide_request_membership_tab');
 
