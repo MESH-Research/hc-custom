@@ -18,8 +18,8 @@ function get_object_property( $obj, string $property, $default ) {
 }
 
 /**
- * Get group type.
- */
+* Get group type.
+*/
 function get_group_type() {
 	global $groups_template;
 
@@ -64,7 +64,6 @@ function hide_join_button( $group ) {
 add_action( 'bp_group_header_actions', 'hide_join_button', 1 );
 add_action( 'bp_directory_groups_actions', 'hide_join_button', 1 );
 
-
 /**
  * Hide the request membership tab for committees.
  *
@@ -75,8 +74,4 @@ function hide_request_membership_tab( string $string ) {
 }
 
 add_filter( 'bp_get_options_nav_request-membership', 'hide_request_membership_tab' );
-
-
-
-
 
