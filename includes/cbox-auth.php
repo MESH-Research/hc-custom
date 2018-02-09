@@ -13,17 +13,17 @@
  * @param mixed  $default  Default value.
  * @return mixed Property value or default value.
  */
-function get_object_property( $obj, $property, $default ) {
+function hc_custom_get_object_property( $obj, $property, $default ) {
 	return ( property_exists( $obj, $property ) ) ? $obj->$property : $default;
 }
 
 /**
 * Get group type.
 */
-function get_group_type() {
+function hc_custom_get_group_type() {
 	global $groups_template;
 
-	if ( $groups_template && get_object_property( $groups_template, 'group', false ) ) {
+	if ( $groups_template && hc_custom_get_object_property( $groups_template, 'group', false ) ) {
 		$bp_id = $groups_template->group->id;
 		return strtolower( \groups_get_groupmeta( $bp_id, 'society_group_type', true ) );
 	}
@@ -37,10 +37,10 @@ function get_group_type() {
  *
  * @param BP_Groups_Group $group BuddyPress group.
  */
-function hide_join_button( $group ) {
+function hc_custom_hide_join_button( $group ) {
 
 	$user_id = \bp_loggedin_user_id();
-	$group_type = get_group_type();
+	$group_type = hc_custom_get_group_type();
 
 	// Remove the other actions that would create this button.
 	$actions = array(
@@ -63,17 +63,17 @@ function hide_join_button( $group ) {
 	}
 }
 
-add_action( 'bp_group_header_actions', 'hide_join_button', 1);
-add_action( 'bp_directory_groups_actions', 'hide_join_button', 1);
+add_action( 'bp_group_header_actions', 'hc_custom_hide_join_button', 1);
+add_action( 'bp_directory_groups_actions', 'hc_custom_hide_join_button', 1);
 
 /**
  * Hide the request membership tab for committees.
  *
  * @param string $string Unchanged filter string.
  */
-function hide_request_membership_tab ( $string ) {
-	return ( 'committee' === get_group_type() ) ? null : $string;
+function hc_custom_hide_request_membership_tab ( $string ) {
+	return ( 'committee' === hc_custom_get_group_type() ) ? null : $string;
 }
 
-add_filter( 'bp_get_options_nav_request-membership', 'hide_request_membership_tab');
+add_filter( 'bp_get_options_nav_request-membership', 'hc_custom_hide_request_membership_tab');
 
