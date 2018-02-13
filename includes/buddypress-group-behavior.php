@@ -15,9 +15,9 @@
  */
 
 function hc_custom_bp_get_signup_page( $register_url ) {
-    $register_url  = '/begin/';
+	$register_url  = '/begin/';
 
-    return $register_url;
+	return $register_url;
 };
 
 add_filter( 'bp_get_signup_page', 'hc_custom_bp_get_signup_page', 10, 1 );
@@ -32,21 +32,21 @@ add_filter( 'bp_get_signup_page', 'hc_custom_bp_get_signup_page', 10, 1 );
 
 function hc_custom_get_env_url( $atts ) {
 	$a = shortcode_atts( array(
-		 'id'    => '',
-		 'class' => '',
-		 'text'  =>  ''
+		'id'    => '',
+		'class' => '',
+		'text'  => '',
 	), $atts );
 
-	if(empty($a['text'])) {
+	if ( empty( $a['text'] ) ) {
 		return;
 	}
 
-	$id = ( !empty($a['id']) ? 'id="'. $a['id'] .'"' : '');
+	$id = ( ! empty( $a['id'] ) ? 'id="'. $a['id'] .'"' : '');
 
-	$class = ( !empty($a['class']) ? 'class="'. $a['class'] .'"' : '');
+	$class = ( ! empty( $a['class'] ) ? 'class="'. $a['class'] .'"' : '');
 
 	if ( class_exists( 'Humanities_Commons' ) && ! empty( Humanities_Commons::$society_id ) && defined( strtoupper( Humanities_Commons::$society_id ) . '_ENROLLMENT_URL' ) ) {
-        $env_url = '<a href="' . constant( strtoupper( Humanities_Commons::$society_id ) . '_ENROLLMENT_URL') . '/done:core"'. $id .' '. $class .'>' . $a['text'] . '</a>';
+		$env_url = '<a href="' . constant( strtoupper( Humanities_Commons::$society_id ) . '_ENROLLMENT_URL' ) . '/done:core"'. $id .' '. $class .'>' . $a['text'] . '</a>';
 
 		return $env_url;
 	}
