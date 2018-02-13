@@ -33,25 +33,27 @@ add_filter( 'the_permalink', 'hcommons_fix_group_forum_permalinks', 20 );
 
 function filter_bp_xprofile_add_xprofile_query_to_user_query( BP_User_Query $q ) {
 
-        $members_search =  !empty($_REQUEST['members_search']) ? sanitize_text_field($_REQUEST['members_search']) : sanitize_text_field($_REQUEST['search_terms']);
+	if ( bp_is_group_members() ) {
+		$members_search =  !empty($_REQUEST['members_search']) ? sanitize_text_field($_REQUEST['members_search']) : sanitize_text_field($_REQUEST['search_terms']);
 
-        if(isset($members_search) && !empty($members_search)) {
+		if(isset($members_search) && !empty($members_search)) {
 
-           $args = array('xprofile_query' => array('relation' => 'AND',
-                    array(
-                       'field' => 'Name',
-                       'value' => $members_search,
-                       'compare' => 'LIKE',
-                     )));
+			$args = array('xprofile_query' => array('relation' => 'AND',
+				array(
+					'field' => 'Name',
+					'value' => $members_search,
+					'compare' => 'LIKE',
+				)));
 
-            $xprofile_query = new BP_XProfile_Query( $args );
-            $sql            = $xprofile_query->get_sql( 'u', $q->uid_name );
+			$xprofile_query = new BP_XProfile_Query( $args );
+			$sql            = $xprofile_query->get_sql( 'u', $q->uid_name );
 
-            if ( ! empty( $sql['join'] ) ) {
-                $q->uid_clauses['select'] .= $sql['join'];
-                $q->uid_clauses['where'] .= $sql['where'];
-            }
-        }
+			if ( ! empty( $sql['join'] ) ) {
+				$q->uid_clauses['select'] .= $sql['join'];
+				$q->uid_clauses['where'] .= $sql['where'];
+			}
+		}
+	}
 }
 
 add_action( 'bp_pre_user_query', 'filter_bp_xprofile_add_xprofile_query_to_user_query' );
