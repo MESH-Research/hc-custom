@@ -30,7 +30,7 @@ add_filter( 'bp_get_signup_page', 'hc_custom_bp_get_signup_page', 10, 1 );
  * @return string env url.
  */
 
-function hc_custom_get_env_url( $atts ) {
+function hcommons_get_society_enrollment_url( $atts ) {
 	$a = shortcode_atts( array(
 		'id'    => '',
 		'class' => '',
@@ -41,15 +41,17 @@ function hc_custom_get_env_url( $atts ) {
 		return;
 	}
 
-	$id = ( ! empty( $a['id'] ) ? 'id="'. $a['id'] .'"' : '');
+	$id = ( ! empty( $a['id'] ) ? $a['id'] : '');
 
-	$class = ( ! empty( $a['class'] ) ? 'class="'. $a['class'] .'"' : '');
+	$class = ( ! empty( $a['class'] ) ? $a['class'] : '');
 
 	if ( class_exists( 'Humanities_Commons' ) && ! empty( Humanities_Commons::$society_id ) && defined( strtoupper( Humanities_Commons::$society_id ) . '_ENROLLMENT_URL' ) ) {
-		$env_url = '<a href="' . constant( strtoupper( Humanities_Commons::$society_id ) . '_ENROLLMENT_URL' ) . '/done:core"'. $id .' '. $class .'>' . $a['text'] . '</a>';
+		$enrollment_url = constant( strtoupper( Humanities_Commons::$society_id ) . '_ENROLLMENT_URL' ) . '/done:core';
+
+		$env_url = sprintf('<a href="%s" id="%s" class="%s">%s</a>', $enrollment_url, $id, $class, $a['text']);
 
 		return $env_url;
 	}
 }
 
-add_shortcode( 'hc_custom_env_url', 'hc_custom_get_env_url' );
+add_shortcode( 'hcommons_society_enrollment_url', 'hcommons_get_society_enrollment_url' );
