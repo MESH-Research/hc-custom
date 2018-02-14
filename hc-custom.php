@@ -21,6 +21,6 @@ require_once trailingslashit( __DIR__ ) . 'includes/buddypress-group-email-subsc
 require_once trailingslashit( __DIR__ ) . 'includes/siteorigin-panels.php';
 require_once trailingslashit( __DIR__ ) . 'includes/buddypress-followers.php';
 require_once trailingslashit( __DIR__ ) . 'includes/cbox-auth.php';
-
+require_once trailingslashit( __DIR__ ) . 'includes/buddypress-group-behavior.php';
 
 
