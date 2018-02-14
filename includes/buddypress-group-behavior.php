@@ -6,23 +6,6 @@
  */
 
 /**
- * Filter the register url to be society specific
- *
- * @since HCommons
- *
- * @param string $register_url
- * @return string $register_url Modified url.
- */
-
-function hc_custom_bp_get_signup_page( $register_url ) {
-	$register_url  = '/begin/';
-
-	return $register_url;
-};
-
-add_filter( 'bp_get_signup_page', 'hc_custom_bp_get_signup_page', 10, 1 );
-
-/**
  * Add shortcode to get the enrollment url
  *
  * @since HCommons
