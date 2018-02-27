@@ -284,3 +284,31 @@ function hcommons_filter_ass_digest_summary_full( string $summary ) {
 	return $summary;
 }
 add_filter( 'ass_digest_summary_full', 'hcommons_filter_ass_digest_summary_full' );
+
+/**
+ * Modify the default bbp_reply_create subject
+ *
+ * @param string $activity_text The subject line of the e-mail.
+ *
+ * @param object $activity The BP_Activity_Activity object for this notification.
+ *
+ * @return string $activity_text Return modified string.
+ */
+function hcommons_bp_ass_activity_notification_action( $activity_text, $activity ) {
+	// Only change the subject if it is a reply to a topic.
+	if ( 'bbp_reply_create' === $activity->type ) {
+		$topic_id = bbp_get_reply_topic_id( $activity->secondary_item_id );
+		$topic_permalink = bbp_get_topic_permalink( $topic_id );
+		$topic_title     = get_post_field( 'post_title', $topic_id, 'raw' );
+
+		$activity_text = sprintf( esc_html__( 're: %1$s', 'bbpress' ), $topic_title);
+
+	}
+
+	return $activity_text;
+
+}
+
+add_filter( 'bp_ass_activity_notification_action', 'hcommons_bp_ass_activity_notification_action', 10, 2 );
+
+
