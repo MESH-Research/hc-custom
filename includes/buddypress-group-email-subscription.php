@@ -307,11 +307,11 @@ function hcommons_bp_ass_activity_notification_action( $activity_text, $activity
 
 	switch ( $activity->type ) {
 		case 'bbp_topic_create' :
-			$activity_text = sprintf( esc_html__( '%1$s [%2$s]', 'bbpress' ), $topic_title, $forum_title );
+			$activity_text = sprintf( esc_html__( '%1$s (%2$s)', 'bbpress' ), $topic_title, $forum_title );
 			break;
 
 		case 'bbp_reply_create' :
-			$activity_text = sprintf( esc_html__( 're: %1$s [%2$s]', 'bbpress' ), $topic_title, $forum_title );
+			$activity_text = sprintf( esc_html__( 're: %1$s (%2$s)', 'bbpress' ), $topic_title, $forum_title );
 			break;
 	}
 
