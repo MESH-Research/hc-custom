@@ -296,15 +296,14 @@ add_filter( 'ass_digest_summary_full', 'hcommons_filter_ass_digest_summary_full'
  */
 function hcommons_bp_ass_activity_notification_action( $activity_text, $activity ) {
 	$topic_id = bbp_get_reply_topic_id( $activity->secondary_item_id );
-	$topic_permalink = bbp_get_topic_permalink( $topic_id );
 	$topic_title = get_post_field( 'post_title', $topic_id, 'raw' );
 
-	$topic_title = hcommons_truncate( $topic_title, 50 );
+	$topic_title = wp_trim_words( $topic_title, 7, '...' );
 
 	$forum_id = bbp_get_topic_forum_id( $topic_id );
 	$forum_title = get_post_field( 'post_title', $forum_id, 'raw' );
 
-	$forum_title = hcommons_truncate( $forum_title, 30 );
+	$forum_title = wp_trim_words( $forum_title, 4, '...' );
 
 	switch ( $activity->type ) {
 		case 'bbp_topic_create' :
@@ -321,22 +320,3 @@ function hcommons_bp_ass_activity_notification_action( $activity_text, $activity
 }
 
 add_filter( 'bp_ass_activity_notification_action', 'hcommons_bp_ass_activity_notification_action', 10, 2 );
-
-/**
- * Truncate a string only at a whitespace.
- *
- * @param string $text The subject line of the e-mail.
- *
- * @param int $length Length of the string.
- *
- * @return string $text Return modified string.
- */
-function hcommons_truncate( $text, $length ) {
-	$length = abs( (int) $length );
-
-	if ( strlen( $text ) > $length ) {
-		$text = preg_replace( "/^(.{1,$length})(\s.*|$)/s", '\\1...', $text );
-	}
-
-	return( $text );
-}
