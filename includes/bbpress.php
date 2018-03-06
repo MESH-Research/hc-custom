@@ -81,10 +81,14 @@ add_filter( 'bbp_get_forum_subscribe_link', 'hcommons_get_forum_subscribe_link' 
  * @param array $buttons the permalink.
  */
 function hcommons_tinymce_buttons( $buttons ) {
-	// Remove image.
-	$remove = array( 'image' );
 
-	return array_diff( $buttons, $remove );
+	if ( bp_is_group_forum_topic() ) {
+		// Remove image button.
+		$remove = array( 'image' );
+		$buttons = array_diff( $buttons, $remove );
+	}
+
+	return $buttons;
 }
 
 add_filter( 'mce_buttons', 'hcommons_tinymce_buttons', 21 );
