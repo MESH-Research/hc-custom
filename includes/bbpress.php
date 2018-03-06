@@ -67,11 +67,25 @@ add_action( 'bp_pre_user_query', 'filter_bp_xprofile_add_xprofile_query_to_user_
    * @uses bbp_get_user_subscribe_link()
    */
 function hcommons_get_forum_subscribe_link( $args = array() ) {
-
     //No link
     $retval = false;
 
     return $retval;
 }
+
 add_filter( 'bbp_get_forum_subscribe_link', 'hcommons_get_forum_subscribe_link' );
+
+/**
+ * Disables bbPress image button.
+ *
+ * @param array $buttons the permalink.
+ */
+function hcommons_tinymce_buttons( $buttons ) {
+	// Remove image.
+	$remove = array( 'image' );
+
+	return array_diff( $buttons, $remove );
+}
+
+add_filter( 'mce_buttons', 'hcommons_tinymce_buttons', 21 );
 
