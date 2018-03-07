@@ -33,5 +33,5 @@ function hcommons_exclude_no_latest_post( $args ) {
 	return $args;
 }
 
-add_filter( 'bp_before_has_blogs_parse_args', 'hcommons_exclude_root_blogs', 999 );
+add_filter( 'bp_before_has_blogs_parse_args', 'hcommons_exclude_no_latest_post', 999 );
 
