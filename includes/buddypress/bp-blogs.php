@@ -1,6 +1,6 @@
 <?php
 /**
- * Customizations to buddypress site directory.
+ * Customizations to BuddyPress Blogs.
  *
  * @package Hc_Custom
  */
