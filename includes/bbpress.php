@@ -60,21 +60,8 @@ add_action( 'bp_pre_user_query', 'filter_bp_xprofile_add_xprofile_query_to_user_
 
 /**
  * Disables the forum subscription link.
- *
- * A custom wrapper for bbp_get_user_subscribe_link()
- *
- * @param array $args Subscribe link arguments.
- * @uses bbp_parse_args()
- * @uses bbp_get_user_subscribe_link()
  */
-function hcommons_get_forum_subscribe_link( $args = array() ) {
-	// No link.
-	$retval = false;
-
-	return $retval;
-}
-
-add_filter( 'bbp_get_forum_subscribe_link', 'hcommons_get_forum_subscribe_link' );
+add_filter( 'bbp_get_forum_subscribe_link', '__return_false' );
 
 /**
  * Disables bbPress image button.
