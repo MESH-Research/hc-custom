@@ -204,3 +204,42 @@ function hcommons_filter_ep_bp_fallback_post_type_facet_selection( $post_types )
 	);
 }
 add_filter( 'ep_bp_fallback_post_type_facet_selection', 'hcommons_filter_ep_bp_fallback_post_type_facet_selection' );
+
+function hcommons_filter_ep_indexable_post_types( $post_types ) {
+	return array_unique( array_merge( $post_types, [
+		'humcore_deposit' => 'humcore_deposit',
+	] ) );
+}
+add_filter( 'ep_indexable_post_types', 'hcommons_filter_ep_indexable_post_types' );
+
+/**
+ * filter humcore permalinks (for elasticpress results)
+ */
+function humcore_filter_post_type_link( $post_link, $post ) {
+	if ( 'humcore_deposit' === get_post_type() ) {
+
+		// hope index has the correct permalink or fall back to meta otherwise
+		if ( false !== strpos( $post->permalink, ':' ) ) {
+			$post_link = $post->permalink;
+		} else {
+			$meta = get_post_meta( get_the_ID() );
+
+			// if we're missing post meta, we're probably on the wrong blog for this post.
+			// TODO is there a way to get blog_id for a post, so we can switch_to_blog for meta instead of invoking solr?
+			if ( ! isset( $meta['_deposit_metadata'][0] ) ) {
+				preg_match( '/\/' . get_post_type() . '\/([\w]+)\//', $post_link, $matches );
+				if ( isset( $matches[1] ) ) {
+					$meta = humcore_has_deposits( 'include=' . $matches[1] );
+				}
+			}
+
+			if ( isset( $meta['_deposit_metadata'][0] ) ) {
+				$decoded_deposit_meta = json_decode( $meta['_deposit_metadata'][0] );
+				$post_link = sprintf( '%1$s/deposits/item/%2$s', bp_get_root_domain(), $decoded_deposit_meta->pid );
+			}
+		}
+	}
+
+	return $post_link;
+}
+add_filter( 'post_type_link', 'humcore_filter_post_type_link', 10, 2 );

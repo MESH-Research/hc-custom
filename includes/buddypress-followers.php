@@ -17,3 +17,13 @@ function hcommons_admin_bar_remove_followers() {
 }
 
 add_action( 'wp_before_admin_bar_render','hcommons_admin_bar_remove_followers' );
+
+// prevent users from seeing one another's followers (can only see their own)
+// unfortunately there's no filter to prevent running the query, but we can at least empty the result before rendering
+function hcommons_filter_get_followers( $followers ) {
+	if ( bp_displayed_user_id() !== get_current_user_id() ) {
+		$followers = [];
+	}
+	return $followers;
+}
+add_filter( 'bp_follow_get_followers', 'hcommons_filter_get_followers' );

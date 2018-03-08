@@ -29,4 +29,3 @@ function hcommons_exclude_root_blogs( $args ) {
 }
 
 add_filter( 'bp_before_has_blogs_parse_args', 'hcommons_exclude_root_blogs', 999 );
-

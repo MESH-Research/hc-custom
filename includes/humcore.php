@@ -61,3 +61,12 @@ function hcommons_filter_humcore_groups_list( $groups ) {
 }
 add_filter( 'humcore_deposits_group_list', 'hcommons_filter_humcore_groups_list' );
 
+/**
+ * change post type label for core deposits
+ * TODO either update the actual post type data or put in humcore plugin
+ */
+function hcommons_filter_post_type_labels_humcore_deposit( $labels ) {
+	$labels->name = 'CORE Deposits';
+	return $labels;
+}
+add_filter( 'post_type_labels_humcore_deposit', 'hcommons_filter_post_type_labels_humcore_deposit' );

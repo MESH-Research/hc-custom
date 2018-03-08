@@ -12,14 +12,25 @@
  * @package         Hc_Custom
  */
 
-require_once trailingslashit( __DIR__ ) . 'includes/wp.php';
+/**
+ * BuddyPress actions & filters.
+ */
+require_once trailingslashit( __DIR__ ) . 'includes/buddypress/bp-blogs.php';
+require_once trailingslashit( __DIR__ ) . 'includes/buddypress/bp-groups.php';
+require_once trailingslashit( __DIR__ ) . 'includes/buddypress/bp-members.php';
+
+/**
+ * Plugin actions & filters.
+ */
 require_once trailingslashit( __DIR__ ) . 'includes/bbpress.php';
+require_once trailingslashit( __DIR__ ) . 'includes/buddypress-followers.php';
+require_once trailingslashit( __DIR__ ) . 'includes/buddypress-group-email-subscription.php';
+require_once trailingslashit( __DIR__ ) . 'includes/cbox-auth.php';
 require_once trailingslashit( __DIR__ ) . 'includes/elasticpress-buddypress.php';
 require_once trailingslashit( __DIR__ ) . 'includes/humcore.php';
-require_once trailingslashit( __DIR__ ) . 'includes/mla-groups.php';
-require_once trailingslashit( __DIR__ ) . 'includes/buddypress-group-email-subscription.php';
 require_once trailingslashit( __DIR__ ) . 'includes/siteorigin-panels.php';
-require_once trailingslashit( __DIR__ ) . 'includes/buddypress-followers.php';
-require_once trailingslashit( __DIR__ ) . 'includes/cbox-auth.php';
-require_once trailingslashit( __DIR__ ) . 'includes/buddypress/bp-blogs.php';
 
+/**
+ * Miscellaneous actions & filters.
+ */
+require_once trailingslashit( __DIR__ ) . 'includes/mla-groups.php';
