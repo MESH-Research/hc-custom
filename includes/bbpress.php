@@ -70,7 +70,7 @@ add_filter( 'bbp_get_forum_subscribe_link', '__return_false' );
  */
 function hcommons_tinymce_buttons( $buttons ) {
 
-	if ( bp_is_group_forum_topic() ) {
+	if ( bp_is_group() ) {
 		// Remove image button.
 		$remove = array( 'image' );
 		$buttons = array_diff( $buttons, $remove );
