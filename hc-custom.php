@@ -25,6 +25,7 @@ require_once trailingslashit( __DIR__ ) . 'includes/buddypress/bp-members.php';
 require_once trailingslashit( __DIR__ ) . 'includes/bbpress.php';
 require_once trailingslashit( __DIR__ ) . 'includes/buddypress-followers.php';
 require_once trailingslashit( __DIR__ ) . 'includes/buddypress-group-email-subscription.php';
+require_once trailingslashit( __DIR__ ) . 'includes/buddypress-more-privacy-options.php';
 require_once trailingslashit( __DIR__ ) . 'includes/cbox-auth.php';
 require_once trailingslashit( __DIR__ ) . 'includes/elasticpress-buddypress.php';
 require_once trailingslashit( __DIR__ ) . 'includes/humcore.php';

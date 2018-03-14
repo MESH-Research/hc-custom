@@ -85,3 +85,17 @@ function hcommons_override_cbox_set_group_default_tab( $retval ) {
 }
 add_filter( 'bp_groups_default_extension', 'hcommons_override_cbox_set_group_default_tab', 100 );
 
+/**
+ * BuddyPress Groups Forbidden Group Slugs
+ * Used for groups that have been redirected or slugs that we want to reserve.
+ */
+function mla_bp_groups_forbidden_names( $forbidden_names ) {
+
+	$mla_forbidden_group_slugs = array (
+		'style',
+	);
+
+	return array_merge( $forbidden_names, $mla_forbidden_group_slugs );
+
+}
+add_filter( 'groups_forbidden_names', 'mla_bp_groups_forbidden_names', 10, 1 );
