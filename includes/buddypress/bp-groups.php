@@ -99,3 +99,52 @@ function mla_bp_groups_forbidden_names( $forbidden_names ) {
 
 }
 add_filter( 'groups_forbidden_names', 'mla_bp_groups_forbidden_names', 10, 1 );
+
+/**
+ * Set forums' status to match the privacy status of the associated group
+ *
+ * Fired whenever a group is saved
+ *
+ * @param BP_Groups_Group $group Group object.
+ */
+function update_group_forum_visibility( BP_Groups_Group $group ) {
+
+        // Get group forum IDs
+        $forum_ids = bbp_get_group_forum_ids( $group->id );
+
+        // Bail if no forum IDs available
+        if ( empty( $forum_ids ) ) {
+                return;
+        }
+
+        // Loop through forum IDs
+        foreach ( $forum_ids as $forum_id ) {
+
+                // Get forum from ID
+                $forum = bbp_get_forum( $forum_id );
+
+                // Check for change
+                if ( $group->status !== $forum->post_status ) {
+                        switch ( $group->status ) {
+
+                                // Changed to hidden
+                                case 'hidden' :
+                                        bbp_hide_forum( $forum_id, $forum->post_status );
+                                        break;
+
+                                // Changed to private
+                                case 'private' :
+                                        bbp_privatize_forum( $forum_id, $forum->post_status );
+                                        break;
+
+                                // Changed to public
+                                case 'public' :
+                                default :
+                                        bbp_publicize_forum( $forum_id, $forum->post_status );
+                                        break;
+                        }
+                }
+        }
+}
+
+add_action( 'groups_group_after_save',  'update_group_forum_visibility' );
