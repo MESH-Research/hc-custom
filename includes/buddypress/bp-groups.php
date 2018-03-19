@@ -38,20 +38,20 @@ add_action( 'bp_before_directory_groups_content', 'hcommons_add_non_society_memb
  *  - rename the 'Home' tab to 'Activity'
  */
 function hcommons_override_config_group_nav() {
-        $group_slug = bp_current_item();
+		$group_slug = bp_current_item();
 
-        // BP 2.6+.
-        if ( function_exists( 'bp_rest_api_init' ) ) {
-                buddypress()->groups->nav->edit_nav( array( 'position' => 1 ), 'forum', $group_slug );
-                buddypress()->groups->nav->edit_nav( array( 'position' => 0 ), 'home', $group_slug );
-                buddypress()->groups->nav->edit_nav( array( 'name' => __( 'Activity', 'buddypress' ) ), 'home', $group_slug );
+		// BP 2.6+.
+	if ( function_exists( 'bp_rest_api_init' ) ) {
+			buddypress()->groups->nav->edit_nav( array( 'position' => 1 ), 'forum', $group_slug );
+			buddypress()->groups->nav->edit_nav( array( 'position' => 0 ), 'home', $group_slug );
+			buddypress()->groups->nav->edit_nav( array( 'name' => __( 'Activity', 'buddypress' ) ), 'home', $group_slug );
 
-        // Older versions of BP.
-        } else {
-                buddypress()->bp_options_nav[$group_slug]['home']['position'] = 0;
-                buddypress()->bp_options_nav[$group_slug]['forum']['position'] = 1;
-                buddypress()->bp_options_nav[$group_slug]['home']['name']      = __( 'Activity', 'buddypress' );
-        }
+		// Older versions of BP.
+	} else {
+			buddypress()->bp_options_nav[ $group_slug ]['home']['position'] = 0;
+			buddypress()->bp_options_nav[ $group_slug ]['forum']['position'] = 1;
+			buddypress()->bp_options_nav[ $group_slug ]['home']['name']      = __( 'Activity', 'buddypress' );
+	}
 
 }
 
@@ -60,28 +60,28 @@ function hcommons_override_config_group_nav() {
  * attached to it.
  */
 function hcommons_override_cbox_set_group_default_tab( $retval ) {
-        // check if bbPress or legacy forums are active and configured properly
-        if ( ( function_exists( 'bbp_is_group_forums_active' ) && bbp_is_group_forums_active() ) ||
-                ( function_exists( 'bp_forums_is_installed_correctly' ) && bp_forums_is_installed_correctly() ) ) {
+		// Check if bbPress or legacy forums are active and configured properly.
+	if ( ( function_exists( 'bbp_is_group_forums_active' ) && bbp_is_group_forums_active() ) ||
+				( function_exists( 'bp_forums_is_installed_correctly' ) && bp_forums_is_installed_correctly() ) ) {
 
-                // if current group does not have a forum attached, stop now!
-                if ( ! bp_group_is_forum_enabled( groups_get_current_group() ) ) {
-                        return $retval;
-                }
+			// If current group does not have a forum attached, stop now!
+		if ( ! bp_group_is_forum_enabled( groups_get_current_group() ) ) {
+					return $retval;
+		}
 
-                // Allow non-logged-in users to view a private group's homepage.
-                if ( false === is_user_logged_in() && groups_get_current_group() && 'private' === bp_get_new_group_status() ) {
-                        return $retval;
-                }
+			// Allow non-logged-in users to view a private group's homepage.
+		if ( false === is_user_logged_in() && groups_get_current_group() && 'private' === bp_get_new_group_status() ) {
+				return $retval;
+		}
 
-                // reconfigure the group's nav
-                add_action( 'bp_actions', 'hcommons_override_config_group_nav', 99 );
+			// Reconfigure the group's nav.
+			add_action( 'bp_actions', 'hcommons_override_config_group_nav', 99 );
 
-                // finally, use 'forum' as the default group tab
-                return 'home';
-        }
+			// Finally, use 'forum' as the default group tab.
+			return 'home';
+	}
 
-        return $retval;
+		return $retval;
 }
 add_filter( 'bp_groups_default_extension', 'hcommons_override_cbox_set_group_default_tab', 100 );
 
@@ -91,7 +91,7 @@ add_filter( 'bp_groups_default_extension', 'hcommons_override_cbox_set_group_def
  */
 function mla_bp_groups_forbidden_names( $forbidden_names ) {
 
-	$mla_forbidden_group_slugs = array (
+	$mla_forbidden_group_slugs = array(
 		'style',
 	);
 
@@ -99,3 +99,52 @@ function mla_bp_groups_forbidden_names( $forbidden_names ) {
 
 }
 add_filter( 'groups_forbidden_names', 'mla_bp_groups_forbidden_names', 10, 1 );
+
+/**
+ * Set forums' status to match the privacy status of the associated group.
+ *
+ * Fired whenever a group is saved.
+ *
+ * @param BP_Groups_Group $group Group object.
+ */
+function update_group_forum_visibility( BP_Groups_Group $group ) {
+
+		// Get group forum IDs.
+		$forum_ids = bbp_get_group_forum_ids( $group->id );
+
+		// Bail if no forum IDs available.
+	if ( empty( $forum_ids ) ) {
+			return;
+	}
+
+		// Loop through forum IDs.
+	foreach ( $forum_ids as $forum_id ) {
+
+			// Get forum from ID.
+			$forum = bbp_get_forum( $forum_id );
+
+			// Check for change.
+		if ( $group->status !== $forum->post_status ) {
+			switch ( $group->status ) {
+
+					// Changed to hidden.
+				case 'hidden' :
+						bbp_hide_forum( $forum_id, $forum->post_status );
+							break;
+
+					// Changed to private.
+				case 'private' :
+						bbp_privatize_forum( $forum_id, $forum->post_status );
+							break;
+
+					// Changed to public.
+				case 'public' :
+				default :
+						bbp_publicize_forum( $forum_id, $forum->post_status );
+							break;
+			}
+		}
+	}
+}
+
+add_action( 'groups_group_after_save',  'update_group_forum_visibility' );
