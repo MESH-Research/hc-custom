@@ -29,8 +29,8 @@ require_once trailingslashit( __DIR__ ) . 'includes/buddypress-more-privacy-opti
 require_once trailingslashit( __DIR__ ) . 'includes/cbox-auth.php';
 require_once trailingslashit( __DIR__ ) . 'includes/elasticpress-buddypress.php';
 require_once trailingslashit( __DIR__ ) . 'includes/humcore.php';
+require_once trailingslashit( __DIR__ ) . 'includes/mashsharer.php';
 require_once trailingslashit( __DIR__ ) . 'includes/siteorigin-panels.php';
-require_once trailingslashit( __DIR__ ) . 'includes/hide-plugin-notices.php';
 
 
 /**
