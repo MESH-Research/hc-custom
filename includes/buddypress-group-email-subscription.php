@@ -376,7 +376,7 @@ function hc_custom_group_forum_subscription_settings() {
 			</td>
 
 			<td class="weekly gas-choice">
-				<input type="radio" name="group-notifications[<?php echo $group_id ?>]" value="super" <?php if ( 'supersub' == $my_status ) { ?>checked="checked" <?php } ?>/>
+				<input type="radio" name="group-notifications[<?php echo $group_id ?>]" value="supersub" <?php if ( 'supersub' == $my_status ) { ?>checked="checked" <?php } ?>/>
 			</td>
 		</tr>
 	<?php endwhile; } ?>
