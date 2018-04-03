@@ -320,3 +320,92 @@ function hcommons_bp_ass_activity_notification_action( $activity_text, $activity
 }
 
 add_filter( 'bp_ass_activity_notification_action', 'hcommons_bp_ass_activity_notification_action', 10, 2 );
+
+/**
+ * Reproduces email notification settings (as in legacy email system) in Group Activity Subscription
+ */
+function hc_custom_group_forum_subscription_settings() {
+
+	global $current_user;
+	global $groups_template, $bp;
+	global $group_obj;
+
+	?>
+
+		<table class="notification-settings" id="groups-notification-settings">
+		<thead>
+		<tr>
+			<th class="icon"></th>
+			<th class="title"><?php _e( 'Group notifications', 'group_forum_subscription' ) ?></th>
+			<th class="no-email gas-choice"><?php _e( 'No Email', 'buddypress' ) ?></th>
+			<th class="weekly gas-choice"><?php _e( 'Weekly Summary', 'buddypress' )?></th>
+			<th class="daily gas-choice"><?php _e( 'Daily Digest', 'buddypress' )?></th>
+			<th class="new-topics gas-choice"><?php _e( 'New Topics', 'buddypress' )?></th>
+			<th class="all-email gas-choice"><?php _e( 'All Email', 'buddypress' )?></th>
+		</tr>
+		</thead>
+
+
+<?php if ( bp_has_groups( array( 'per_page' => 100 ) ) ) { ?>
+	<tbody>
+	<?php while ( bp_groups() ) : bp_the_group();
+		$group_id = bp_get_group_id();
+		$subscribers = groups_get_groupmeta( $group_id, 'ass_subscribed_users' );
+		$user_id = $bp->displayed_user->id;
+		$my_status = $subscribers[ $user_id ];
+
+		?>
+		<tr>
+			<td></td>
+			<td><a href="<?php bp_group_permalink() ?>"><?php bp_group_name() ?></a></td>
+
+			<td class="no-email gas-choice">
+				<input type="radio" name="group-notifications[<?php echo $group_id ?>]" value="no" <?php if ( 'no' == $my_status || ! $my_status ) { ?>checked="checked" <?php } ?>/>
+			</td>
+
+			<td class="weekly gas-choice">
+				<input type="radio" name="group-notifications[<?php echo $group_id ?>]" value="sum" <?php if ( 'sum' == $my_status ) { ?>checked="checked" <?php } ?>/>
+			</td>
+
+			<td class="daily gas-choice">
+				<input type="radio" name="group-notifications[<?php echo $group_id ?>]" value="dig" <?php if ( 'dig' == $my_status ) { ?>checked="checked" <?php } ?>/>
+			</td>
+
+			<td class="new-topics gas-choice">
+				<input type="radio" name="group-notifications[<?php echo $group_id ?>]" value="sub" <?php if ( 'sub' == $my_status ) { ?>checked="checked" <?php } ?>/>
+			</td>
+
+			<td class="weekly gas-choice">
+				<input type="radio" name="group-notifications[<?php echo $group_id ?>]" value="super" <?php if ( 'supersub' == $my_status ) { ?>checked="checked" <?php } ?>/>
+			</td>
+		</tr>
+	<?php endwhile; } ?>
+	</tbody>
+	</table>
+		<?php
+}
+
+add_action( 'bp_notification_settings', 'hc_custom_group_forum_subscription_settings' );
+
+/**
+ * Save group notification email settings.
+ **/
+function hc_custom_update_group_subscribe_settings() {
+	global $bp;
+
+	if ( ! bp_is_settings_component() && ! bp_is_current_action( 'notifications' ) ) {
+		return false;
+	}
+
+	// If the edit form has been submitted, save the edited details.
+	if ( isset( $_POST['group-notifications'] ) ) {
+		$user_id = bp_loggedin_user_id();
+
+		foreach ( $_POST['group-notifications'] as $group_id => $value ) {
+			// Save the setting.
+			ass_group_subscription( $value, $user_id, $group_id );
+		}
+	}
+}
+
+add_action( 'bp_actions', 'hc_custom_update_group_subscribe_settings' );
