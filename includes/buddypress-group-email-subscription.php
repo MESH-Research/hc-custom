@@ -47,7 +47,8 @@ function hcommons_filter_ass_digest_format_item_group( $group_message, $group_id
 
 	$userdomain = ass_digest_get_user_domain( $user_id );
 	$unsubscribe_link = "$userdomain?bpass-action=unsubscribe&group=$group_id&access_key=" . md5( "{$group_id}{$user_id}unsubscribe" . wp_salt() );
-	$gnotifications_link = ass_get_login_redirect_url( $group_permalink . 'notifications/' );
+	//$gnotifications_link = ass_get_login_redirect_url( $group_permalink . 'notifications/' );
+	$gnotifications_link = ass_get_login_redirect_url( $userdomain . 'settings/notifications/' );
 
 	// add the group title bar
 	if ( 'dig' === $type ) {
@@ -254,7 +255,7 @@ add_action( 'ass_digest_group_activity_ids', 'hcommons_filter_ass_digest_group_a
  * @return string summary
  */
 function hcommons_filter_ass_digest_summary_full( string $summary ) {
-	// start with a clean slate, handle below if we need to kill this particular email
+	// Start with a clean slate, handle below if we need to kill this particular email.
 	remove_filter( 'ass_send_email_args', '__return_false' );
 
 	/**
@@ -331,9 +332,8 @@ function hc_custom_group_forum_subscription_settings() {
 	global $group_obj;
 
 	?>
-
-		<table class="notification-settings" id="groups-notification-settings">
-		<thead>
+	<table class="notification-settings" id="groups-notification-settings">
+	<thead>
 		<tr>
 			<th class="icon"></th>
 			<th class="title"><?php _e( 'Group notifications', 'group_forum_subscription' ) ?></th>
@@ -342,47 +342,78 @@ function hc_custom_group_forum_subscription_settings() {
 			<th class="daily gas-choice"><?php _e( 'Daily Digest', 'buddypress' )?></th>
 			<th class="new-topics gas-choice"><?php _e( 'New Topics', 'buddypress' )?></th>
 			<th class="all-email gas-choice"><?php _e( 'All Email', 'buddypress' )?></th>
+
 		</tr>
-		</thead>
+	</thead>
 
+	<?php
+	$group_types = bp_groups_get_group_types();
 
-<?php if ( bp_has_groups( array( 'per_page' => 100 ) ) ) { ?>
-	<tbody>
-	<?php while ( bp_groups() ) : bp_the_group();
-		$group_id = bp_get_group_id();
-		$subscribers = groups_get_groupmeta( $group_id, 'ass_subscribed_users' );
-		$user_id = $bp->displayed_user->id;
-		$my_status = $subscribers[ $user_id ];
+	foreach ( $group_types as $group_type ) {
+
+		$args = array(
+			'per_page' => 100,
+			'group_type__in' => $group_type,
+			'action' => '',
+			'type' => '',
+			'orderby' => 'name',
+			'order' => 'ASC',
+		);
+		if ( bp_has_groups( $args ) ) {
 
 		?>
-		<tr>
-			<td></td>
-			<td><a href="<?php bp_group_permalink() ?>"><?php bp_group_name() ?></a></td>
+		<thead>
+			<tr id="network">
+				<th class="network-header"><?php echo strtoupper( $group_type ); ?></th>
+			</tr>
+		</thead>
 
-			<td class="no-email gas-choice">
-				<input type="radio" name="group-notifications[<?php echo $group_id ?>]" value="no" <?php if ( 'no' == $my_status || ! $my_status ) { ?>checked="checked" <?php } ?>/>
-			</td>
+		<tbody>
 
-			<td class="weekly gas-choice">
-				<input type="radio" name="group-notifications[<?php echo $group_id ?>]" value="sum" <?php if ( 'sum' == $my_status ) { ?>checked="checked" <?php } ?>/>
-			</td>
-
-			<td class="daily gas-choice">
-				<input type="radio" name="group-notifications[<?php echo $group_id ?>]" value="dig" <?php if ( 'dig' == $my_status ) { ?>checked="checked" <?php } ?>/>
-			</td>
-
-			<td class="new-topics gas-choice">
-				<input type="radio" name="group-notifications[<?php echo $group_id ?>]" value="sub" <?php if ( 'sub' == $my_status ) { ?>checked="checked" <?php } ?>/>
-			</td>
-
-			<td class="weekly gas-choice">
-				<input type="radio" name="group-notifications[<?php echo $group_id ?>]" value="supersub" <?php if ( 'supersub' == $my_status ) { ?>checked="checked" <?php } ?>/>
-			</td>
-		</tr>
-	<?php endwhile; } ?>
-	</tbody>
-	</table>
 		<?php
+		while ( bp_groups() ) : bp_the_group();
+
+			$group_id = bp_get_group_id();
+			$subscribers = groups_get_groupmeta( $group_id, 'ass_subscribed_users' );
+			$user_id = $bp->displayed_user->id;
+			$my_status = $subscribers[ $user_id ];
+
+		?>
+				<tr>
+					<td></td>
+
+					<td>
+						<a href="<?php bp_group_permalink() ?>"><?php bp_group_name() ?></a>
+					</td>
+
+					<td class="no-email gas-choice">
+						<input type="radio" name="group-notifications[<?php echo $group_id ?>]" value="no" <?php if ( 'no' == $my_status || ! $my_status ) { ?>checked="checked" <?php } ?>/>
+					</td>
+
+					<td class="weekly gas-choice">
+						<input type="radio" name="group-notifications[<?php echo $group_id ?>]" value="sum" <?php if ( 'sum' == $my_status ) { ?>checked="checked" <?php } ?>/>
+					</td>
+
+					<td class="daily gas-choice">
+						<input type="radio" name="group-notifications[<?php echo $group_id ?>]" value="dig" <?php if ( 'dig' == $my_status ) { ?>checked="checked" <?php } ?>/>
+					</td>
+
+					<td class="new-topics gas-choice">
+						<input type="radio" name="group-notifications[<?php echo $group_id ?>]" value="sub" <?php if ( 'sub' == $my_status ) { ?>checked="checked" <?php } ?>/>
+					</td>
+
+					<td class="weekly gas-choice">
+						<input type="radio" name="group-notifications[<?php echo $group_id ?>]" value="supersub" <?php if ( 'supersub' == $my_status ) { ?>checked="checked" <?php } ?>/>
+					</td>
+				</tr>
+			<?php
+			endwhile;
+		}
+	}
+	?>
+	</tbody>
+</table>
+<?php
 }
 
 add_action( 'bp_notification_settings', 'hc_custom_group_forum_subscription_settings' );
@@ -406,6 +437,47 @@ function hc_custom_update_group_subscribe_settings() {
 			ass_group_subscription( $value, $user_id, $group_id );
 		}
 	}
+
 }
 
 add_action( 'bp_actions', 'hc_custom_update_group_subscribe_settings' );
+
+/**
+ * Overwrite unsubscribe link in e-mails.
+ *
+ * @param string   $formatted_tokens Associative pairing of token names (key) and replacement values (value).
+ *
+ * @param string   $tokens Associative pairing of unformatted token names (key) and replacement values (value).
+ *
+ * @param BP_Email $instance Current instance of the email type class.
+ */
+function hc_custom_bp_email_set_tokens( $formatted_tokens, $tokens, $instance ) {
+	$formatted_tokens['unsubscribe']  = bp_displayed_user_domain() . bp_get_settings_slug() . '/notifications';
+
+	return $formatted_tokens;
+}
+
+add_filter( 'bp_email_set_tokens', 'hc_custom_bp_email_set_tokens', 1, 3 );
+
+/**
+ * Change group digest unsubscribe link in e-mails.
+ *
+ *  @param string $unsubscribe_message The unsubscribe message.
+ *
+ *  @param string $userdomain_bp_groups_slug The url containing the userdomain and the groups slug.
+ **/
+function hc_custom_ass_digest_disable_notifications( $unsubscribe_message, $userdomain_bp_groups_slug ) {
+	$userdomain = explode( '/', $userdomain_bp_groups_slug );
+
+	if ( ! isset( $userdomain[4] ) ) {
+		return $unsubscribe_message;
+	}
+
+	$settings_page = bp_get_settings_slug() . '/notifications';
+
+	$unsubscribe_message = '\n\n' . sprintf( __( 'To disable these notifications per group please login and go to: %s where you can change your email settings for each group.', 'bp-ass' ), '<a href="https://{$userdomain[2]}/{$userdomain[3]}/{$userdomain[4]}/{$settings_page}/">'. __( 'My Groups', 'bp-ass' ) . '</a>' );
+
+	return $unsubscribe_message;
+}
+
+add_filter( 'ass_digest_disable_notifications', 'hc_custom_ass_digest_disable_notifications', 10, 2 );
