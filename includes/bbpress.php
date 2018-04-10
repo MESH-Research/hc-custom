@@ -82,37 +82,61 @@ function hcommons_tinymce_buttons( $buttons ) {
 add_filter( 'mce_buttons', 'hcommons_tinymce_buttons', 21 );
 
 /**
- * Lets modify the admin links for a forum topic so admins cannot modify other users posts
- * and only their own on the front-end
+ * Filter who can edit forum topics.
  *
- * @param  array $array  array of the links to modify
- * @param  int 	 $id     id for admin links on the front-end
- * @return array $array  modified array of items
+ * @uses mla_is_group_committee()
+ * @param  array $array Array of the links to modify.
+ * @return array Modified array of items.
  */
-function hcommons_topic_admin_links( $array, $id ) {
-	$cap = groups_filter_bbpress_caps( 'bp_moderate' );
+function hcommons_topic_admin_links( $array ) {
+	// Super admins can edit any post.
+	if ( is_super_admin() ) {
+		return $array;
+	}
 
-	if( $cap == true && bbp_get_current_user_id() !== bbp_get_topic_author_id( bbp_get_topic_id() ) ) {
+	// Committee admins can edit any post in their group.
+	if ( mla_is_group_committee( bp_get_current_group_id() ) && groups_is_user_admin( get_current_user_id(), bp_get_current_group_id() ) ) {
+		return $array;
+	}
+
+	// All other users can only edit their own posts.
+	if (
+		isset( $array['edit'] ) &&
+		get_current_user_id() !== bbp_get_topic_author_id( bbp_get_topic_id() )
+	) {
 		unset( $array['edit'] );
 	}
+
 	return $array;
 }
-add_filter( 'bbp_topic_admin_links', 'hcommons_topic_admin_links',  10, 2 );
+add_filter( 'bbp_topic_admin_links', 'hcommons_topic_admin_links' );
 
 /**
- * Lets modify the admin links for a forum reply so admins cannot modify other users posts
- * and only their own on the front-end
+ * Filter who can edit forum replies.
  *
- * @param  array $array  array of the links to modify
- * @param  int   $id     id for admin links on the front-end
- * @return array $array  modified array of items
+ * @uses mla_is_group_committee()
+ * @param  array $array Array of the links to modify.
+ * @return array Modified array of items.
  */
-function hcommons_reply_admin_links( $array, $id ) {
-	$cap = groups_filter_bbpress_caps( 'bp_moderate' );
+function hcommons_reply_admin_links( $array ) {
+	// Super admins can edit any post.
+	if ( is_super_admin() ) {
+		return $array;
+	}
 
-	if( $cap == true && bbp_get_current_user_id() !== bbp_get_reply_author_id( bbp_get_reply_id() ) ) {
+	// Committee admins can edit any post in their group.
+	if ( mla_is_group_committee( bp_get_current_group_id() ) && groups_is_user_admin( get_current_user_id(), bp_get_current_group_id() ) ) {
+		return $array;
+	}
+
+	// All other users can only edit their own posts.
+	if (
+		isset( $array['edit'] ) &&
+		get_current_user_id() !== bbp_get_reply_author_id( bbp_get_reply_id() )
+	) {
 		unset( $array['edit'] );
 	}
+
 	return $array;
 }
-add_filter( 'bbp_reply_admin_links', 'hcommons_reply_admin_links', 10, 2 );
+add_filter( 'bbp_reply_admin_links', 'hcommons_reply_admin_links' );
