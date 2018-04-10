@@ -481,3 +481,57 @@ function hc_custom_ass_digest_disable_notifications( $unsubscribe_message, $user
 }
 
 add_filter( 'ass_digest_disable_notifications', 'hc_custom_ass_digest_disable_notifications', 10, 2 );
+
+/**
+ * Add custom BP email footer for HTML emails.
+ *
+ * We want to override the default {{unsubscribe}} token with something else.
+ **/
+function hc_custom_ass_bp_email_footer_html_unsubscribe_links() {
+	$tokens = buddypress()->ges_tokens;
+
+	if ( ! isset( $tokens['subscription_type'] ) ) {
+		return;
+	}
+
+	remove_action( 'bp_after_email_footer', 'ass_bp_email_footer_html_unsubscribe_links' );
+
+	$userdomain  = strtok( $tokens['ges.unsubscribe'], '?' );
+	$settings_page = $userdomain . '/settings/notifications/';
+
+	$link_format = '<a href="%1$s" title="%2$s" style="text-decoration: underline;">%3$s</a>';
+	$footer_links = array();
+
+	switch ( $tokens['subscription_type'] ) {
+		// Self-notifications.
+		case 'self_notify' :
+			$footer_links[] = sprintf( $link_format,
+				$tokens['ges.settings-link'],
+				esc_attr__( 'Once you are logged in, uncheck "Receive notifications of your own posts?".', 'bp-ass' ),
+				esc_html__( 'Change email settings', 'bp-ass' )
+			);
+
+			break;
+
+		// Everything else.
+		case 'sub':
+		case 'supersub':
+		case 'dig' :
+		case 'sum' :
+			$footer_links[] = sprintf( $link_format,
+				$settings_page,
+				esc_attr__( 'Once you are logged in, change your email settings for each group.', 'bp-ass' ),
+				esc_html__( 'Change email settings', 'bp-ass' )
+			);
+
+			break;
+	}
+
+	if ( ! empty( $footer_links ) ) {
+		echo implode( ' &middot; ', $footer_links );
+	}
+
+		unset( buddypress()->ges_tokens );
+}
+
+add_action( 'bp_after_email_footer' , 'hc_custom_ass_bp_email_footer_html_unsubscribe_links' );
