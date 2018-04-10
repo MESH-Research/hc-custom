@@ -81,3 +81,38 @@ function hcommons_tinymce_buttons( $buttons ) {
 
 add_filter( 'mce_buttons', 'hcommons_tinymce_buttons', 21 );
 
+/**
+ * Lets modify the admin links for a forum topic so admins cannot modify other users posts
+ * and only their own on the front-end
+ *
+ * @param  array $array  array of the links to modify
+ * @param  int 	 $id     id for admin links on the front-end
+ * @return array $array  modified array of items
+ */
+function hcommons_topic_admin_links( $array, $id ) {
+	$cap = groups_filter_bbpress_caps( 'bp_moderate' );
+
+	if( $cap == true && bbp_get_current_user_id() !== bbp_get_topic_author_id( bbp_get_topic_id() ) ) {
+		unset( $array['edit'] );
+	}
+	return $array;
+}
+add_filter( 'bbp_topic_admin_links', 'hcommons_topic_admin_links',  10, 2 );
+
+/**
+ * Lets modify the admin links for a forum reply so admins cannot modify other users posts
+ * and only their own on the front-end
+ *
+ * @param  array $array  array of the links to modify
+ * @param  int   $id     id for admin links on the front-end
+ * @return array $array  modified array of items
+ */
+function hcommons_reply_admin_links( $array, $id ) {
+	$cap = groups_filter_bbpress_caps( 'bp_moderate' );
+
+	if( $cap == true && bbp_get_current_user_id() !== bbp_get_reply_author_id( bbp_get_reply_id() ) ) {
+		unset( $array['edit'] );
+	}
+	return $array;
+}
+add_filter( 'bbp_reply_admin_links', 'hcommons_reply_admin_links', 10, 2 );
