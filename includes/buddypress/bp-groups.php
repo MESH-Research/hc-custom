@@ -5,13 +5,20 @@
  * @package Hc_Custom
  */
 
-
+/**
+ * Filters the action for the new group activity update.
+ *
+ * @param string $activity_action The new group activity update.
+ */
 function hcommons_filter_groups_activity_new_update_action( $activity_action ) {
 	$activity_action = preg_replace( '/(in the group <a href="[^"]*)(">)/', '\1activity\2', $activity_action );
 	return $activity_action;
 }
 add_filter( 'groups_activity_new_update_action', 'hcommons_filter_groups_activity_new_update_action' );
 
+/**
+ * Adds join group button for non-society members
+ */
 function hcommons_add_non_society_member_join_group_button() {
 	if ( ! is_super_admin() && hcommons_check_non_member_active_session() ) {
 		echo '<div class="disabled-button">Join Group</div>';
@@ -19,6 +26,9 @@ function hcommons_add_non_society_member_join_group_button() {
 }
 add_action( 'bp_directory_groups_actions', 'hcommons_add_non_society_member_join_group_button' );
 
+/**
+ * Adds disclaimer notice for non society members
+ */
 function hcommons_add_non_society_member_disclaimer_group() {
 	if ( ! is_super_admin() && hcommons_check_non_member_active_session() ) {
 		printf(
@@ -58,6 +68,8 @@ function hcommons_override_config_group_nav() {
 /**
  * Set the group default tab to 'forum' if the current group has a forum
  * attached to it.
+ *
+ * @param string $retval Navigation slug.
  */
 function hcommons_override_cbox_set_group_default_tab( $retval ) {
 		// Check if bbPress or legacy forums are active and configured properly.
@@ -88,6 +100,8 @@ add_filter( 'bp_groups_default_extension', 'hcommons_override_cbox_set_group_def
 /**
  * BuddyPress Groups Forbidden Group Slugs
  * Used for groups that have been redirected or slugs that we want to reserve.
+ *
+ * @param array $forbidden_names List of forbidden group slugs.
  */
 function mla_bp_groups_forbidden_names( $forbidden_names ) {
 
@@ -108,42 +122,64 @@ add_filter( 'groups_forbidden_names', 'mla_bp_groups_forbidden_names', 10, 1 );
  * @param BP_Groups_Group $group Group object.
  */
 function update_group_forum_visibility( BP_Groups_Group $group ) {
+	global $wpdb;
 
-		// Get group forum IDs.
-		$forum_ids = bbp_get_group_forum_ids( $group->id );
+	$bp = buddypress();
 
-		// Bail if no forum IDs available.
+	// Get group forum IDs.
+	$forum_ids = bbp_get_group_forum_ids( $group->id );
+
+	// Bail if no forum IDs available.
 	if ( empty( $forum_ids ) ) {
 			return;
 	}
 
-		// Loop through forum IDs.
+	// Loop through forum IDs.
 	foreach ( $forum_ids as $forum_id ) {
 
-			// Get forum from ID.
-			$forum = bbp_get_forum( $forum_id );
+		// Get forum from ID.
+		$forum = bbp_get_forum( $forum_id );
 
-			// Check for change.
+		// Check for change.
 		if ( $group->status !== $forum->post_status ) {
 			switch ( $group->status ) {
 
-					// Changed to hidden.
+				// Changed to hidden.
 				case 'hidden' :
 						bbp_hide_forum( $forum_id, $forum->post_status );
-							break;
+						break;
 
-					// Changed to private.
+				// Changed to private.
 				case 'private' :
 						bbp_privatize_forum( $forum_id, $forum->post_status );
-							break;
+						break;
 
-					// Changed to public.
+				// Changed to public.
 				case 'public' :
 				default :
 						bbp_publicize_forum( $forum_id, $forum->post_status );
-							break;
+						break;
 			}
 		}
+	}
+
+	// Update activity table.
+	switch ( $group->status ) {
+		// Changed to hidden.
+		case 'hidden' :
+				$wpdb->query( $wpdb->prepare( "UPDATE {$bp->activity->table_name} SET hide_sitewide = 1 WHERE item_id = %d AND component = 'groups'", $group->id ) );
+				break;
+
+		// Changed to private.
+		case 'private' :
+				$wpdb->query( $wpdb->prepare( "UPDATE {$bp->activity->table_name} SET hide_sitewide = 1 WHERE item_id = %d AND component = 'groups'", $group->id ) );
+				break;
+
+		// Changed to public.
+		case 'public' :
+		default :
+				$wpdb->query( $wpdb->prepare( "UPDATE {$bp->activity->table_name} SET hide_sitewide = 0 WHERE item_id = %d AND component = 'groups'", $group->id ) );
+				break;
 	}
 }
 
