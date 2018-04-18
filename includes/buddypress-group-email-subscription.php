@@ -418,6 +418,65 @@ function hc_custom_group_forum_subscription_settings() {
 
 add_action( 'bp_notification_settings', 'hc_custom_group_forum_subscription_settings' );
 
+
+/**
+ * Reproduces email notification settings (as in legacy email system) in Group Activity Subscription
+ */
+function hc_custom_default_group_forum_subscription_settings() {
+	global $bp;
+
+	$user_id = $bp->displayed_user->id;
+	$my_status = get_user_meta( $user_id, 'default_group_notifications', true);
+?>
+
+	<table class="notification-settings" id="groups-notification-settings">
+		<thead>
+			<tr>
+				<th class="icon"></th>
+				<th class="title"><?php _e( 'Default Notifications For New Groups', 'group_forum_subscription' ) ?></th>
+				<th class="no-email gas-choice"><?php _e( 'No Email', 'buddypress' ) ?></th>
+				<th class="weekly gas-choice"><?php _e( 'Weekly Summary', 'buddypress' )?></th>
+				<th class="daily gas-choice"><?php _e( 'Daily Digest', 'buddypress' )?></th>
+				<th class="new-topics gas-choice"><?php _e( 'New Topics', 'buddypress' )?></th>
+				<th class="all-email gas-choice"><?php _e( 'All Email', 'buddypress' )?></th>
+
+			</tr>
+		</thead>
+
+		<tbody>
+
+		<tr>
+			<td></td>
+
+			<td>
+				<a href="<?php bp_group_permalink() ?>"><?php bp_group_name() ?></a>
+			</td>
+
+			<td class="no-email gas-choice">
+				<input type="radio" name="default-group-notifications" value="no" <?php if ( 'no' == $my_status || ! $my_status ) { ?>checked="checked" <?php } ?>/>
+			</td>
+
+			<td class="weekly gas-choice">
+				<input type="radio" name="default-group-notifications" value="sum" <?php if ( 'sum' == $my_status ) { ?>checked="checked" <?php } ?>/>
+			</td>
+
+			<td class="daily gas-choice">
+				<input type="radio" name="default-group-notifications" value="dig" <?php if ( 'dig' == $my_status ) { ?>checked="checked" <?php } ?>/>
+			</td>
+
+			<td class="new-topics gas-choice">
+				<input type="radio" name="default-group-notifications" value="sub" <?php if ( 'sub' == $my_status ) { ?>checked="checked" <?php } ?>/>
+			</td>
+
+			<td class="weekly gas-choice">
+				<input type="radio" name="default-group-notifications" value="supersub" <?php if ( 'supersub' == $my_status ) { ?>checked="checked" <?php } ?>/>
+			</td>
+		</tr>
+<?php
+}
+
+add_action( 'bp_notification_settings', 'hc_custom_default_group_forum_subscription_settings' );
+
 /**
  * Save group notification email settings.
  **/
@@ -438,9 +497,39 @@ function hc_custom_update_group_subscribe_settings() {
 		}
 	}
 
+	if ( isset( $_POST['default-group-notifications'] ) ) {
+		$user_id = bp_loggedin_user_id();
+		$value = $_POST['default-group-notifications'];
+
+		update_user_meta( $user_id, 'default_group_notifications',  $value);
+	}
+
 }
 
 add_action( 'bp_actions', 'hc_custom_update_group_subscribe_settings' );
+
+// give the user a notice if they are default subscribed to this group (does not work for invites or requests)
+function hc_custom_join_group_message( $group_id, $user_id ) {
+	global $bp;
+
+	remove_action( 'groups_join_group', 'ass_join_group_message' );
+
+	if ( $user_id != bp_loggedin_user_id()  )
+		return;
+
+	$status = get_user_meta( $user_id, 'default_group_notifications', true );
+
+	if ( empty( $status ) ) {
+		$status = 'no';
+	}
+
+	ass_group_subscription( $status, $user_id, $group_id );
+
+	bp_core_add_message( __( 'You successfully joined the group. Your group email status is: ', 'bp-ass' ) . ass_subscribe_translate( $status ) );
+
+}
+
+add_action( 'groups_join_group', 'hc_custom_join_group_message', 2, 2 );
 
 /**
  * Overwrite unsubscribe link in e-mails.
@@ -535,3 +624,13 @@ function hc_custom_ass_bp_email_footer_html_unsubscribe_links() {
 }
 
 add_action( 'bp_after_email_footer' , 'hc_custom_ass_bp_email_footer_html_unsubscribe_links' );
+
+// Disable the default subscription settings during group creation and editing.
+function hc_custom_disable_subscription_settings_form() {
+	remove_action( 'bp_after_group_settings_admin' , 'ass_default_subscription_settings_form' );
+    remove_action( 'bp_after_group_settings_creation_step' , 'ass_default_subscription_settings_form' );
+
+}
+
+//add_action ( 'bp_after_group_settings_admin' ,'hc_custom_disable_subscription_settings_form', 0);
+add_action ( 'bp_after_group_settings_creation_step' ,'hc_custom_disable_subscription_settings_form', 0 );
