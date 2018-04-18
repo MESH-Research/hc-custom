@@ -2,6 +2,11 @@
 /**
  * Plugin Name: BuddyPress / More Privacy Options patch
  * Description: Hook into some functions provided by BuddyPress to accommodate features added by More Privacy Options
+ *
+ * This file contains code copied from BP that doesn't pass phpcs, ignore it.
+ * @codingStandardsIgnoreFile
+ *
+ * @package Hc_Custom
  */
 
 /**
@@ -24,43 +29,44 @@ function more_privacy_options_blogs_get( $return_value, $args ) {
 
 	$bp = buddypress();
 
-	if ( is_user_logged_in() && bp_is_current_action('my-sites') ) {
-		$hidden_sql = "AND wb.public in ( 0, 1, -1, -2 )"; // this accommodates More Privacy Options
-	} elseif( bp_is_current_action('my-sites') && current_user_can('manage_options') || is_super_admin() ) {
-		$hidden_sql = ""; // this enables sites to users that are admin if the visibility is -3
-	}
-	else {
-		if ( !is_user_logged_in() || !bp_current_user_can( 'bp_moderate' ) && ( $user_id != bp_loggedin_user_id() ) )
-			$hidden_sql = "AND wb.public in ( 0, 1 ) "; // this does not consider any values of "public" added by MPO
-		else
+	if ( is_user_logged_in() && bp_is_current_action( 'my-sites' ) ) {
+		$hidden_sql = 'AND wb.public in ( 0, 1, -1, -2 )'; // this accommodates More Privacy Options
+	} elseif ( bp_is_current_action( 'my-sites' ) && current_user_can( 'manage_options' ) || is_super_admin() ) {
+		$hidden_sql = ''; // this enables sites to users that are admin if the visibility is -3
+	} else {
+		if ( ! is_user_logged_in() || ! bp_current_user_can( 'bp_moderate' ) && ( bp_loggedin_user_id() != $user_id ) ) {
+			$hidden_sql = 'AND wb.public in ( 0, 1 ) '; // this does not consider any values of "public" added by MPO
+		} else {
 			$hidden_sql = '';
+		}
 	}
 
-	$pag_sql = ( $limit && $page ) ? $wpdb->prepare( " LIMIT %d, %d", intval( ( $page - 1 ) * $limit), intval( $limit ) ) : '';
+	$pag_sql = ( $limit && $page ) ? $wpdb->prepare( ' LIMIT %d, %d', intval( ( $page - 1 ) * $limit ), intval( $limit ) ) : '';
 
-	$user_sql = !empty( $user_id ) ? $wpdb->prepare( " AND b.user_id = %d", $user_id ) : '';
+	$user_sql = ! empty( $user_id ) ? $wpdb->prepare( ' AND b.user_id = %d', $user_id ) : '';
 
 	switch ( $type ) {
-		case 'active': default:
-			$order_sql = "ORDER BY bm.meta_value DESC";
+		case 'active':
+		default:
+			$order_sql = 'ORDER BY bm.meta_value DESC';
 			break;
 		case 'alphabetical':
-			$order_sql = "ORDER BY bm_name.meta_value ASC";
+			$order_sql = 'ORDER BY bm_name.meta_value ASC';
 			break;
 		case 'newest':
-			$order_sql = "ORDER BY wb.registered DESC";
+			$order_sql = 'ORDER BY wb.registered DESC';
 			break;
 		case 'random':
-			$order_sql = "ORDER BY RAND()";
+			$order_sql = 'ORDER BY RAND()';
 			break;
 	}
 
-	$include_sql = '';
+	$include_sql      = '';
 	$include_blog_ids = array_filter( wp_parse_id_list( $include_blog_ids ) );
 
 	if ( ! empty( $include_blog_ids ) ) {
 		$blog_ids_sql = implode( ',', $include_blog_ids );
-		$include_sql = " AND b.blog_id IN ({$blog_ids_sql})";
+		$include_sql  = " AND b.blog_id IN ({$blog_ids_sql})";
 	}
 
 	if ( ! empty( $search_terms ) ) {
@@ -70,7 +76,8 @@ function more_privacy_options_blogs_get( $return_value, $args ) {
 		$search_terms_sql = '';
 	}
 
-	$paged_blogs = $wpdb->get_results( "
+	$paged_blogs = $wpdb->get_results(
+		"
 		SELECT b.blog_id, b.user_id as admin_user_id, u.user_email as admin_user_email, wb.domain, wb.path, bm.meta_value as last_activity, bm_name.meta_value as name
 		FROM
 		  {$bp->blogs->table_name} b
@@ -84,9 +91,11 @@ function more_privacy_options_blogs_get( $return_value, $args ) {
 		  AND bm.meta_key = 'last_activity' AND bm_name.meta_key = 'name' AND bm_description.meta_key = 'description'
 		  {$search_terms_sql} {$user_sql} {$include_sql}
 		GROUP BY b.blog_id {$order_sql} {$pag_sql}
-	" );
+	"
+	);
 
-	$total_blogs = $wpdb->get_var( "
+	$total_blogs = $wpdb->get_var(
+		"
 		SELECT COUNT(DISTINCT b.blog_id)
 		FROM
 		  {$bp->blogs->table_name} b
@@ -98,7 +107,8 @@ function more_privacy_options_blogs_get( $return_value, $args ) {
 		  AND
 		  bm_name.meta_key = 'name' AND bm_description.meta_key = 'description'
 		  {$search_terms_sql} {$user_sql} {$include_sql}
-	" );
+	"
+	);
 
 	$blog_ids = array();
 	foreach ( (array) $paged_blogs as $blog ) {
@@ -111,7 +121,10 @@ function more_privacy_options_blogs_get( $return_value, $args ) {
 		bp_blogs_update_meta_cache( $blog_ids );
 	}
 
-	return array( 'blogs' => $paged_blogs, 'total' => $total_blogs );
+	return array(
+		'blogs' => $paged_blogs,
+		'total' => $total_blogs,
+	);
 
 }
 add_filter( 'bp_blogs_get_blogs', 'more_privacy_options_blogs_get', null, 3 );
