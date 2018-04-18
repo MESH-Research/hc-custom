@@ -206,9 +206,13 @@ function hcommons_filter_ep_bp_fallback_post_type_facet_selection( $post_types )
 add_filter( 'ep_bp_fallback_post_type_facet_selection', 'hcommons_filter_ep_bp_fallback_post_type_facet_selection' );
 
 function hcommons_filter_ep_indexable_post_types( $post_types ) {
-	return array_unique( array_merge( $post_types, [
-		'humcore_deposit' => 'humcore_deposit',
-	] ) );
+	return array_unique(
+		array_merge(
+			$post_types, [
+				'humcore_deposit' => 'humcore_deposit',
+			]
+		)
+	);
 }
 add_filter( 'ep_indexable_post_types', 'hcommons_filter_ep_indexable_post_types' );
 
@@ -235,7 +239,7 @@ function humcore_filter_post_type_link( $post_link, $post ) {
 
 			if ( isset( $meta['_deposit_metadata'][0] ) ) {
 				$decoded_deposit_meta = json_decode( $meta['_deposit_metadata'][0] );
-				$post_link = sprintf( '%1$s/deposits/item/%2$s', bp_get_root_domain(), $decoded_deposit_meta->pid );
+				$post_link            = sprintf( '%1$s/deposits/item/%2$s', bp_get_root_domain(), $decoded_deposit_meta->pid );
 			}
 		}
 	}

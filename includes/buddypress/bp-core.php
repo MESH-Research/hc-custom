@@ -25,10 +25,12 @@ function hcommons_filter_wp_mail( $args ) {
 	$template = ob_get_contents();
 	ob_end_clean();
 
-	$args['message'] = bp_core_replace_tokens_in_text( $template, [
-		'content' => make_clickable( nl2br( $message ) ),
-		'recipient.name' => 'there', // since we don't know the user's actual name
-	] );
+	$args['message'] = bp_core_replace_tokens_in_text(
+		$template, [
+			'content'        => make_clickable( nl2br( $message ) ),
+			'recipient.name' => 'there', // since we don't know the user's actual name
+		]
+	);
 
 	// wp core sets headers to a string value joined by newlines for e.g. comment notifications.
 	// most plugins use/keep the array set by apply_filter( 'wp_mail' ).
@@ -37,9 +39,11 @@ function hcommons_filter_wp_mail( $args ) {
 		$args['headers'] = explode( "\n", $args['headers'] );
 	}
 	// remove existing content-type header if present
-	$args['headers'] = array_filter( $args['headers'], function( $v ) {
-		return strpos( strtolower( $v ), 'content-type' ) === false;
-	} );
+	$args['headers'] = array_filter(
+		$args['headers'], function( $v ) {
+			return strpos( strtolower( $v ), 'content-type' ) === false;
+		}
+	);
 	// set html content-type
 	$args['headers'][] = 'Content-Type: text/html';
 
@@ -70,7 +74,9 @@ function hcommons_unfilter_wp_mail() {
 add_action( 'bbp_pre_notify_subscribers', 'hcommons_unfilter_wp_mail' );
 add_action( 'bbp_pre_notify_forum_subscribers', 'hcommons_unfilter_wp_mail' );
 // no action available for this one, so abuse a filter instead
-add_filter( 'newsletters_execute_mail_message', function( $message ) {
-	hcommons_unfilter_wp_mail();
-	return $message;
-} );
+add_filter(
+	'newsletters_execute_mail_message', function( $message ) {
+		hcommons_unfilter_wp_mail();
+		return $message;
+	}
+);

@@ -58,7 +58,7 @@ function hcommons_override_config_group_nav() {
 
 		// Older versions of BP.
 	} else {
-			buddypress()->bp_options_nav[ $group_slug ]['home']['position'] = 0;
+			buddypress()->bp_options_nav[ $group_slug ]['home']['position']  = 0;
 			buddypress()->bp_options_nav[ $group_slug ]['forum']['position'] = 1;
 			buddypress()->bp_options_nav[ $group_slug ]['home']['name']      = __( 'Activity', 'buddypress' );
 	}
@@ -145,20 +145,20 @@ function update_group_forum_visibility( BP_Groups_Group $group ) {
 			switch ( $group->status ) {
 
 				// Changed to hidden.
-				case 'hidden' :
+				case 'hidden':
 						bbp_hide_forum( $forum_id, $forum->post_status );
-						break;
+					break;
 
 				// Changed to private.
-				case 'private' :
+				case 'private':
 						bbp_privatize_forum( $forum_id, $forum->post_status );
-						break;
+					break;
 
 				// Changed to public.
-				case 'public' :
-				default :
+				case 'public':
+				default:
 						bbp_publicize_forum( $forum_id, $forum->post_status );
-						break;
+					break;
 			}
 		}
 	}
@@ -166,21 +166,21 @@ function update_group_forum_visibility( BP_Groups_Group $group ) {
 	// Update activity table.
 	switch ( $group->status ) {
 		// Changed to hidden.
-		case 'hidden' :
+		case 'hidden':
 				$wpdb->query( $wpdb->prepare( "UPDATE {$bp->activity->table_name} SET hide_sitewide = 1 WHERE item_id = %d AND component = 'groups'", $group->id ) );
-				break;
+			break;
 
 		// Changed to private.
-		case 'private' :
+		case 'private':
 				$wpdb->query( $wpdb->prepare( "UPDATE {$bp->activity->table_name} SET hide_sitewide = 1 WHERE item_id = %d AND component = 'groups'", $group->id ) );
-				break;
+			break;
 
 		// Changed to public.
-		case 'public' :
-		default :
+		case 'public':
+		default:
 				$wpdb->query( $wpdb->prepare( "UPDATE {$bp->activity->table_name} SET hide_sitewide = 0 WHERE item_id = %d AND component = 'groups'", $group->id ) );
-				break;
+			break;
 	}
 }
 
-add_action( 'groups_group_after_save',  'update_group_forum_visibility' );
+add_action( 'groups_group_after_save', 'update_group_forum_visibility' );

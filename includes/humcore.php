@@ -13,11 +13,10 @@
 function hcommons_core_member_groups_with_authorship() {
 
 	$committee_group_ids = array();
-	//$society_id      = get_network_option( '', 'society_id' );
-
+	// $society_id      = get_network_option( '', 'society_id' );
 	$args = array(
 		'type'       => 'alphabetical',
-		//'group_type' => $society_id,
+		// 'group_type' => $society_id,
 		'meta_query' => array(
 			array(
 				'key'     => 'mla_oid',
@@ -28,7 +27,8 @@ function hcommons_core_member_groups_with_authorship() {
 		'per_page'   => '500',
 	);
 
-	/* Special case for now - remove committees.
+	/*
+	 Special case for now - remove committees.
 	$m_groups = groups_get_groups( $args );
 
 	foreach ( $m_groups['groups'] as $group ) {

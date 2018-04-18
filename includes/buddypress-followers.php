@@ -16,7 +16,7 @@ function hcommons_admin_bar_remove_followers() {
 	$wp_admin_bar->remove_node( 'my-account-follow-followers' );
 }
 
-add_action( 'wp_before_admin_bar_render','hcommons_admin_bar_remove_followers' );
+add_action( 'wp_before_admin_bar_render', 'hcommons_admin_bar_remove_followers' );
 
 // prevent users from seeing one another's followers (can only see their own)
 // unfortunately there's no filter to prevent running the query, but we can at least empty the result before rendering

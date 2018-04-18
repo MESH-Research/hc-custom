@@ -45,9 +45,9 @@ function hcommons_filter_ass_digest_format_item_group( $group_message, $group_id
 	$group_permalink = bp_get_group_permalink( $group );
 	$group_name_link = '<a class="item-group-group-link" href="' . esc_url( $group_permalink ) . '" name="' . esc_attr( $group->slug ) . '">' . esc_html( $group->name ) . '</a>';
 
-	$userdomain = ass_digest_get_user_domain( $user_id );
+	$userdomain       = ass_digest_get_user_domain( $user_id );
 	$unsubscribe_link = "$userdomain?bpass-action=unsubscribe&group=$group_id&access_key=" . md5( "{$group_id}{$user_id}unsubscribe" . wp_salt() );
-	//$gnotifications_link = ass_get_login_redirect_url( $group_permalink . 'notifications/' );
+	// $gnotifications_link = ass_get_login_redirect_url( $group_permalink . 'notifications/' );
 	$gnotifications_link = ass_get_login_redirect_url( $userdomain . 'settings/notifications/' );
 
 	// add the group title bar
@@ -68,7 +68,7 @@ function hcommons_filter_ass_digest_format_item_group( $group_message, $group_id
 	// Sort activity items and group by forum topic, where possible.
 	$grouped_activity_ids = array(
 		'topics' => array(),
-		'other' => array(),
+		'other'  => array(),
 	);
 
 	$topic_activity_map = array();
@@ -77,8 +77,8 @@ function hcommons_filter_ass_digest_format_item_group( $group_message, $group_id
 		$activity_item = ! empty( $bp->ass->items[ $activity_id ] ) ? $bp->ass->items[ $activity_id ] : false;
 
 		switch ( $activity_item->type ) {
-			case 'bbp_topic_create' :
-				$topic_id = $activity_item->secondary_item_id;
+			case 'bbp_topic_create':
+				$topic_id                         = $activity_item->secondary_item_id;
 				$grouped_activity_ids['topics'][] = $topic_id;
 
 				if ( ! isset( $topic_activity_map[ $topic_id ] ) ) {
@@ -86,11 +86,11 @@ function hcommons_filter_ass_digest_format_item_group( $group_message, $group_id
 				}
 
 				$topic_activity_map[ $topic_id ][] = $activity_id;
-			break;
+				break;
 
-			case 'bbp_reply_create' :
+			case 'bbp_reply_create':
 				// Topic may or may not be in this digest queue.
-				$topic_id = bbp_get_reply_topic_id( $activity_item->secondary_item_id );
+				$topic_id                         = bbp_get_reply_topic_id( $activity_item->secondary_item_id );
 				$grouped_activity_ids['topics'][] = $topic_id;
 
 				if ( ! isset( $topic_activity_map[ $topic_id ] ) ) {
@@ -98,11 +98,11 @@ function hcommons_filter_ass_digest_format_item_group( $group_message, $group_id
 				}
 
 				$topic_activity_map[ $topic_id ][] = $activity_id;
-			break;
+				break;
 
-			default :
+			default:
 				$grouped_activity_ids['other'][] = $activity_id;
-			break;
+				break;
 		}
 
 		$grouped_activity_ids['topics'] = array_unique( $grouped_activity_ids['topics'] );
@@ -130,9 +130,9 @@ function hcommons_filter_ass_digest_format_item_group( $group_message, $group_id
 		foreach ( $topic_activity_map[ $topic_id ] as $activity_id ) {
 			$activity_item = new BP_Activity_Activity( $activity_id );
 
-			$poster_name = bp_core_get_user_displayname( $activity_item->user_id );
-			$poster_url = bp_core_get_user_domain( $activity_item->user_id );
-			$topic_name = $topic->post_title;
+			$poster_name     = bp_core_get_user_displayname( $activity_item->user_id );
+			$poster_url      = bp_core_get_user_domain( $activity_item->user_id );
+			$topic_name      = $topic->post_title;
 			$topic_permalink = get_permalink( $topic_id );
 
 			if ( 'bbp_topic_create' === $activity_item->type ) {
@@ -150,10 +150,10 @@ function hcommons_filter_ass_digest_format_item_group( $group_message, $group_id
 			$date_posted = date( get_option( 'date_format' ), $timestamp );
 
 			$item_message .= '<div class="digest-topic-item" style="border-top:1px solid #eee; margin: 15px 0 15px 30px;">';
-			$item_message .= "<span class=\"digest-item-action\" {$ass_email_css['item_action']}>" . $action . ": ";
-			$item_message .= "<span class=\"digest-item-timestamp\" {$ass_email_css['item_date']}>" . sprintf( __('at %s, %s', 'bp-ass'), $time_posted, $date_posted ) ."</span>";
-			$item_message .= "<br><span class=\"digest-item-content\" {$ass_email_css['item_content']}>" . apply_filters( 'ass_digest_content', $activity_item->content, $activity_item, $type ) . "</span>";
-			$item_message .=  "</span>\n";
+			$item_message .= "<span class=\"digest-item-action\" {$ass_email_css['item_action']}>" . $action . ': ';
+			$item_message .= "<span class=\"digest-item-timestamp\" {$ass_email_css['item_date']}>" . sprintf( __( 'at %1$s, %2$s', 'bp-ass' ), $time_posted, $date_posted ) . '</span>';
+			$item_message .= "<br><span class=\"digest-item-content\" {$ass_email_css['item_content']}>" . apply_filters( 'ass_digest_content', $activity_item->content, $activity_item, $type ) . '</span>';
+			$item_message .= "</span>\n";
 			$item_message .= '</div>'; // .digest-topic-item
 		}
 		$item_message .= '</div>'; // .digest-topic-items
@@ -170,33 +170,33 @@ function hcommons_filter_ass_digest_format_item_group( $group_message, $group_id
 
 		if ( ! empty( $activity_item ) ) {
 
-		    if( 'bpeo_create_event' === $activity_item->type ) {
+			if ( 'bpeo_create_event' === $activity_item->type ) {
 				$event_id = $activity_item->secondary_item_id;
 
 				$occurrences = eo_get_the_occurrences_of( $event_id );
 
-        		if($occurrences) {
-                	$occurence_ids = array_keys( $occurrences );
-                    $occurence_id = $occurence_ids[0];
-                } else {
-                	continue;
-                }
+				if ( $occurrences ) {
+					$occurence_ids = array_keys( $occurrences );
+					$occurence_id  = $occurence_ids[0];
+				} else {
+					continue;
+				}
 
-				$event_date = eo_get_the_start( 'g:i a jS M Y' , $event_id, $occurence_id );
+				$event_date = eo_get_the_start( 'g:i a jS M Y', $event_id, $occurence_id );
 
-				$group_message .=  "<div class=\"digest-item\" {$ass_email_css['item_div']}>";
-				$group_message .=  "<span class=\"digest-item-action\" {$ass_email_css['item_action']}>" . $activity_item->action . ": ";
-				$group_message .= "<span class=\"digest-item-timestamp\" {$ass_email_css['item_date']}>" . sprintf( __('at %s', 'bp-ass'), $event_date)  ."</span>";
-				$group_message .=  "</span>\n";
+				$group_message .= "<div class=\"digest-item\" {$ass_email_css['item_div']}>";
+				$group_message .= "<span class=\"digest-item-action\" {$ass_email_css['item_action']}>" . $activity_item->action . ': ';
+				$group_message .= "<span class=\"digest-item-timestamp\" {$ass_email_css['item_date']}>" . sprintf( __( 'at %s', 'bp-ass' ), $event_date ) . '</span>';
+				$group_message .= "</span>\n";
 
 				// activity content
 				if ( ! empty( $activity_item->content ) ) {
-					$item_message .= "<br><span class=\"digest-item-content\" {$ass_email_css['item_content']}>" . apply_filters( 'ass_digest_content', $activity_item->content, $activity_item, $type ) . "</span>";
+					$item_message .= "<br><span class=\"digest-item-content\" {$ass_email_css['item_content']}>" . apply_filters( 'ass_digest_content', $activity_item->content, $activity_item, $type ) . '</span>';
 				}
 
 				$view_link = $activity_item->primary_link;
 
-				$group_message .= ' - <a class="digest-item-view-link" href="' . ass_get_login_redirect_url( $view_link ) .'">' . __( 'View', 'bp-ass' ) . '</a>';
+				$group_message .= ' - <a class="digest-item-view-link" href="' . ass_get_login_redirect_url( $view_link ) . '">' . __( 'View', 'bp-ass' ) . '</a>';
 
 				$group_message .= "</div>\n\n";
 
@@ -230,7 +230,7 @@ function hcommons_filter_ass_digest_group_activity_ids( $group_activity_ids ) {
 		// Allow for weekly digests to include one prior week of potentially delayed items.
 		// Beyond that, consider the inclusion of this activity a bug and remove it.
 		foreach ( $activity_ids as $i => $activity_id ) {
-			$activity = new BP_Activity_Activity( $activity_id );
+			$activity     = new BP_Activity_Activity( $activity_id );
 			$activity_age = time() - strtotime( $activity->date_recorded );
 
 			if ( $activity_age > 2 * WEEK_IN_SECONDS ) {
@@ -296,22 +296,22 @@ add_filter( 'ass_digest_summary_full', 'hcommons_filter_ass_digest_summary_full'
  * @return string $activity_text Return modified string.
  */
 function hcommons_bp_ass_activity_notification_action( $activity_text, $activity ) {
-	$topic_id = bbp_get_reply_topic_id( $activity->secondary_item_id );
+	$topic_id    = bbp_get_reply_topic_id( $activity->secondary_item_id );
 	$topic_title = get_post_field( 'post_title', $topic_id, 'raw' );
 
 	$topic_title = wp_trim_words( $topic_title, 7, '...' );
 
-	$forum_id = bbp_get_topic_forum_id( $topic_id );
+	$forum_id    = bbp_get_topic_forum_id( $topic_id );
 	$forum_title = get_post_field( 'post_title', $forum_id, 'raw' );
 
 	$forum_title = wp_trim_words( $forum_title, 4, '...' );
 
 	switch ( $activity->type ) {
-		case 'bbp_topic_create' :
+		case 'bbp_topic_create':
 			$activity_text = sprintf( esc_html__( '%1$s (%2$s)', 'bbpress' ), $topic_title, $forum_title );
 			break;
 
-		case 'bbp_reply_create' :
+		case 'bbp_reply_create':
 			$activity_text = sprintf( esc_html__( 're: %1$s (%2$s)', 'bbpress' ), $topic_title, $forum_title );
 			break;
 	}
@@ -336,12 +336,12 @@ function hc_custom_group_forum_subscription_settings() {
 	<thead>
 		<tr>
 			<th class="icon"></th>
-			<th class="title"><?php _e( 'Group notifications', 'group_forum_subscription' ) ?></th>
-			<th class="no-email gas-choice"><?php _e( 'No Email', 'buddypress' ) ?></th>
-			<th class="weekly gas-choice"><?php _e( 'Weekly Summary', 'buddypress' )?></th>
-			<th class="daily gas-choice"><?php _e( 'Daily Digest', 'buddypress' )?></th>
-			<th class="new-topics gas-choice"><?php _e( 'New Topics', 'buddypress' )?></th>
-			<th class="all-email gas-choice"><?php _e( 'All Email', 'buddypress' )?></th>
+			<th class="title"><?php _e( 'Group notifications', 'group_forum_subscription' ); ?></th>
+			<th class="no-email gas-choice"><?php _e( 'No Email', 'buddypress' ); ?></th>
+			<th class="weekly gas-choice"><?php _e( 'Weekly Summary', 'buddypress' ); ?></th>
+			<th class="daily gas-choice"><?php _e( 'Daily Digest', 'buddypress' ); ?></th>
+			<th class="new-topics gas-choice"><?php _e( 'New Topics', 'buddypress' ); ?></th>
+			<th class="all-email gas-choice"><?php _e( 'All Email', 'buddypress' ); ?></th>
 
 		</tr>
 	</thead>
@@ -352,12 +352,12 @@ function hc_custom_group_forum_subscription_settings() {
 	foreach ( $group_types as $group_type ) {
 
 		$args = array(
-			'per_page' => 100,
+			'per_page'       => 100,
 			'group_type__in' => $group_type,
-			'action' => '',
-			'type' => '',
-			'orderby' => 'name',
-			'order' => 'ASC',
+			'action'         => '',
+			'type'           => '',
+			'orderby'        => 'name',
+			'order'          => 'ASC',
 		);
 		if ( bp_has_groups( $args ) ) {
 
@@ -371,39 +371,60 @@ function hc_custom_group_forum_subscription_settings() {
 		<tbody>
 
 		<?php
-		while ( bp_groups() ) : bp_the_group();
+		while ( bp_groups() ) :
+			bp_the_group();
 
-			$group_id = bp_get_group_id();
+			$group_id    = bp_get_group_id();
 			$subscribers = groups_get_groupmeta( $group_id, 'ass_subscribed_users' );
-			$user_id = $bp->displayed_user->id;
-			$my_status = $subscribers[ $user_id ];
+			$user_id     = $bp->displayed_user->id;
+			$my_status   = $subscribers[ $user_id ];
 
 		?>
 				<tr>
 					<td></td>
 
 					<td>
-						<a href="<?php bp_group_permalink() ?>"><?php bp_group_name() ?></a>
+						<a href="<?php bp_group_permalink(); ?>"><?php bp_group_name(); ?></a>
 					</td>
 
 					<td class="no-email gas-choice">
-						<input type="radio" name="group-notifications[<?php echo $group_id ?>]" value="no" <?php if ( 'no' == $my_status || ! $my_status ) { ?>checked="checked" <?php } ?>/>
+						<input type="radio" name="group-notifications[<?php echo $group_id; ?>]" value="no" 
+																					<?php
+																					if ( 'no' == $my_status || ! $my_status ) {
+															?>
+															checked="checked" <?php } ?>/>
 					</td>
 
 					<td class="weekly gas-choice">
-						<input type="radio" name="group-notifications[<?php echo $group_id ?>]" value="sum" <?php if ( 'sum' == $my_status ) { ?>checked="checked" <?php } ?>/>
+						<input type="radio" name="group-notifications[<?php echo $group_id; ?>]" value="sum" 
+																					<?php
+																					if ( 'sum' == $my_status ) {
+															?>
+															checked="checked" <?php } ?>/>
 					</td>
 
 					<td class="daily gas-choice">
-						<input type="radio" name="group-notifications[<?php echo $group_id ?>]" value="dig" <?php if ( 'dig' == $my_status ) { ?>checked="checked" <?php } ?>/>
+						<input type="radio" name="group-notifications[<?php echo $group_id; ?>]" value="dig" 
+																					<?php
+																					if ( 'dig' == $my_status ) {
+															?>
+															checked="checked" <?php } ?>/>
 					</td>
 
 					<td class="new-topics gas-choice">
-						<input type="radio" name="group-notifications[<?php echo $group_id ?>]" value="sub" <?php if ( 'sub' == $my_status ) { ?>checked="checked" <?php } ?>/>
+						<input type="radio" name="group-notifications[<?php echo $group_id; ?>]" value="sub" 
+																					<?php
+																					if ( 'sub' == $my_status ) {
+															?>
+															checked="checked" <?php } ?>/>
 					</td>
 
 					<td class="weekly gas-choice">
-						<input type="radio" name="group-notifications[<?php echo $group_id ?>]" value="supersub" <?php if ( 'supersub' == $my_status ) { ?>checked="checked" <?php } ?>/>
+						<input type="radio" name="group-notifications[<?php echo $group_id; ?>]" value="supersub" 
+																					<?php
+																					if ( 'supersub' == $my_status ) {
+															?>
+															checked="checked" <?php } ?>/>
 					</td>
 				</tr>
 			<?php
@@ -452,7 +473,7 @@ add_action( 'bp_actions', 'hc_custom_update_group_subscribe_settings' );
  * @param BP_Email $instance Current instance of the email type class.
  */
 function hc_custom_bp_email_set_tokens( $formatted_tokens, $tokens, $instance ) {
-	$formatted_tokens['unsubscribe']  = bp_displayed_user_domain() . bp_get_settings_slug() . '/notifications';
+	$formatted_tokens['unsubscribe'] = bp_displayed_user_domain() . bp_get_settings_slug() . '/notifications';
 
 	return $formatted_tokens;
 }
@@ -475,7 +496,7 @@ function hc_custom_ass_digest_disable_notifications( $unsubscribe_message, $user
 
 	$settings_page = bp_get_settings_slug() . '/notifications';
 
-	$unsubscribe_message = '\n\n' . sprintf( __( 'To disable these notifications per group please login and go to: %s where you can change your email settings for each group.', 'bp-ass' ), '<a href="https://{$userdomain[2]}/{$userdomain[3]}/{$userdomain[4]}/{$settings_page}/">'. __( 'My Groups', 'bp-ass' ) . '</a>' );
+	$unsubscribe_message = '\n\n' . sprintf( __( 'To disable these notifications per group please login and go to: %s where you can change your email settings for each group.', 'bp-ass' ), '<a href="https://{$userdomain[2]}/{$userdomain[3]}/{$userdomain[4]}/{$settings_page}/">' . __( 'My Groups', 'bp-ass' ) . '</a>' );
 
 	return $unsubscribe_message;
 }
@@ -496,16 +517,17 @@ function hc_custom_ass_bp_email_footer_html_unsubscribe_links() {
 
 	remove_action( 'bp_after_email_footer', 'ass_bp_email_footer_html_unsubscribe_links' );
 
-	$userdomain  = strtok( $tokens['ges.unsubscribe'], '?' );
+	$userdomain    = strtok( $tokens['ges.unsubscribe'], '?' );
 	$settings_page = $userdomain . '/settings/notifications/';
 
-	$link_format = '<a href="%1$s" title="%2$s" style="text-decoration: underline;">%3$s</a>';
+	$link_format  = '<a href="%1$s" title="%2$s" style="text-decoration: underline;">%3$s</a>';
 	$footer_links = array();
 
 	switch ( $tokens['subscription_type'] ) {
 		// Self-notifications.
-		case 'self_notify' :
-			$footer_links[] = sprintf( $link_format,
+		case 'self_notify':
+			$footer_links[] = sprintf(
+				$link_format,
 				$tokens['ges.settings-link'],
 				esc_attr__( 'Once you are logged in, uncheck "Receive notifications of your own posts?".', 'bp-ass' ),
 				esc_html__( 'Change email settings', 'bp-ass' )
@@ -516,9 +538,10 @@ function hc_custom_ass_bp_email_footer_html_unsubscribe_links() {
 		// Everything else.
 		case 'sub':
 		case 'supersub':
-		case 'dig' :
-		case 'sum' :
-			$footer_links[] = sprintf( $link_format,
+		case 'dig':
+		case 'sum':
+			$footer_links[] = sprintf(
+				$link_format,
 				$settings_page,
 				esc_attr__( 'Once you are logged in, change your email settings for each group.', 'bp-ass' ),
 				esc_html__( 'Change email settings', 'bp-ass' )
@@ -534,4 +557,4 @@ function hc_custom_ass_bp_email_footer_html_unsubscribe_links() {
 		unset( buddypress()->ges_tokens );
 }
 
-add_action( 'bp_after_email_footer' , 'hc_custom_ass_bp_email_footer_html_unsubscribe_links' );
+add_action( 'bp_after_email_footer', 'hc_custom_ass_bp_email_footer_html_unsubscribe_links' );
