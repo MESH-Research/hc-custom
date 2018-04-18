@@ -31,6 +31,11 @@ function hcommons_fix_group_forum_permalinks( $url ) {
 // Priority 20 to run after CBox_BBP_Autoload->override_the_permalink_with_group_permalink().
 add_filter( 'the_permalink', 'hcommons_fix_group_forum_permalinks', 20 );
 
+/**
+ * Add xprofile query to user query.
+ *
+ * @param BP_User_Query $q User query.
+ */
 function filter_bp_xprofile_add_xprofile_query_to_user_query( BP_User_Query $q ) {
 
 	if ( bp_is_group_members() ) {

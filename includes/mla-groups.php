@@ -1,4 +1,8 @@
 <?php
+/**
+ * Legacy.
+ * @codingStandardsIgnoreFile
+ */
 
 class MLA_Groups {
 

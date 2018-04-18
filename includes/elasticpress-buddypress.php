@@ -6,7 +6,7 @@
  */
 
 /**
- * add core deposit metadata to index
+ * Add core deposit metadata to index.
  *
  * @param array   $keys Array of index-able private meta keys.
  * @param WP_Post $post The current post to be indexed.
@@ -27,7 +27,7 @@ add_filter( 'ep_prepare_meta_allowed_protected_keys', 'hcommons_filter_ep_prepar
 /**
  * Ensure $post->permalink is used rather than the_permalink() to handle cross-network results.
  *
- * @param string $post_link permalink
+ * @param string $post_link Permalink.
  * @return string
  */
 function hcommons_filter_post_type_link( string $post_link = '' ) {
@@ -205,6 +205,12 @@ function hcommons_filter_ep_bp_fallback_post_type_facet_selection( $post_types )
 }
 add_filter( 'ep_bp_fallback_post_type_facet_selection', 'hcommons_filter_ep_bp_fallback_post_type_facet_selection' );
 
+/**
+ * Make deposits indexable.
+ *
+ * @param array $post_types Indexable post types.
+ * @return array
+ */
 function hcommons_filter_ep_indexable_post_types( $post_types ) {
 	return array_unique(
 		array_merge(
@@ -217,18 +223,21 @@ function hcommons_filter_ep_indexable_post_types( $post_types ) {
 add_filter( 'ep_indexable_post_types', 'hcommons_filter_ep_indexable_post_types' );
 
 /**
- * filter humcore permalinks (for elasticpress results)
+ * Filter humcore permalinks (for elasticpress results).
+ *
+ * @param string  $post_link Post link.
+ * @param WP_Post $post Post.
  */
 function humcore_filter_post_type_link( $post_link, $post ) {
 	if ( 'humcore_deposit' === get_post_type() ) {
 
-		// hope index has the correct permalink or fall back to meta otherwise
+		// Hope index has the correct permalink or fall back to meta otherwise.
 		if ( false !== strpos( $post->permalink, ':' ) ) {
 			$post_link = $post->permalink;
 		} else {
 			$meta = get_post_meta( get_the_ID() );
 
-			// if we're missing post meta, we're probably on the wrong blog for this post.
+			// If we're missing post meta, we're probably on the wrong blog for this post.
 			// TODO is there a way to get blog_id for a post, so we can switch_to_blog for meta instead of invoking solr?
 			if ( ! isset( $meta['_deposit_metadata'][0] ) ) {
 				preg_match( '/\/' . get_post_type() . '\/([\w]+)\//', $post_link, $matches );

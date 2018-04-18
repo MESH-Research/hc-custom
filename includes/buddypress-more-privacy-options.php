@@ -2,6 +2,11 @@
 /**
  * Plugin Name: BuddyPress / More Privacy Options patch
  * Description: Hook into some functions provided by BuddyPress to accommodate features added by More Privacy Options
+ *
+ * This file contains code copied from BP that doesn't pass phpcs, ignore it.
+ * @codingStandardsIgnoreFile
+ *
+ * @package Hc_Custom
  */
 
 /**
@@ -29,7 +34,7 @@ function more_privacy_options_blogs_get( $return_value, $args ) {
 	} elseif ( bp_is_current_action( 'my-sites' ) && current_user_can( 'manage_options' ) || is_super_admin() ) {
 		$hidden_sql = ''; // this enables sites to users that are admin if the visibility is -3
 	} else {
-		if ( ! is_user_logged_in() || ! bp_current_user_can( 'bp_moderate' ) && ( $user_id != bp_loggedin_user_id() ) ) {
+		if ( ! is_user_logged_in() || ! bp_current_user_can( 'bp_moderate' ) && ( bp_loggedin_user_id() != $user_id ) ) {
 			$hidden_sql = 'AND wb.public in ( 0, 1 ) '; // this does not consider any values of "public" added by MPO
 		} else {
 			$hidden_sql = '';

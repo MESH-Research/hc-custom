@@ -5,7 +5,9 @@
  * @package Hc_Custom
  */
 
-
+/**
+ * Disable follow button for non-society-members.
+ */
 function hcommons_add_non_society_member_follow_button() {
 	if ( ! is_super_admin() && hcommons_check_non_member_active_session() ) {
 		echo '<div class="disabled-button">Follow</div>';
@@ -13,6 +15,9 @@ function hcommons_add_non_society_member_follow_button() {
 }
 add_action( 'bp_directory_members_actions', 'hcommons_add_non_society_member_follow_button' );
 
+/**
+ * Add follow disclaimer for non-society-members.
+ */
 function hcommons_add_non_society_member_disclaimer_member() {
 	if ( ! is_super_admin() && hcommons_check_non_member_active_session() ) {
 		printf(

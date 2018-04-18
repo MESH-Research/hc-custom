@@ -29,6 +29,9 @@ add_action( 'bp_rbe_get_nonrbe_notice', 'hcommons_filter_bp_rbe_get_nonrbe_notic
 /**
  * Add nested reply formatting to digests.
  *
+ * TODO pass phpcs.
+ * @codingStandardsIgnoreStart
+ *
  * @param string $group_message
  * @param int    $group_id
  * @param string $type
@@ -206,23 +209,25 @@ function hcommons_filter_ass_digest_format_item_group( $group_message, $group_id
 		}
 	}
 
+
 	return $group_message;
 };
 add_filter( 'ass_digest_format_item_group', 'hcommons_filter_ass_digest_format_item_group', 10, 5 );
+// @codingStandardsIgnoreEnd
 
 /**
  * Remove activity items that don't belong to the current network from digest emails
  *
  * @uses Humanities_Commons
  *
- * @param array $group_activity_ids List of activities keyed by group ID
+ * @param array $group_activity_ids List of activities keyed by group ID.
  * @return array Only those activity IDs belonging to the current network
  */
 function hcommons_filter_ass_digest_group_activity_ids( $group_activity_ids ) {
 	$network_activity_ids = [];
 
 	foreach ( $group_activity_ids as $group_id => $activity_ids ) {
-		if ( Humanities_Commons::$society_id === bp_groups_get_group_type( $group_id ) ) {
+		if ( bp_groups_get_group_type( $group_id ) === Humanities_Commons::$society_id ) {
 			$network_activity_ids[ $group_id ] = $activity_ids;
 		}
 
@@ -251,8 +256,8 @@ add_action( 'ass_digest_group_activity_ids', 'hcommons_filter_ass_digest_group_a
  *
  * @uses Humanities_Commons
  *
- * @param string $summary
- * @return string summary
+ * @param string $summary Summary.
+ * @return string Summary.
  */
 function hcommons_filter_ass_digest_summary_full( string $summary ) {
 	// Start with a clean slate, handle below if we need to kill this particular email.
@@ -308,10 +313,12 @@ function hcommons_bp_ass_activity_notification_action( $activity_text, $activity
 
 	switch ( $activity->type ) {
 		case 'bbp_topic_create':
+			// @codingStandardsIgnoreLine
 			$activity_text = sprintf( esc_html__( '%1$s (%2$s)', 'bbpress' ), $topic_title, $forum_title );
 			break;
 
 		case 'bbp_reply_create':
+			// @codingStandardsIgnoreLine
 			$activity_text = sprintf( esc_html__( 're: %1$s (%2$s)', 'bbpress' ), $topic_title, $forum_title );
 			break;
 	}
@@ -388,7 +395,7 @@ function hc_custom_group_forum_subscription_settings() {
 					</td>
 
 					<td class="no-email gas-choice">
-						<input type="radio" name="group-notifications[<?php echo $group_id; ?>]" value="no" 
+						<input type="radio" name="group-notifications[<?php echo $group_id; ?>]" value="no"
 																					<?php
 																					if ( 'no' == $my_status || ! $my_status ) {
 															?>
@@ -396,7 +403,7 @@ function hc_custom_group_forum_subscription_settings() {
 					</td>
 
 					<td class="weekly gas-choice">
-						<input type="radio" name="group-notifications[<?php echo $group_id; ?>]" value="sum" 
+						<input type="radio" name="group-notifications[<?php echo $group_id; ?>]" value="sum"
 																					<?php
 																					if ( 'sum' == $my_status ) {
 															?>
@@ -404,7 +411,7 @@ function hc_custom_group_forum_subscription_settings() {
 					</td>
 
 					<td class="daily gas-choice">
-						<input type="radio" name="group-notifications[<?php echo $group_id; ?>]" value="dig" 
+						<input type="radio" name="group-notifications[<?php echo $group_id; ?>]" value="dig"
 																					<?php
 																					if ( 'dig' == $my_status ) {
 															?>
@@ -412,7 +419,7 @@ function hc_custom_group_forum_subscription_settings() {
 					</td>
 
 					<td class="new-topics gas-choice">
-						<input type="radio" name="group-notifications[<?php echo $group_id; ?>]" value="sub" 
+						<input type="radio" name="group-notifications[<?php echo $group_id; ?>]" value="sub"
 																					<?php
 																					if ( 'sub' == $my_status ) {
 															?>
@@ -420,7 +427,7 @@ function hc_custom_group_forum_subscription_settings() {
 					</td>
 
 					<td class="weekly gas-choice">
-						<input type="radio" name="group-notifications[<?php echo $group_id; ?>]" value="supersub" 
+						<input type="radio" name="group-notifications[<?php echo $group_id; ?>]" value="supersub"
 																					<?php
 																					if ( 'supersub' == $my_status ) {
 															?>
@@ -496,6 +503,7 @@ function hc_custom_ass_digest_disable_notifications( $unsubscribe_message, $user
 
 	$settings_page = bp_get_settings_slug() . '/notifications';
 
+	// @codingStandardsIgnoreLine
 	$unsubscribe_message = '\n\n' . sprintf( __( 'To disable these notifications per group please login and go to: %s where you can change your email settings for each group.', 'bp-ass' ), '<a href="https://{$userdomain[2]}/{$userdomain[3]}/{$userdomain[4]}/{$settings_page}/">' . __( 'My Groups', 'bp-ass' ) . '</a>' );
 
 	return $unsubscribe_message;
