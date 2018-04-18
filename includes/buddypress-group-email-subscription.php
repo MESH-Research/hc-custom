@@ -632,5 +632,4 @@ function hc_custom_disable_subscription_settings_form() {
 
 }
 
-//add_action ( 'bp_after_group_settings_admin' ,'hc_custom_disable_subscription_settings_form', 0);
 add_action ( 'bp_after_group_settings_creation_step' ,'hc_custom_disable_subscription_settings_form', 0 );
