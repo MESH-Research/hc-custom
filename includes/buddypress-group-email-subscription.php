@@ -420,7 +420,7 @@ add_action( 'bp_notification_settings', 'hc_custom_group_forum_subscription_sett
 
 
 /**
- * Reproduces email notification settings (as in legacy email system) in Group Activity Subscription
+ * Adds a section for users to set their default group notifications when joining a new group.
  */
 function hc_custom_default_group_forum_subscription_settings() {
 	global $bp;
@@ -508,9 +508,10 @@ function hc_custom_update_group_subscribe_settings() {
 
 add_action( 'bp_actions', 'hc_custom_update_group_subscribe_settings' );
 
-// give the user a notice if they are default subscribed to this group (does not work for invites or requests)
+/**
+ * Give the user a notice if they are default subscribed to this group (does not work for invites or requests).
+ **/
 function hc_custom_join_group_message( $group_id, $user_id ) {
-	global $bp;
 
 	remove_action( 'groups_join_group', 'ass_join_group_message' );
 
@@ -625,11 +626,35 @@ function hc_custom_ass_bp_email_footer_html_unsubscribe_links() {
 
 add_action( 'bp_after_email_footer' , 'hc_custom_ass_bp_email_footer_html_unsubscribe_links' );
 
-// Disable the default subscription settings during group creation and editing.
+/**
+ * Disable the default subscription settings during group creation.
+ */
 function hc_custom_disable_subscription_settings_form() {
-	remove_action( 'bp_after_group_settings_admin' , 'ass_default_subscription_settings_form' );
     remove_action( 'bp_after_group_settings_creation_step' , 'ass_default_subscription_settings_form' );
-
 }
 
 add_action ( 'bp_after_group_settings_creation_step' ,'hc_custom_disable_subscription_settings_form', 0 );
+
+
+/**
+ * Set default notification for user on accept or invite.
+ *
+ * @param int $user_id  ID of the user who joined the group.
+ * @param int $group_id ID of the group the member has joined.
+ */
+function hc_custom_set_notifications_on_accept_invite_or_request( $user_id, $group_id ) {
+
+	if ( $user_id != bp_loggedin_user_id()  )
+		return;
+
+	$status = get_user_meta( $user_id, 'default_group_notifications', true );
+
+	if ( empty( $status ) ) {
+		$status = 'no';
+	}
+
+	ass_group_subscription( $status, $user_id, $group_id );
+}
+
+add_action( 'groups_accept_invite', 'ass_send_welcome_email_on_accept_invite_or_request', 10, 2 );
+add_action( 'groups_membership_accepted', 'ass_send_welcome_email_on_accept_invite_or_request', 10, 2 );
