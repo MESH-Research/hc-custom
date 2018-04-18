@@ -454,7 +454,7 @@ function hc_custom_default_group_forum_subscription_settings() {
 	global $bp;
 
 	$user_id = $bp->displayed_user->id;
-	$my_status = get_user_meta( $user_id, 'default_group_notifications', true);
+	$my_status = get_user_meta( $user_id, 'default_group_notifications', true );
 ?>
 
 	<table class="notification-settings" id="groups-notification-settings">
@@ -529,7 +529,7 @@ function hc_custom_update_group_subscribe_settings() {
 		$user_id = bp_loggedin_user_id();
 		$value = $_POST['default-group-notifications'];
 
-		update_user_meta( $user_id, 'default_group_notifications',  $value);
+		update_user_meta( $user_id, 'default_group_notifications',  $value );
 	}
 
 }
@@ -538,18 +538,22 @@ add_action( 'bp_actions', 'hc_custom_update_group_subscribe_settings' );
 
 /**
  * Give the user a notice if they are default subscribed to this group (does not work for invites or requests).
+ *
+ * @param int $group_id ID of the group the member has joined.
+ * @param int $user_id ID of the user who joined the group.
  **/
 function hc_custom_join_group_message( $group_id, $user_id ) {
 
 	remove_action( 'groups_join_group', 'ass_join_group_message' );
 
-	if ( $user_id != bp_loggedin_user_id()  )
-		return;
+	if ( bp_loggedin_user_id() != $user_id ) {
+		return; }
 
 	$status = get_user_meta( $user_id, 'default_group_notifications', true );
 
 	if ( empty( $status ) ) {
 		$status = 'no';
+		update_user_meta( $user_id, 'default_group_notifications', 'no' );
 	}
 
 	ass_group_subscription( $status, $user_id, $group_id );
@@ -661,10 +665,10 @@ add_action( 'bp_after_email_footer' , 'hc_custom_ass_bp_email_footer_html_unsubs
  * Disable the default subscription settings during group creation.
  */
 function hc_custom_disable_subscription_settings_form() {
-    remove_action( 'bp_after_group_settings_creation_step' , 'ass_default_subscription_settings_form' );
+	remove_action( 'bp_after_group_settings_creation_step' , 'ass_default_subscription_settings_form' );
 }
 
-add_action ( 'bp_after_group_settings_creation_step' ,'hc_custom_disable_subscription_settings_form', 0 );
+add_action( 'bp_after_group_settings_creation_step' ,'hc_custom_disable_subscription_settings_form', 0 );
 
 /**
  * Set default notification for user on accept or invite.
@@ -674,17 +678,15 @@ add_action ( 'bp_after_group_settings_creation_step' ,'hc_custom_disable_subscri
  */
 function hc_custom_set_notifications_on_accept_invite_or_request( $user_id, $group_id ) {
 
-	if ( $user_id != bp_loggedin_user_id()  )
-		return;
-
 	$status = get_user_meta( $user_id, 'default_group_notifications', true );
 
 	if ( empty( $status ) ) {
 		$status = 'no';
+		update_user_meta( $user_id, 'default_group_notifications', 'no' );
 	}
 
 	ass_group_subscription( $status, $user_id, $group_id );
 }
 
-add_action( 'groups_accept_invite', 'ass_send_welcome_email_on_accept_invite_or_request', 10, 2 );
-add_action( 'groups_membership_accepted', 'ass_send_welcome_email_on_accept_invite_or_request', 10, 2 );
+add_action( 'groups_accept_invite', 'hc_custom_set_notifications_on_accept_invite_or_request', 20, 2 );
+add_action( 'groups_membership_accepted', 'hc_custom_set_notifications_on_accept_invite_or_request', 20, 2 );
