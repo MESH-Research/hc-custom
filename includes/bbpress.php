@@ -14,18 +14,27 @@ add_filter( 'bbp_is_akismet_active', '__return_false' );
  * Replace default bbp notification formatter with our own multinetwork-compatible version.
  * Copied from bbp_format_buddypress_notifications().
  * Added switch_to_blog logic for multinetwork compatibility
+ *
+ * @param string $action                Component action.
+ * @param int    $item_id               Notification item ID.
+ * @param int    $secondary_item_id     Notification secondary item ID.
+ * @param int    $total_items           Number of notifications with the same action.
+ * @param string $format                Format of return. Either 'string' or 'object'.
+ * @param string $component_action_name Canonical notification action.
+ * @param string $component_name        Notification component ID.
+ * @param int    $notification_id       Notification ID.
  */
 function hcommons_bbp_format_buddypress_notifications( $action, $item_id, $secondary_item_id, $total_items, $format = 'string', $component_action_name, $component_name, $notification_id ) {
 	$return = $action;
 
 	if ( function_exists( 'bbp_format_buddypress_notifications' ) ) {
 
-		// New reply notifications
+		// New reply notifications.
 		if ( 'bbp_new_reply' === $action ) {
 			$society_id           = bp_notifications_get_meta( $notification_id, 'society_id', true );
 			$notification_blog_id = (int) constant( strtoupper( $society_id ) . '_ROOT_BLOG_ID' );
 			$switched             = false;
-			if ( ! empty( $notification_blog_id ) && $notification_blog_id !== get_current_blog_id() ) {
+			if ( ! empty( $notification_blog_id ) && get_current_blog_id() !== $notification_blog_id ) {
 				switch_to_blog( $notification_blog_id );
 				$switched = true;
 			}
@@ -43,23 +52,26 @@ function hcommons_bbp_format_buddypress_notifications( $action, $item_id, $secon
 			$title_attr  = __( 'Topic Replies', 'bbpress' );
 
 			if ( (int) $total_items > 1 ) {
+				// @codingStandardsIgnoreLine
 				$text   = sprintf( __( 'You have %d new replies', 'bbpress' ), (int) $total_items );
 				$filter = 'bbp_multiple_new_subscription_notification';
 			} else {
 				if ( ! empty( $secondary_item_id ) ) {
+					// @codingStandardsIgnoreLine
 					$text = sprintf( __( 'You have %d new reply to %2$s from %3$s', 'bbpress' ), (int) $total_items, $topic_title, bp_core_get_user_displayname( $secondary_item_id ) );
 				} else {
+					// @codingStandardsIgnoreLine
 					$text = sprintf( __( 'You have %1$d new reply to %2$s', 'bbpress' ), (int) $total_items, $topic_title );
 				}
 				$filter = 'bbp_single_new_subscription_notification';
 			}
 
-			// WordPress Toolbar
 			if ( 'string' === $format ) {
+				// WordPress Toolbar.
 				$return = apply_filters( $filter, '<a href="' . esc_url( $topic_link ) . '" title="' . esc_attr( $title_attr ) . '">' . esc_html( $text ) . '</a>', (int) $total_items, $text, $topic_link );
 
-				// Deprecated BuddyBar
 			} else {
+				// Deprecated BuddyBar.
 				$return = apply_filters(
 					$filter, array(
 						'text' => $text,

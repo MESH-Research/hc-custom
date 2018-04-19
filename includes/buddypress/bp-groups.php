@@ -167,30 +167,36 @@ function update_group_forum_visibility( BP_Groups_Group $group ) {
 	switch ( $group->status ) {
 		// Changed to hidden.
 		case 'hidden':
-			$wpdb->query( $wpdb->prepare(
-				"UPDATE %s SET hide_sitewide = 1 WHERE item_id = %d AND component = 'groups'",
-				$bp->activity->table_name,
-				$group->id
-			) );
+			$wpdb->query(
+				$wpdb->prepare(
+					"UPDATE %s SET hide_sitewide = 1 WHERE item_id = %d AND component = 'groups'",
+					$bp->activity->table_name,
+					$group->id
+				)
+			);
 			break;
 
 		// Changed to private.
 		case 'private':
-			$wpdb->query( $wpdb->prepare(
-				"UPDATE %s SET hide_sitewide = 1 WHERE item_id = %d AND component = 'groups'",
-				$bp->activity->table_name,
-				$group->id
-			) );
+			$wpdb->query(
+				$wpdb->prepare(
+					"UPDATE %s SET hide_sitewide = 1 WHERE item_id = %d AND component = 'groups'",
+					$bp->activity->table_name,
+					$group->id
+				)
+			);
 			break;
 
 		// Changed to public.
 		case 'public':
 		default:
-			$wpdb->query( $wpdb->prepare(
-				"UPDATE %s SET hide_sitewide = 0 WHERE item_id = %d AND component = 'groups'",
-				$bp->activity->table_name,
-				$group->id
-			) );
+			$wpdb->query(
+				$wpdb->prepare(
+					"UPDATE %s SET hide_sitewide = 0 WHERE item_id = %d AND component = 'groups'",
+					$bp->activity->table_name,
+					$group->id
+				)
+			);
 			break;
 	}
 }
