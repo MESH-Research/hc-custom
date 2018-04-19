@@ -11,6 +11,54 @@
 add_filter( 'bbp_is_akismet_active', '__return_false' );
 
 /**
+ * Filter topic permalinks.
+ * Switch blogs to get the correct metadata for topics on other networks.
+ *
+ * @param string $topic_permalink Permalink.
+ * @param int    $topic_id ID.
+ * @return string
+ */
+function hcommons_fix_multinetwork_topic_permalinks( $topic_permalink, $topic_id ) {
+	// Assume we're already on the correct network if the permalink is set.
+	if ( $topic_permalink ) {
+		return $topic_permalink;
+	}
+
+	// Otherwise look up the activity to get its blog id.
+	$results = bp_activity_get(
+		[
+			'filter' => [
+				'action'       => 'bbp_topic_create',
+				'secondary_id' => $topic_id,
+			],
+		]
+	);
+
+	// There should be one activity for the creation of any given topic.
+	if ( 1 !== count( $results['activities'] ) ) {
+		return $topic_permalink;
+	}
+
+	$society_id       = bp_activity_get_meta( $results['activities'][0]->id, 'society_id', true );
+	$activity_blog_id = (int) constant( strtoupper( $society_id ) . '_ROOT_BLOG_ID' );
+
+	switch_to_blog( $activity_blog_id );
+
+	// Remove this filter so we can run the original again.
+	remove_filter( 'bbp_get_topic_permalink', 'hcommons_fix_multinetwork_topic_permalinks', 10, 2 );
+
+	$topic_permalink = bbp_get_topic_permalink( $topic_id );
+
+	restore_current_blog();
+
+	// Restore this filter.
+	add_filter( 'bbp_get_topic_permalink', 'hcommons_fix_multinetwork_topic_permalinks', 10, 2 );
+
+	return $topic_permalink;
+}
+add_filter( 'bbp_get_topic_permalink', 'hcommons_fix_multinetwork_topic_permalinks', 10, 2 );
+
+/**
  * Replace default bbp notification formatter with our own multinetwork-compatible version.
  * Copied from bbp_format_buddypress_notifications().
  * Added switch_to_blog logic for multinetwork compatibility
