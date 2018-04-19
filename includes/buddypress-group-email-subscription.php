@@ -453,7 +453,7 @@ add_action( 'bp_notification_settings', 'hc_custom_group_forum_subscription_sett
 function hc_custom_default_group_forum_subscription_settings() {
 	global $bp;
 
-	$user_id = $bp->displayed_user->id;
+	$user_id   = $bp->displayed_user->id;
 	$my_status = get_user_meta( $user_id, 'default_group_notifications', true );
 ?>
 
@@ -461,12 +461,12 @@ function hc_custom_default_group_forum_subscription_settings() {
 		<thead>
 			<tr>
 				<th class="icon"></th>
-				<th class="title"><?php _e( 'Default Notifications For New Groups', 'group_forum_subscription' ) ?></th>
-				<th class="no-email gas-choice"><?php _e( 'No Email', 'buddypress' ) ?></th>
-				<th class="weekly gas-choice"><?php _e( 'Weekly Summary', 'buddypress' )?></th>
-				<th class="daily gas-choice"><?php _e( 'Daily Digest', 'buddypress' )?></th>
-				<th class="new-topics gas-choice"><?php _e( 'New Topics', 'buddypress' )?></th>
-				<th class="all-email gas-choice"><?php _e( 'All Email', 'buddypress' )?></th>
+				<th class="title"><?php _e( 'Default Notifications For New Groups', 'group_forum_subscription' ); ?></th>
+				<th class="no-email gas-choice"><?php _e( 'No Email', 'buddypress' ); ?></th>
+				<th class="weekly gas-choice"><?php _e( 'Weekly Summary', 'buddypress' ); ?></th>
+				<th class="daily gas-choice"><?php _e( 'Daily Digest', 'buddypress' ); ?></th>
+				<th class="new-topics gas-choice"><?php _e( 'New Topics', 'buddypress' ); ?></th>
+				<th class="all-email gas-choice"><?php _e( 'All Email', 'buddypress' ); ?></th>
 
 			</tr>
 		</thead>
@@ -477,27 +477,43 @@ function hc_custom_default_group_forum_subscription_settings() {
 			<td></td>
 
 			<td>
-				<a href="<?php bp_group_permalink() ?>"><?php bp_group_name() ?></a>
+				<a href="<?php bp_group_permalink(); ?>"><?php bp_group_name(); ?></a>
 			</td>
 
 			<td class="no-email gas-choice">
-				<input type="radio" name="default-group-notifications" value="no" <?php if ( 'no' == $my_status || ! $my_status ) { ?>checked="checked" <?php } ?>/>
+				<input type="radio" name="default-group-notifications" value="no"
+				<?php if ( 'no' == $my_status || ! $my_status ) { ?>
+					checked="checked"
+				<?php } ?>/>
 			</td>
 
 			<td class="weekly gas-choice">
-				<input type="radio" name="default-group-notifications" value="sum" <?php if ( 'sum' == $my_status ) { ?>checked="checked" <?php } ?>/>
+				<input type="radio" name="default-group-notifications" value="sum" 
+				<?php
+				if ( 'sum' == $my_status ) {
+?>
+checked="checked" <?php } ?>/>
 			</td>
 
 			<td class="daily gas-choice">
-				<input type="radio" name="default-group-notifications" value="dig" <?php if ( 'dig' == $my_status ) { ?>checked="checked" <?php } ?>/>
+				<input type="radio" name="default-group-notifications" value="dig"
+				<?php if ( 'dig' == $my_status ) { ?>
+					checked="checked"
+				<?php } ?>/>
 			</td>
 
 			<td class="new-topics gas-choice">
-				<input type="radio" name="default-group-notifications" value="sub" <?php if ( 'sub' == $my_status ) { ?>checked="checked" <?php } ?>/>
+				<input type="radio" name="default-group-notifications" value="sub"
+				<?php if ( 'sub' == $my_status ) { ?>
+					checked="checked"
+				<?php } ?>/>
 			</td>
 
 			<td class="weekly gas-choice">
-				<input type="radio" name="default-group-notifications" value="supersub" <?php if ( 'supersub' == $my_status ) { ?>checked="checked" <?php } ?>/>
+				<input type="radio" name="default-group-notifications" value="supersub"
+				<?php if ( 'supersub' == $my_status ) { ?>
+					checked="checked"
+				<?php } ?>/>
 			</td>
 		</tr>
 <?php
@@ -527,9 +543,9 @@ function hc_custom_update_group_subscribe_settings() {
 
 	if ( isset( $_POST['default-group-notifications'] ) ) {
 		$user_id = bp_loggedin_user_id();
-		$value = $_POST['default-group-notifications'];
+		$value   = $_POST['default-group-notifications'];
 
-		update_user_meta( $user_id, 'default_group_notifications',  $value );
+		update_user_meta( $user_id, 'default_group_notifications', $value );
 	}
 
 }
@@ -659,16 +675,16 @@ function hc_custom_ass_bp_email_footer_html_unsubscribe_links() {
 		unset( buddypress()->ges_tokens );
 }
 
-add_action( 'bp_after_email_footer' , 'hc_custom_ass_bp_email_footer_html_unsubscribe_links' );
+add_action( 'bp_after_email_footer', 'hc_custom_ass_bp_email_footer_html_unsubscribe_links' );
 
 /**
  * Disable the default subscription settings during group creation.
  */
 function hc_custom_disable_subscription_settings_form() {
-	remove_action( 'bp_after_group_settings_creation_step' , 'ass_default_subscription_settings_form' );
+	remove_action( 'bp_after_group_settings_creation_step', 'ass_default_subscription_settings_form' );
 }
 
-add_action( 'bp_after_group_settings_creation_step' ,'hc_custom_disable_subscription_settings_form', 0 );
+add_action( 'bp_after_group_settings_creation_step', 'hc_custom_disable_subscription_settings_form', 0 );
 
 /**
  * Set default notification for user on accept or invite.
