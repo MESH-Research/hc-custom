@@ -167,8 +167,8 @@ add_filter( 'bp_notifications_get_notifications_for_user', 'hcommons_bbp_format_
 /**
  * Fix multinetwork forum permalinks in multiforum bbp_create_topic activities.
  *
- * @param string $forum_permalink Permalink
- * @param int    $forum_id        ID
+ * @param string $forum_permalink Permalink.
+ * @param int    $forum_id        ID.
  * @return string
  */
 function hcommons_fix_multinetwork_forum_permalinks( $forum_permalink, $forum_id ) {
