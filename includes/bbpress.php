@@ -165,7 +165,11 @@ remove_filter( 'bp_notifications_get_notifications_for_user', 'bbp_format_buddyp
 add_filter( 'bp_notifications_get_notifications_for_user', 'hcommons_bbp_format_buddypress_notifications', 10, 8 );
 
 /**
+ * Fix multinetwork forum permalinks in multiforum bbp_create_topic activities.
  *
+ * @param string $forum_permalink Permalink
+ * @param int    $forum_id        ID
+ * @return string
  */
 function hcommons_fix_multinetwork_forum_permalinks( $forum_permalink, $forum_id ) {
 	// We depend on bp_get_activity_id() to look up the network ID in activity meta.
@@ -174,7 +178,7 @@ function hcommons_fix_multinetwork_forum_permalinks( $forum_permalink, $forum_id
 	}
 
 	if ( get_current_blog_id() !== $activity_blog_id ) {
-		$society_id       = bp_activity_get_meta(  bp_get_activity_id(), 'society_id', true );
+		$society_id       = bp_activity_get_meta( bp_get_activity_id(), 'society_id', true );
 		$activity_blog_id = (int) constant( strtoupper( $society_id ) . '_ROOT_BLOG_ID' );
 
 		switch_to_blog( $activity_blog_id );
