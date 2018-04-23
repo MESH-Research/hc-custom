@@ -11,6 +11,29 @@
 add_filter( 'bbp_is_akismet_active', '__return_false' );
 
 /**
+ * Fix multinetwork forum names in multiforum bbp_create_topic activities.
+ *
+ * @param string               $forum_name The forum name.
+ * @param int                  $forum_id   The forum ID.
+ * @param BP_Activity_Activity $activity   The bbp_create_topic activity.
+ * @return string
+ */
+function hcommons_fix_multinetwork_forum_name( $forum_name, $forum_id, $activity ) {
+	$society_id       = bp_activity_get_meta( $activity->id, 'society_id', true );
+	$activity_blog_id = (int) constant( strtoupper( $society_id ) . '_ROOT_BLOG_ID' );
+
+	if ( get_current_blog_id() !== $activity_blog_id ) {
+		switch_to_blog( $activity_blog_id );
+		$forum_name = get_post_field( 'post_title', $forum_id, 'raw' );
+		restore_current_blog();
+	}
+
+	return $forum_name;
+}
+add_filter( 'bpmfp_displayed_forum_name', 'hcommons_fix_multinetwork_forum_name', 10, 3 );
+add_filter( 'bpmfp_added_topic_forum_name', 'hcommons_fix_multinetwork_forum_name', 10, 3 );
+
+/**
  * Filter topic permalinks.
  * Switch blogs to get the correct metadata for topics on other networks.
  *
@@ -140,6 +163,37 @@ function hcommons_bbp_format_buddypress_notifications( $action, $item_id, $secon
 }
 remove_filter( 'bp_notifications_get_notifications_for_user', 'bbp_format_buddypress_notifications' );
 add_filter( 'bp_notifications_get_notifications_for_user', 'hcommons_bbp_format_buddypress_notifications', 10, 8 );
+
+/**
+ *
+ */
+function hcommons_fix_multinetwork_forum_permalinks( $forum_permalink, $forum_id ) {
+	// We depend on bp_get_activity_id() to look up the network ID in activity meta.
+	if ( ! bp_get_activity_id() ) {
+		return $forum_permalink;
+	}
+
+	if ( get_current_blog_id() !== $activity_blog_id ) {
+		$society_id       = bp_activity_get_meta(  bp_get_activity_id(), 'society_id', true );
+		$activity_blog_id = (int) constant( strtoupper( $society_id ) . '_ROOT_BLOG_ID' );
+
+		switch_to_blog( $activity_blog_id );
+
+		// Remove this filter so we can run the original again.
+		remove_filter( 'bbp_get_forum_permalink', 'hcommons_fix_multinetwork_forum_permalinks', 15, 2 );
+
+		$forum_permalink = bbp_get_forum_permalink( $forum_id );
+
+		restore_current_blog();
+
+		// Restore this filter.
+		add_filter( 'bbp_get_forum_permalink', 'hcommons_fix_multinetwork_forum_permalinks', 15, 2 );
+	}
+
+	return $forum_permalink;
+}
+// Priority 15 to run after CBox_BBP_Autoload->override_the_permalink_with_group_permalink().
+add_filter( 'bbp_get_forum_permalink', 'hcommons_fix_multinetwork_forum_permalinks', 15, 2 );
 
 /**
  * Make sure the_permalink() ends in /forum when posting a new topic so that
