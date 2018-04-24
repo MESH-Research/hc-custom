@@ -444,8 +444,7 @@ function hc_custom_group_forum_subscription_settings() {
 <?php
 }
 
-// @codingStandardsIgnoreLine
-//add_action( 'bp_notification_settings', 'hc_custom_group_forum_subscription_settings' );
+add_action( 'bp_notification_settings', 'hc_custom_group_forum_subscription_settings' );
 
 
 /**
