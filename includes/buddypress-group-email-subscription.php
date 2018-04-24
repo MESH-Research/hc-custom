@@ -444,6 +444,7 @@ function hc_custom_group_forum_subscription_settings() {
 <?php
 }
 
+// @codingStandardsIgnoreLine
 //add_action( 'bp_notification_settings', 'hc_custom_group_forum_subscription_settings' );
 
 
@@ -578,6 +579,7 @@ function hc_custom_join_group_message( $group_id, $user_id ) {
 
 }
 
+// @codingStandardsIgnoreLine
 //add_action( 'groups_join_group', 'hc_custom_join_group_message', 2, 2 );
 
 /**
@@ -684,6 +686,7 @@ function hc_custom_disable_subscription_settings_form() {
 	remove_action( 'bp_after_group_settings_creation_step', 'ass_default_subscription_settings_form' );
 }
 
+// @codingStandardsIgnoreLine
 //add_action( 'bp_after_group_settings_creation_step', 'hc_custom_disable_subscription_settings_form', 0 );
 
 /**
