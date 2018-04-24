@@ -520,7 +520,8 @@ checked="checked" <?php } ?>/>
 <?php
 }
 
-add_action( 'bp_notification_settings', 'hc_custom_default_group_forum_subscription_settings' );
+// @codingStandardsIgnoreLine
+//add_action( 'bp_notification_settings', 'hc_custom_default_group_forum_subscription_settings' );
 
 /**
  * Save group notification email settings.
