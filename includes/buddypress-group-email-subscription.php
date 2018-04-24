@@ -477,7 +477,7 @@ function hc_custom_default_group_forum_subscription_settings() {
 			<td></td>
 
 			<td>
-				<a href="<?php bp_group_permalink(); ?>"><?php bp_group_name(); ?></a>
+				<!--placeholder for name to show -->
 			</td>
 
 			<td class="no-email gas-choice">
@@ -488,7 +488,7 @@ function hc_custom_default_group_forum_subscription_settings() {
 			</td>
 
 			<td class="weekly gas-choice">
-				<input type="radio" name="default-group-notifications" value="sum" 
+				<input type="radio" name="default-group-notifications" value="sum"
 				<?php
 				if ( 'sum' == $my_status ) {
 ?>
