@@ -444,7 +444,7 @@ function hc_custom_group_forum_subscription_settings() {
 <?php
 }
 
-add_action( 'bp_notification_settings', 'hc_custom_group_forum_subscription_settings' );
+//add_action( 'bp_notification_settings', 'hc_custom_group_forum_subscription_settings' );
 
 
 /**
@@ -578,7 +578,7 @@ function hc_custom_join_group_message( $group_id, $user_id ) {
 
 }
 
-add_action( 'groups_join_group', 'hc_custom_join_group_message', 2, 2 );
+//add_action( 'groups_join_group', 'hc_custom_join_group_message', 2, 2 );
 
 /**
  * Overwrite unsubscribe link in e-mails.
@@ -684,7 +684,7 @@ function hc_custom_disable_subscription_settings_form() {
 	remove_action( 'bp_after_group_settings_creation_step', 'ass_default_subscription_settings_form' );
 }
 
-add_action( 'bp_after_group_settings_creation_step', 'hc_custom_disable_subscription_settings_form', 0 );
+//add_action( 'bp_after_group_settings_creation_step', 'hc_custom_disable_subscription_settings_form', 0 );
 
 /**
  * Set default notification for user on accept or invite.
