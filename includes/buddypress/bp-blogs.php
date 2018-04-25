@@ -34,9 +34,9 @@ add_filter( 'bp_before_has_blogs_parse_args', 'hcommons_exclude_root_blogs', 999
  * BuddyPress does not consider whether post comments are enabled when users reply to a post activity.
  * Remove the action responsible for posting the comment unless comments are enabled.
  *
- * @param int    $comment_id      The activity ID for the posted activity comment.
- * @param array  $params          Parameters for the activity comment.
- * @param object $parent_activity Parameters of the parent activity item (in this case, the blog post).
+ * @param int    $comment_id The activity ID for the posted activity comment.
+ * @param array  $r          Parameters for the activity comment.
+ * @param object $activity   Parameters of the parent activity item (in this case, the blog post).
  */
 function hcommons_constrain_activity_comments( $comment_id, $r, $activity ) {
 	switch_to_blog( $activity->item_id );
@@ -53,5 +53,5 @@ function hcommons_constrain_activity_comments( $comment_id, $r, $activity ) {
 
 	restore_current_blog();
 }
-// Priority 5 to run before bp_blogs_sync_add_from_activity_comment()
+// Priority 5 to run before bp_blogs_sync_add_from_activity_comment().
 add_action( 'bp_activity_comment_posted', 'hcommons_constrain_activity_comments', 5, 3 );
