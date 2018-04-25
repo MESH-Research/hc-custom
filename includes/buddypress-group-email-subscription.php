@@ -716,7 +716,7 @@ add_action( 'groups_membership_accepted', 'hc_custom_set_notifications_on_accept
 function hc_custom_newsletter_settings() {
 	global $bp;
 
-	$user_id   		   = $bp->displayed_user->id;
+	$user_id          = $bp->displayed_user->id;
 	$newsletter_optin = get_user_meta( $user_id, 'newsletter_optin', true );
 ?>
 
