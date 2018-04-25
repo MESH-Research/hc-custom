@@ -716,7 +716,7 @@ add_action( 'groups_membership_accepted', 'hc_custom_set_notifications_on_accept
 function hc_custom_newsletter_settings() {
 	global $bp;
 
-	$user_id          = $bp->displayed_user->id;
+	$user_id   		   = $bp->displayed_user->id;
 	$newsletter_optin = get_user_meta( $user_id, 'newsletter_optin', true );
 ?>
 
@@ -762,7 +762,7 @@ add_action( 'bp_notification_settings', 'hc_custom_newsletter_settings' );
 /**
  * Save group notification email settings.
  **/
-function hc_custom_update_group_subscribe_settings() {
+function hc_custom_update_newsletter_settings() {
 	global $bp;
 
 	if ( ! bp_is_settings_component() && ! bp_is_current_action( 'notifications' ) ) {
@@ -778,4 +778,4 @@ function hc_custom_update_group_subscribe_settings() {
 
 }
 
-add_action( 'bp_actions', 'hc_custom_update_group_subscribe_settings' );
+add_action( 'bp_actions', 'hc_custom_update_newsletter_settings' );
