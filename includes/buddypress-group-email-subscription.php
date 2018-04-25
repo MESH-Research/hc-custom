@@ -709,3 +709,73 @@ function hc_custom_set_notifications_on_accept_invite_or_request( $user_id, $gro
 
 add_action( 'groups_accept_invite', 'hc_custom_set_notifications_on_accept_invite_or_request', 20, 2 );
 add_action( 'groups_membership_accepted', 'hc_custom_set_notifications_on_accept_invite_or_request', 20, 2 );
+
+/**
+ * Adds a section for users to set their newsletter settings
+ */
+function hc_custom_newsletter_settings() {
+	global $bp;
+
+	$user_id          = $bp->displayed_user->id;
+	$newsletter_optin = get_user_meta( $user_id, 'newsletter_optin', true );
+?>
+
+	<table class="notification-settings" id="groups-notification-settings">
+		<thead>
+			<tr>
+				<th class="icon"></th>
+				<th class="title"><?php _e( 'Newsletter', 'group_forum_subscription' ); ?></th>
+				<th class="no-email gas-choice"><?php _e( 'Yes', 'buddypress' ); ?></th>
+				<th class="weekly gas-choice"><?php _e( 'No', 'buddypress' ); ?></th>
+			</tr>
+		</thead>
+
+		<tbody>
+
+		<tr>
+			<td></td>
+
+			<td>
+				Subscribe to Newsletter
+			</td>
+
+			<td class="no-newsletter gas-choice">
+				<input type="radio" name="newsletter-optin" value="yes"
+				<?php if ( 'yes' === $newsletter_optin ) : ?>
+					checked="checked"
+				<?php endif; ?>/>
+			</td>
+
+			<td class="yes-newsletter gas-choice">
+				<input type="radio" name="newsletter-optin" value="no"
+				<?php if ( 'no' === $newsletter_optin || ! $newsletter_optin ) : ?>
+					checked="checked"
+				<?php endif; ?>/>
+			</td>
+
+		</tr>
+<?php
+}
+
+add_action( 'bp_notification_settings', 'hc_custom_newsletter_settings' );
+
+/**
+ * Save group notification email settings.
+ **/
+function hc_custom_update_newsletter_settings() {
+	global $bp;
+
+	if ( ! bp_is_settings_component() && ! bp_is_current_action( 'notifications' ) ) {
+		return false;
+	}
+
+	if ( isset( $_POST['newsletter-optin'] ) ) {
+		$user_id = bp_loggedin_user_id();
+		$value   = $_POST['newsletter-optin'];
+
+		update_user_meta( $user_id, 'newsletter_optin', $value );
+	}
+
+}
+
+add_action( 'bp_actions', 'hc_custom_update_newsletter_settings' );
