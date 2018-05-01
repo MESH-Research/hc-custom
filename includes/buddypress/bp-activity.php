@@ -32,6 +32,7 @@ function hc_custom_template_part_filter( $templates, $slug, $name ) {
 		}
 	}
 
+	return $templates;
 }
 
 add_filter( 'bp_get_template_part', 'hc_custom_template_part_filter', 10, 3 );
