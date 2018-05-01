@@ -7,14 +7,18 @@
 
 /**
  * Removes the activity form if there is a discussion board.
+ *
+ * @param array  $templates Array of templates located.
+ * @param string $slug      Template part slug requested.
+ * @param string $name      Template part name requested.
  */
 function hc_custom_template_part_filter( $templates, $slug, $name ) {
 
 	if ( 'activity/post-form' !== $slug ) {
-    	return $templates;
-    }
+		return $templates;
+	}
 
-    if( bp_is_group() ) {
+	if ( bp_is_group() ) {
 		$bp = buddypress();
 
 		// Get group forum IDs.
