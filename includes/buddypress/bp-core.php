@@ -6,6 +6,19 @@
  */
 
 /**
+ * Enqueue jQuery UI dialog and convert template notices to modal dialogs.
+ */
+function hc_custom_convert_template_notices_to_dialogs() {
+	wp_enqueue_script( 'jquery-ui-dialog' );
+	wp_enqueue_style( 'wp-jquery-ui-dialog' );
+	$add_inline_js = function() {
+		wp_add_inline_script( 'jquery-ui-dialog', 'jQuery("#message").dialog({modal:true});' );
+	};
+	add_action( 'bp_core_render_message', $add_inline_js );
+}
+add_action( 'wp_enqueue_scripts', 'hc_custom_convert_template_notices_to_dialogs' );
+
+/**
  * Inject BP_Email into wp_mail.
  *
  * @param array $args Mail args.
