@@ -537,19 +537,19 @@ function hc_custom_member_activity_settings() {
 		}
 	}
 
-	$reply = bp_get_user_meta( bp_displayed_user_id(), 'notification_activity_new_reply', true )
+	$reply = bp_get_user_meta( bp_displayed_user_id(), 'notification_activity_new_reply', true );
 
 	if ( ! $reply ) {
 		$reply = 'yes';
 	}
 
-	$new_messages = bp_get_user_meta( bp_displayed_user_id(), 'notification_messages_new_message', true )
+	$new_messages = bp_get_user_meta( bp_displayed_user_id(), 'notification_messages_new_message', true );
 
 	if ( ! $new_messages ) {
 		$new_messages = 'yes';
 	}
 
-	$notify = bp_get_user_meta( bp_displayed_user_id(), 'notification_starts_following', true )
+	$notify = bp_get_user_meta( bp_displayed_user_id(), 'notification_starts_following', true );
 
 	if ( ! $notify ) {
 		$notify = 'yes';
@@ -646,43 +646,43 @@ function hc_custom_general_group_settings() {
 		return;
 	}
 
-	$group_invite = bp_get_user_meta( bp_displayed_user_id(), 'notification_groups_invite', true )
+	$group_invite = bp_get_user_meta( bp_displayed_user_id(), 'notification_groups_invite', true );
 
 	if ( ! $group_invite ) {
 		$group_invite = 'yes';
 	}
 
-	$group_update = bp_get_user_meta( bp_displayed_user_id(), 'notification_groups_group_updated', true )
+	$group_update = bp_get_user_meta( bp_displayed_user_id(), 'notification_groups_group_updated', true );
 
 	if ( ! $group_update ) {
 		$group_update = 'yes';
 	}
 
-	$group_promo = bp_get_user_meta( bp_displayed_user_id(), 'notification_groups_admin_promotion', true )
+	$group_promo = bp_get_user_meta( bp_displayed_user_id(), 'notification_groups_admin_promotion', true );
 
 	if ( ! $group_promo ) {
 		$group_promo = 'yes';
 	}
 
-	$group_request = bp_get_user_meta( bp_displayed_user_id(), 'notification_groups_membership_request', true )
+	$group_request = bp_get_user_meta( bp_displayed_user_id(), 'notification_groups_membership_request', true );
 
 	if ( ! $group_request ) {
 		$group_request = 'yes';
 	}
 
-	$group_request_completed = bp_get_user_meta( bp_displayed_user_id(), 'notification_membership_request_completed', true )
+	$group_request_completed = bp_get_user_meta( bp_displayed_user_id(), 'notification_membership_request_completed', true );
 
 	if ( ! $group_request_completed ) {
 		$group_request_completed = 'yes';
 	}
 
-	$notification_group_documents_upload_member = bp_get_user_meta( bp_displayed_user_id(), 'notification_group_documents_upload_member', true )
+	$notification_group_documents_upload_member = bp_get_user_meta( bp_displayed_user_id(), 'notification_group_documents_upload_member', true );
 
 	if ( ! $notification_group_documents_upload_member ) {
 		$notification_group_documents_upload_member = 'yes';
 	}
 
-	$notification_group_documents_upload_mod = bp_get_user_meta( bp_displayed_user_id(), 'notification_group_documents_upload_mod', true )
+	$notification_group_documents_upload_mod = bp_get_user_meta( bp_displayed_user_id(), 'notification_group_documents_upload_mod', true );
 
 	if ( ! $notification_group_documents_upload_mod ) {
 		$notification_group_documents_upload_mod = 'yes';
@@ -706,15 +706,15 @@ function hc_custom_general_group_settings() {
 	?>
 
 	<?php
-	if ( 'buddypress' == $forums ) :
+	if ( 'buddypress' == $forums   ) :
 
-		$replies_to_topic = bp_get_user_meta( bp_displayed_user_id(), 'ass_replies_to_my_topic', true )
+		$replies_to_topic = bp_get_user_meta( bp_displayed_user_id(), 'ass_replies_to_my_topic', true );
 
 		if ( ! $replies_to_topic ) {
 			$replies_to_topic = 'yes';
 		}
 
-		$replies_after_me = bp_get_user_meta( bp_displayed_user_id(), 'ass_replies_after_me_topic', true )
+		$replies_after_me = bp_get_user_meta( bp_displayed_user_id(), 'ass_replies_after_me_topic', true );
 
 		if ( ! $replies_after_me ) {
 			$replies_after_me = 'yes';
