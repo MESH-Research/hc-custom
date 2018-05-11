@@ -573,6 +573,7 @@ function hc_custom_member_activity_settings() {
 			<?php if ( bp_activity_do_mentions() ) : ?>
 				<tr id="activity-notification-settings-mentions">
 					<td>&nbsp;</td>
+					<?php /* translators: username */ ?>
 					<td><?php printf( __( 'A member mentions you in an update using "@%s"', 'buddypress' ), bp_core_get_username( bp_displayed_user_id() ) ); ?></td>
 					<td class="yes"><input type="radio" name="notifications[notification_activity_new_mention]" id="notification-activity-new-mention-yes" value="yes" <?php checked( $mention, 'yes', true ); ?>/><label for="notification-activity-new-mention-yes" class="bp-screen-reader-text">
 																																														<?php
@@ -706,7 +707,7 @@ function hc_custom_general_group_settings() {
 	?>
 
 	<?php
-	if ( 'buddypress' == $forums   ) :
+	if ( 'buddypress' == $forums ) :
 
 		$replies_to_topic = bp_get_user_meta( bp_displayed_user_id(), 'ass_replies_to_my_topic', true );
 
