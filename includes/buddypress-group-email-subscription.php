@@ -330,138 +330,22 @@ function hcommons_bp_ass_activity_notification_action( $activity_text, $activity
 add_filter( 'bp_ass_activity_notification_action', 'hcommons_bp_ass_activity_notification_action', 10, 2 );
 
 /**
- * Reproduces email notification settings (as in legacy email system) in Group Activity Subscription
- */
-function hc_custom_group_forum_subscription_settings() {
-
-	global $current_user;
-	global $groups_template, $bp;
-	global $group_obj;
-
-	?>
-	<table class="notification-settings" id="groups-notification-settings">
-	<thead>
-		<tr>
-			<th class="icon"></th>
-			<th class="title"><?php _e( 'Group notifications', 'group_forum_subscription' ); ?></th>
-			<th class="no-email gas-choice"><?php _e( 'No Email', 'buddypress' ); ?></th>
-			<th class="weekly gas-choice"><?php _e( 'Weekly Summary', 'buddypress' ); ?></th>
-			<th class="daily gas-choice"><?php _e( 'Daily Digest', 'buddypress' ); ?></th>
-			<th class="new-topics gas-choice"><?php _e( 'New Topics', 'buddypress' ); ?></th>
-			<th class="all-email gas-choice"><?php _e( 'All Email', 'buddypress' ); ?></th>
-
-		</tr>
-	</thead>
-
-	<?php
-	$group_types = bp_groups_get_group_types();
-
-	foreach ( $group_types as $group_type ) {
-
-		$args = array(
-			'per_page'       => 100,
-			'group_type__in' => $group_type,
-			'action'         => '',
-			'type'           => '',
-			'orderby'        => 'name',
-			'order'          => 'ASC',
-		);
-		if ( bp_has_groups( $args ) ) {
-
-		?>
-		<thead>
-			<tr id="network">
-				<th class="network-header"><?php echo strtoupper( $group_type ); ?></th>
-			</tr>
-		</thead>
-
-		<tbody>
-
-		<?php
-		while ( bp_groups() ) :
-			bp_the_group();
-
-			$group_id    = bp_get_group_id();
-			$subscribers = groups_get_groupmeta( $group_id, 'ass_subscribed_users' );
-			$user_id     = $bp->displayed_user->id;
-			$my_status   = $subscribers[ $user_id ];
-
-		?>
-				<tr>
-					<td></td>
-
-					<td>
-						<a href="<?php bp_group_permalink(); ?>"><?php bp_group_name(); ?></a>
-					</td>
-
-					<td class="no-email gas-choice">
-						<input type="radio" name="group-notifications[<?php echo $group_id; ?>]" value="no"
-																					<?php
-																					if ( 'no' == $my_status || ! $my_status ) {
-															?>
-															checked="checked" <?php } ?>/>
-					</td>
-
-					<td class="weekly gas-choice">
-						<input type="radio" name="group-notifications[<?php echo $group_id; ?>]" value="sum"
-																					<?php
-																					if ( 'sum' == $my_status ) {
-															?>
-															checked="checked" <?php } ?>/>
-					</td>
-
-					<td class="daily gas-choice">
-						<input type="radio" name="group-notifications[<?php echo $group_id; ?>]" value="dig"
-																					<?php
-																					if ( 'dig' == $my_status ) {
-															?>
-															checked="checked" <?php } ?>/>
-					</td>
-
-					<td class="new-topics gas-choice">
-						<input type="radio" name="group-notifications[<?php echo $group_id; ?>]" value="sub"
-																					<?php
-																					if ( 'sub' == $my_status ) {
-															?>
-															checked="checked" <?php } ?>/>
-					</td>
-
-					<td class="weekly gas-choice">
-						<input type="radio" name="group-notifications[<?php echo $group_id; ?>]" value="supersub"
-																					<?php
-																					if ( 'supersub' == $my_status ) {
-															?>
-															checked="checked" <?php } ?>/>
-					</td>
-				</tr>
-			<?php
-			endwhile;
-		}
-	}
-	?>
-	</tbody>
-</table>
-<?php
-}
-
-add_action( 'bp_notification_settings', 'hc_custom_group_forum_subscription_settings' );
-
-
-/**
  * Adds a section for users to set their default group notifications when joining a new group.
  */
 function hc_custom_default_group_forum_subscription_settings() {
 	global $bp;
+	global $current_user;
+	global $groups_template, $bp;
+	global $group_obj;
 
 	$user_id   = $bp->displayed_user->id;
 	$my_status = get_user_meta( $user_id, 'default_group_notifications', true );
 ?>
-
 	<table class="notification-settings" id="groups-notification-settings">
 		<thead>
 			<tr>
 				<th class="icon"></th>
-				<th class="title"><?php _e( 'Default Notifications For New Groups', 'group_forum_subscription' ); ?></th>
+				<th class="title"><?php _e( 'Default For Groups', 'group_forum_subscription' ); ?></th>
 				<th class="no-email gas-choice"><?php _e( 'No Email', 'buddypress' ); ?></th>
 				<th class="weekly gas-choice"><?php _e( 'Weekly Summary', 'buddypress' ); ?></th>
 				<th class="daily gas-choice"><?php _e( 'Daily Digest', 'buddypress' ); ?></th>
@@ -477,7 +361,7 @@ function hc_custom_default_group_forum_subscription_settings() {
 			<td></td>
 
 			<td>
-				<!--placeholder for name to show -->
+				When you join a group, you’ll be subscribed to
 			</td>
 
 			<td class="no-email gas-choice">
@@ -516,11 +400,457 @@ checked="checked" <?php } ?>/>
 				<?php } ?>/>
 			</td>
 		</tr>
+
+		<thead>
+			<tr id="network">
+				<th class="section-title" style="border:none;font-size:18px;">YOUR GROUPS</th>
+			</tr>
+		</thead>
+		<?php
+		$group_types = bp_groups_get_group_types();
+
+		foreach ( $group_types as $group_type ) {
+
+			$args = array(
+				'per_page'       => 100,
+				'group_type__in' => $group_type,
+				'action'         => '',
+				'type'           => '',
+				'orderby'        => 'name',
+				'order'          => 'ASC',
+			);
+			if ( bp_has_groups( $args ) ) {
+
+			?>
+			<thead>
+			<tr id="network">
+				<th class="network-header"><?php echo strtoupper( $group_type ); ?></th>
+			</tr>
+		</thead>
+		<?php
+		while ( bp_groups() ) :
+			bp_the_group();
+
+			$group_id       = bp_get_group_id();
+			$subscribers    = groups_get_groupmeta( $group_id, 'ass_subscribed_users' );
+			$user_id        = $bp->displayed_user->id;
+			$current_status = $subscribers[ $user_id ];
+
+		?>
+				<tr>
+					<td></td>
+
+					<td>
+						<a href="<?php bp_group_permalink(); ?>"><?php bp_group_name(); ?></a>
+					</td>
+
+					<td class="no-email gas-choice">
+						<input type="radio" name="group-notifications[<?php echo $group_id; ?>]" value="no"
+																					<?php
+																					if ( 'no' == $current_status || ! $current_status ) {
+															?>
+															checked="checked" <?php } ?>/>
+					</td>
+
+					<td class="weekly gas-choice">
+						<input type="radio" name="group-notifications[<?php echo $group_id; ?>]" value="sum"
+																					<?php
+																					if ( 'sum' == $current_status ) {
+															?>
+															checked="checked" <?php } ?>/>
+					</td>
+
+					<td class="daily gas-choice">
+						<input type="radio" name="group-notifications[<?php echo $group_id; ?>]" value="dig"
+																					<?php
+																					if ( 'dig' == $current_status ) {
+															?>
+															checked="checked" <?php } ?>/>
+					</td>
+
+					<td class="new-topics gas-choice">
+						<input type="radio" name="group-notifications[<?php echo $group_id; ?>]" value="sub"
+																					<?php
+																					if ( 'sub' == $current_status ) {
+															?>
+															checked="checked" <?php } ?>/>
+					</td>
+
+					<td class="weekly gas-choice">
+						<input type="radio" name="group-notifications[<?php echo $group_id; ?>]" value="supersub"
+																					<?php
+																					if ( 'supersub' == $current_status ) {
+															?>
+															checked="checked" <?php } ?>/>
+					</td>
+				</tr>
+			<?php
+			endwhile;
+			}
+		}
+	?>
+
+	</tbody>
+</table>
 <?php
 }
 
-// @codingStandardsIgnoreLine
-//add_action( 'bp_notification_settings', 'hc_custom_default_group_forum_subscription_settings' );
+/**
+ * Modify the email settings page.
+ */
+function hc_custom_notifications_page() {
+	remove_action( 'bp_notification_settings', 'bp_activity_screen_notification_settings', 1 );
+	remove_action( 'bp_notification_settings', 'groups_screen_notification_settings' );
+	remove_action( 'bp_notification_settings', 'ass_group_subscription_notification_settings' );
+	remove_action( 'bp_notification_settings', 'messages_screen_notification_settings', 2 );
+	remove_action( 'bp_notification_settings', 'bp_follow_screen_notification_settings' );
+
+?>
+<h1>Groups</h1>
+
+<?php
+
+// Default For Groups.
+echo hc_custom_default_group_forum_subscription_settings();
+
+// General Groups Settings.
+echo hc_custom_general_group_settings();
+
+// Member Activity.
+echo hc_custom_member_activity_settings();
+
+}
+
+add_action( 'bp_notification_settings', 'hc_custom_notifications_page', 0 );
+
+/**
+ * Modify the Member Activity section of the settings page.
+ */
+function hc_custom_member_activity_settings() {
+
+	if ( bp_activity_do_mentions() ) {
+
+		$mention = bp_get_user_meta( bp_displayed_user_id(), 'notification_activity_new_mention', true );
+
+		if ( ! $mention ) {
+			$mention = 'yes';
+		}
+	}
+
+	$reply = bp_get_user_meta( bp_displayed_user_id(), 'notification_activity_new_reply', true );
+
+	if ( ! $reply ) {
+		$reply = 'yes';
+	}
+
+	$new_messages = bp_get_user_meta( bp_displayed_user_id(), 'notification_messages_new_message', true );
+
+	if ( ! $new_messages ) {
+		$new_messages = 'yes';
+	}
+
+	$notify = bp_get_user_meta( bp_displayed_user_id(), 'notification_starts_following', true );
+
+	if ( ! $notify ) {
+		$notify = 'yes';
+	}
+
+?>
+	<br>Send an e-mail notice when:
+	<table class="notification-settings" id="activity-notification-settings">
+
+		<thead>
+			<tr>
+
+				<th class="icon">&nbsp;</th>
+				<th class="title"><H1><?php _e( 'Member Activity', 'buddypress' ); ?></H1></th>
+				<th class="yes"><?php _e( 'Yes', 'buddypress' ); ?></th>
+				<th class="no"><?php _e( 'No', 'buddypress' ); ?></th>
+			</tr>
+		</thead>
+
+		<tbody>
+			<?php if ( bp_activity_do_mentions() ) : ?>
+				<tr id="activity-notification-settings-mentions">
+					<td>&nbsp;</td>
+					<?php /* translators: username */ ?>
+					<td><?php printf( __( 'A member mentions you in an update using "@%s"', 'buddypress' ), bp_core_get_username( bp_displayed_user_id() ) ); ?></td>
+					<td class="yes"><input type="radio" name="notifications[notification_activity_new_mention]" id="notification-activity-new-mention-yes" value="yes" <?php checked( $mention, 'yes', true ); ?>/><label for="notification-activity-new-mention-yes" class="bp-screen-reader-text">
+																																														<?php
+																																														/* translators: accessibility text */
+																																														_e( 'Yes, send email', 'buddypress' );
+					?>
+					</label></td>
+					<td class="no"><input type="radio" name="notifications[notification_activity_new_mention]" id="notification-activity-new-mention-no" value="no" <?php checked( $mention, 'no', true ); ?>/><label for="notification-activity-new-mention-no" class="bp-screen-reader-text">
+																																													<?php
+																																													/* translators: accessibility text */
+																																													_e( 'No, do not send email', 'buddypress' );
+					?>
+					</label></td>
+				</tr>
+			<?php endif; ?>
+
+			<tr id="activity-notification-settings-replies">
+				<td>&nbsp;</td>
+				<td><?php _e( "A member replies to an update or comment you've posted", 'buddypress' ); ?></td>
+				<td class="yes"><input type="radio" name="notifications[notification_activity_new_reply]" id="notification-activity-new-reply-yes" value="yes" <?php checked( $reply, 'yes', true ); ?>/><label for="notification-activity-new-reply-yes" class="bp-screen-reader-text">
+																																												<?php
+																																												/* translators: accessibility text */
+																																												_e( 'Yes, send email', 'buddypress' );
+				?>
+				</label></td>
+				<td class="no"><input type="radio" name="notifications[notification_activity_new_reply]" id="notification-activity-new-reply-no" value="no" <?php checked( $reply, 'no', true ); ?>/><label for="notification-activity-new-reply-no" class="bp-screen-reader-text">
+																																											<?php
+																																											/* translators: accessibility text */
+																																											_e( 'No, do not send email', 'buddypress' );
+				?>
+				</label></td>
+			</tr>
+
+			<tr id="messages-notification-settings-new-message">
+				<td></td>
+				<td><?php _e( 'A member sends you a new message', 'buddypress' ); ?></td>
+				<td class="yes"><input type="radio" name="notifications[notification_messages_new_message]" id="notification-messages-new-messages-yes" value="yes" <?php checked( $new_messages, 'yes', true ); ?>/><label for="notification-messages-new-messages-yes" class="bp-screen-reader-text">
+																																													<?php
+																																													/* translators: accessibility text */
+																																													_e( 'Yes, send email', 'buddypress' );
+				?>
+				</label></td>
+				<td class="no"><input type="radio" name="notifications[notification_messages_new_message]" id="notification-messages-new-messages-no" value="no" <?php checked( $new_messages, 'no', true ); ?>/><label for="notification-messages-new-messages-no" class="bp-screen-reader-text">
+																																												<?php
+																																												/* translators: accessibility text */
+																																												_e( 'No, do not send email', 'buddypress' );
+				?>
+				</label></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><?php _e( 'A member starts following your activity', 'bp-follow' ); ?></td>
+				<td class="yes"><input type="radio" name="notifications[notification_starts_following]" value="yes" <?php checked( $notify, 'yes', true ); ?>/></td>
+				<td class="no"><input type="radio" name="notifications[notification_starts_following]" value="no" <?php checked( $notify, 'no', true ); ?>/></td>
+			</tr>
+
+		</tbody>
+	</table>
+<?php
+}
+
+/**
+ * General group settings.
+ */
+function hc_custom_general_group_settings() {
+	// Get forum type.
+	$forums = ass_get_forum_type();
+
+	// No forums installed? stop now!
+	if ( ! $forums ) {
+		return;
+	}
+
+	$group_invite = bp_get_user_meta( bp_displayed_user_id(), 'notification_groups_invite', true );
+
+	if ( ! $group_invite ) {
+		$group_invite = 'yes';
+	}
+
+	$group_update = bp_get_user_meta( bp_displayed_user_id(), 'notification_groups_group_updated', true );
+
+	if ( ! $group_update ) {
+		$group_update = 'yes';
+	}
+
+	$group_promo = bp_get_user_meta( bp_displayed_user_id(), 'notification_groups_admin_promotion', true );
+
+	if ( ! $group_promo ) {
+		$group_promo = 'yes';
+	}
+
+	$group_request = bp_get_user_meta( bp_displayed_user_id(), 'notification_groups_membership_request', true );
+
+	if ( ! $group_request ) {
+		$group_request = 'yes';
+	}
+
+	$group_request_completed = bp_get_user_meta( bp_displayed_user_id(), 'notification_membership_request_completed', true );
+
+	if ( ! $group_request_completed ) {
+		$group_request_completed = 'yes';
+	}
+
+	$notification_group_documents_upload_member = bp_get_user_meta( bp_displayed_user_id(), 'notification_group_documents_upload_member', true );
+
+	if ( ! $notification_group_documents_upload_member ) {
+		$notification_group_documents_upload_member = 'yes';
+	}
+
+	$notification_group_documents_upload_mod = bp_get_user_meta( bp_displayed_user_id(), 'notification_group_documents_upload_mod', true );
+
+	if ( ! $notification_group_documents_upload_mod ) {
+		$notification_group_documents_upload_mod = 'yes';
+	}
+	?>
+	Send an e-mail notice when:
+	<table class="notification-settings zebra" id="groups-subscription-notification-settings">
+	<thead>
+		<tr>
+			<th class="icon"></th>
+			<th class="title"><?php _e( 'General Groups Settings', 'bp-ass' ); ?></th>
+			<th class="yes"><?php _e( 'Yes', 'bp-ass' ); ?></th>
+			<th class="no"><?php _e( 'No', 'bp-ass' ); ?></th>
+		</tr>
+	</thead>
+	<tbody>
+
+	<?php
+		// only add the following options if BP's bundled forums are installed...
+		// @todo add back these options for bbPress if possible.
+	?>
+
+	<?php
+	if ( 'buddypress' == $forums ) :
+
+		$replies_to_topic = bp_get_user_meta( bp_displayed_user_id(), 'ass_replies_to_my_topic', true );
+
+		if ( ! $replies_to_topic ) {
+			$replies_to_topic = 'yes';
+		}
+
+		$replies_after_me = bp_get_user_meta( bp_displayed_user_id(), 'ass_replies_after_me_topic', true );
+
+		if ( ! $replies_after_me ) {
+			$replies_after_me = 'yes';
+		}
+	?>
+
+		<tr>
+			<td></td>
+			<td><?php _e( 'A member replies in a forum topic you\'ve started', 'bp-ass' ); ?></td>
+			<td class="yes"><input type="radio" name="notifications[ass_replies_to_my_topic]" value="yes" <?php checked( $replies_to_topic, 'yes', true ); ?>/></td>
+			<td class="no"><input type="radio" name="notifications[ass_replies_to_my_topic]" value="no" <?php checked( $replies_to_topic, 'no', true ); ?>/></td>
+		</tr>
+
+		<tr>
+			<td></td>
+			<td><?php _e( 'A member replies after you in a forum topic', 'bp-ass' ); ?></td>
+			<td class="yes"><input type="radio" name="notifications[ass_replies_after_me_topic]" value="yes" <?php checked( $replies_after_me, 'yes', true ); ?>/></td>
+			<td class="no"><input type="radio" name="notifications[ass_replies_after_me_topic]" value="no" <?php checked( $replies_after_me, 'no', true ); ?>/></td>
+		</tr>
+
+	<?php endif; ?>
+
+		<tr>
+			<td></td>
+			<td><?php _e( 'Receive notifications of your own posts?', 'bp-ass' ); ?></td>
+			<td class="yes"><input type="radio" name="notifications[ass_self_post_notification]" value="yes"
+			<?php
+			if ( ass_self_post_notification( bp_displayed_user_id() ) ) {
+?>
+checked="checked" <?php } ?>/></td>
+			<td class="no"><input type="radio" name="notifications[ass_self_post_notification]" value="no"
+			<?php
+			if ( ! ass_self_post_notification( bp_displayed_user_id() ) ) {
+?>
+checked="checked" <?php } ?>/></td>
+		</tr>
+
+		<tr id="groups-notification-settings-invitation">
+				<td></td>
+				<td><?php _ex( 'A member invites you to join a group', 'group settings on notification settings page', 'buddypress' ); ?></td>
+				<td class="yes"><input type="radio" name="notifications[notification_groups_invite]" id="notification-groups-invite-yes" value="yes" <?php checked( $group_invite, 'yes', true ); ?>/><label for="notification-groups-invite-yes" class="bp-screen-reader-text">
+																																									<?php
+																																									/* translators: accessibility text */
+																																									_e( 'Yes, send email', 'buddypress' );
+				?>
+				</label></td>
+				<td class="no"><input type="radio" name="notifications[notification_groups_invite]" id="notification-groups-invite-no" value="no" <?php checked( $group_invite, 'no', true ); ?>/><label for="notification-groups-invite-no" class="bp-screen-reader-text">
+																																									<?php
+																																									/* translators: accessibility text */
+																																									_e( 'No, do not send email', 'buddypress' );
+				?>
+				</label></td>
+			</tr>
+			<tr id="groups-notification-settings-info-updated">
+				<td></td>
+				<td><?php _ex( 'Group information is updated', 'group settings on notification settings page', 'buddypress' ); ?></td>
+				<td class="yes"><input type="radio" name="notifications[notification_groups_group_updated]" id="notification-groups-group-updated-yes" value="yes" <?php checked( $group_update, 'yes', true ); ?>/><label for="notification-groups-group-updated-yes" class="bp-screen-reader-text">
+																																													<?php
+																																													/* translators: accessibility text */
+																																													_e( 'Yes, send email', 'buddypress' );
+				?>
+				</label></td>
+				<td class="no"><input type="radio" name="notifications[notification_groups_group_updated]" id="notification-groups-group-updated-no" value="no" <?php checked( $group_update, 'no', true ); ?>/><label for="notification-groups-group-updated-no" class="bp-screen-reader-text">
+																																												<?php
+																																												/* translators: accessibility text */
+																																												_e( 'No, do not send email', 'buddypress' );
+				?>
+				</label></td>
+			</tr>
+			<tr id="groups-notification-settings-promoted">
+				<td></td>
+				<td><?php _ex( 'You are promoted to a group administrator or moderator', 'group settings on notification settings page', 'buddypress' ); ?></td>
+				<td class="yes"><input type="radio" name="notifications[notification_groups_admin_promotion]" id="notification-groups-admin-promotion-yes" value="yes" <?php checked( $group_promo, 'yes', true ); ?>/><label for="notification-groups-admin-promotion-yes" class="bp-screen-reader-text">
+																																														<?php
+																																														/* translators: accessibility text */
+																																														_e( 'Yes, send email', 'buddypress' );
+				?>
+				</label></td>
+				<td class="no"><input type="radio" name="notifications[notification_groups_admin_promotion]" id="notification-groups-admin-promotion-no" value="no" <?php checked( $group_promo, 'no', true ); ?>/><label for="notification-groups-admin-promotion-no" class="bp-screen-reader-text">
+																																													<?php
+																																													/* translators: accessibility text */
+																																													_e( 'No, do not send email', 'buddypress' );
+				?>
+				</label></td>
+			</tr>
+			<tr id="groups-notification-settings-request">
+				<td></td>
+				<td><?php _ex( 'A member requests to join a private group for which you are an admin', 'group settings on notification settings page', 'buddypress' ); ?></td>
+				<td class="yes"><input type="radio" name="notifications[notification_groups_membership_request]" id="notification-groups-membership-request-yes" value="yes" <?php checked( $group_request, 'yes', true ); ?>/><label for="notification-groups-membership-request-yes" class="bp-screen-reader-text">
+																																															<?php
+																																															/* translators: accessibility text */
+																																															_e( 'Yes, send email', 'buddypress' );
+				?>
+				</label></td>
+				<td class="no"><input type="radio" name="notifications[notification_groups_membership_request]" id="notification-groups-membership-request-no" value="no" <?php checked( $group_request, 'no', true ); ?>/><label for="notification-groups-membership-request-no" class="bp-screen-reader-text">
+																																															<?php
+																																															/* translators: accessibility text */
+																																															_e( 'No, do not send email', 'buddypress' );
+				?>
+				</label></td>
+			</tr>
+			<tr id="groups-notification-settings-request-completed">
+				<td></td>
+				<td><?php _ex( 'Your request to join a group has been approved or denied', 'group settings on notification settings page', 'buddypress' ); ?></td>
+				<td class="yes"><input type="radio" name="notifications[notification_membership_request_completed]" id="notification-groups-membership-request-completed-yes" value="yes" <?php checked( $group_request_completed, 'yes', true ); ?>/><label for="notification-groups-membership-request-completed-yes" class="bp-screen-reader-text">
+																																																			<?php
+																																																			/* translators: accessibility text */
+																																																			_e( 'Yes, send email', 'buddypress' );
+				?>
+				</label></td>
+				<td class="no"><input type="radio" name="notifications[notification_membership_request_completed]" id="notification-groups-membership-request-completed-no" value="no" <?php checked( $group_request_completed, 'no', true ); ?>/><label for="notification-groups-membership-request-completed-no" class="bp-screen-reader-text">
+																																																		<?php
+																																																		/* translators: accessibility text */
+																																																		_e( 'No, do not send email', 'buddypress' );
+				?>
+				</label></td>
+			</tr>
+			<tr id="groups-notification-settings-user-upload-file">
+			<td></td>
+			<td><?php _e( 'A member uploads a file to a group you belong to', 'bp-group-documents' ); ?></td>
+			<td class="yes"><input type="radio" name="notifications[notification_group_documents_upload_member]" value="yes" <?php checked( $notification_group_documents_upload_member, 'yes', true ); ?>/></td>
+			<td class="no"><input type="radio" name="notifications[notification_group_documents_upload_member]" value="no" <?php checked( $notification_group_documents_upload_member, 'no', true ); ?>/></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><?php _e( 'A member uploads a file to a group for which you are an moderator/admin', 'bp-group-documents' ); ?></td>
+				<td class="yes"><input type="radio" name="notifications[notification_group_documents_upload_mod]" value="yes" <?php checked( $notification_group_documents_upload_mod, 'yes', true ); ?>/></td>
+				<td class="no"><input type="radio" name="notifications[notification_group_documents_upload_mod]" value="no" <?php checked( $notification_group_documents_upload_mod, 'no', true ); ?>/></td>
+			</tr>
+	</tbody>
+</table>
+
+
+<?php
+}
 
 /**
  * Save group notification email settings.
@@ -580,7 +910,7 @@ function hc_custom_join_group_message( $group_id, $user_id ) {
 }
 
 // @codingStandardsIgnoreLine
-//add_action( 'groups_join_group', 'hc_custom_join_group_message', 2, 2 );
+add_action( 'groups_join_group', 'hc_custom_join_group_message', 2, 2 );
 
 /**
  * Overwrite unsubscribe link in e-mails.
@@ -687,7 +1017,7 @@ function hc_custom_disable_subscription_settings_form() {
 }
 
 // @codingStandardsIgnoreLine
-//add_action( 'bp_after_group_settings_creation_step', 'hc_custom_disable_subscription_settings_form', 0 );
+add_action( 'bp_after_group_settings_creation_step', 'hc_custom_disable_subscription_settings_form', 0 );
 
 /**
  * Set default notification for user on accept or invite.
@@ -724,7 +1054,7 @@ function hc_custom_newsletter_settings() {
 		<thead>
 			<tr>
 				<th class="icon"></th>
-				<th class="title"><?php _e( 'Newsletter', 'group_forum_subscription' ); ?></th>
+				<th class="title"><h1><?php _e( 'Newsletter', 'group_forum_subscription' ); ?></h1></th>
 				<th class="no-email gas-choice"><?php _e( 'Yes', 'buddypress' ); ?></th>
 				<th class="weekly gas-choice"><?php _e( 'No', 'buddypress' ); ?></th>
 			</tr>
@@ -736,7 +1066,7 @@ function hc_custom_newsletter_settings() {
 			<td></td>
 
 			<td>
-				Subscribe to Newsletter
+				Can we send you periodic updates about the Commons?
 			</td>
 
 			<td class="no-newsletter gas-choice">
@@ -754,6 +1084,8 @@ function hc_custom_newsletter_settings() {
 			</td>
 
 		</tr>
+	</tbody>
+</table>
 <?php
 }
 
