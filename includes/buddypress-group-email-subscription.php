@@ -505,7 +505,7 @@ function hc_custom_notifications_page() {
 	remove_action( 'bp_notification_settings', 'messages_screen_notification_settings', 2 );
 	remove_action( 'bp_notification_settings', 'bp_follow_screen_notification_settings' );
 
-	// Newsletter
+	// Newsletter.
 	echo hc_custom_newsletter_settings();
 
 ?>
@@ -1130,7 +1130,7 @@ function hc_custom_update_newsletter_settings() {
 add_action( 'bp_actions', 'hc_custom_update_newsletter_settings' );
 
 /**
- * Enqueue jQuery UI dialog and convert template notices to modal dialogs.
+ * Enqueue jQuery AreYouSure, monitors html forms and alerts users to unsaved changes.
  */
 function hc_custom_jquery_are_you_sure() {
 	wp_enqueue_script( 'jquery-are-you-sure', trailingslashit( plugins_url() ) . 'hc-custom/includes/js/jquery.are-you-sure.js', array( 'jquery' ) );
