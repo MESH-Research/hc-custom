@@ -505,19 +505,21 @@ function hc_custom_notifications_page() {
 	remove_action( 'bp_notification_settings', 'messages_screen_notification_settings', 2 );
 	remove_action( 'bp_notification_settings', 'bp_follow_screen_notification_settings' );
 
+	// Newsletter
+	echo hc_custom_newsletter_settings();
+
 ?>
-<h1>Groups</h1>
+	<h1>Groups</h1>
 
 <?php
+	// Default For Groups.
+	echo hc_custom_default_group_forum_subscription_settings();
 
-// Default For Groups.
-echo hc_custom_default_group_forum_subscription_settings();
+	// General Groups Settings.
+	echo hc_custom_general_group_settings();
 
-// General Groups Settings.
-echo hc_custom_general_group_settings();
-
-// Member Activity.
-echo hc_custom_member_activity_settings();
+	// Member Activity.
+	echo hc_custom_member_activity_settings();
 
 }
 
@@ -556,12 +558,11 @@ function hc_custom_member_activity_settings() {
 	}
 
 ?>
-	<br>Send an e-mail notice when:
+
 	<table class="notification-settings" id="activity-notification-settings">
 
 		<thead>
 			<tr>
-
 				<th class="icon">&nbsp;</th>
 				<th class="title"><H1><?php _e( 'Member Activity', 'buddypress' ); ?></H1></th>
 				<th class="yes"><?php _e( 'Yes', 'buddypress' ); ?></th>
@@ -570,9 +571,22 @@ function hc_custom_member_activity_settings() {
 		</thead>
 
 		<tbody>
+
 			<?php if ( bp_activity_do_mentions() ) : ?>
+
 				<tr id="activity-notification-settings-mentions">
 					<td>&nbsp;</td>
+
+					<td>Send an e-mail notice when:</td>
+
+
+				</tr>
+
+				<tr id="activity-notification-settings-mentions">
+					<td>&nbsp;</td>
+
+
+
 					<?php /* translators: username */ ?>
 					<td><?php printf( __( 'A member mentions you in an update using "@%s"', 'buddypress' ), bp_core_get_username( bp_displayed_user_id() ) ); ?></td>
 					<td class="yes"><input type="radio" name="notifications[notification_activity_new_mention]" id="notification-activity-new-mention-yes" value="yes" <?php checked( $mention, 'yes', true ); ?>/><label for="notification-activity-new-mention-yes" class="bp-screen-reader-text">
@@ -689,17 +703,16 @@ function hc_custom_general_group_settings() {
 		$notification_group_documents_upload_mod = 'yes';
 	}
 	?>
-	Send an e-mail notice when:
 	<table class="notification-settings zebra" id="groups-subscription-notification-settings">
-	<thead>
-		<tr>
-			<th class="icon"></th>
-			<th class="title"><?php _e( 'General Groups Settings', 'bp-ass' ); ?></th>
-			<th class="yes"><?php _e( 'Yes', 'bp-ass' ); ?></th>
-			<th class="no"><?php _e( 'No', 'bp-ass' ); ?></th>
-		</tr>
-	</thead>
-	<tbody>
+		<thead>
+			<tr>
+				<th class="icon"></th>
+				<th class="title"><?php _e( 'General Groups Settings', 'bp-ass' ); ?></th>
+				<th class="yes"><?php _e( 'Yes', 'bp-ass' ); ?></th>
+				<th class="no"><?php _e( 'No', 'bp-ass' ); ?></th>
+			</tr>
+		</thead>
+		<tbody>
 
 	<?php
 		// only add the following options if BP's bundled forums are installed...
@@ -722,6 +735,7 @@ function hc_custom_general_group_settings() {
 		}
 	?>
 
+
 		<tr>
 			<td></td>
 			<td><?php _e( 'A member replies in a forum topic you\'ve started', 'bp-ass' ); ?></td>
@@ -740,18 +754,10 @@ function hc_custom_general_group_settings() {
 
 		<tr>
 			<td></td>
-			<td><?php _e( 'Receive notifications of your own posts?', 'bp-ass' ); ?></td>
-			<td class="yes"><input type="radio" name="notifications[ass_self_post_notification]" value="yes"
-			<?php
-			if ( ass_self_post_notification( bp_displayed_user_id() ) ) {
-?>
-checked="checked" <?php } ?>/></td>
-			<td class="no"><input type="radio" name="notifications[ass_self_post_notification]" value="no"
-			<?php
-			if ( ! ass_self_post_notification( bp_displayed_user_id() ) ) {
-?>
-checked="checked" <?php } ?>/></td>
+			<td>Send an e-mail notice when:</td>
+
 		</tr>
+
 
 		<tr id="groups-notification-settings-invitation">
 				<td></td>
@@ -844,6 +850,20 @@ checked="checked" <?php } ?>/></td>
 				<td><?php _e( 'A member uploads a file to a group for which you are an moderator/admin', 'bp-group-documents' ); ?></td>
 				<td class="yes"><input type="radio" name="notifications[notification_group_documents_upload_mod]" value="yes" <?php checked( $notification_group_documents_upload_mod, 'yes', true ); ?>/></td>
 				<td class="no"><input type="radio" name="notifications[notification_group_documents_upload_mod]" value="no" <?php checked( $notification_group_documents_upload_mod, 'no', true ); ?>/></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><?php _e( 'Receive notifications of your own posts?', 'bp-ass' ); ?></td>
+				<td class="yes"><input type="radio" name="notifications[ass_self_post_notification]" value="yes"
+				<?php
+				if ( ass_self_post_notification( bp_displayed_user_id() ) ) {
+	?>
+	checked="checked" <?php } ?>/></td>
+				<td class="no"><input type="radio" name="notifications[ass_self_post_notification]" value="no"
+				<?php
+				if ( ! ass_self_post_notification( bp_displayed_user_id() ) ) {
+	?>
+	checked="checked" <?php } ?>/></td>
 			</tr>
 	</tbody>
 </table>
@@ -1089,8 +1109,6 @@ function hc_custom_newsletter_settings() {
 <?php
 }
 
-add_action( 'bp_notification_settings', 'hc_custom_newsletter_settings' );
-
 /**
  * Save group notification email settings.
  **/
@@ -1109,5 +1127,12 @@ function hc_custom_update_newsletter_settings() {
 	}
 
 }
-
 add_action( 'bp_actions', 'hc_custom_update_newsletter_settings' );
+
+/**
+ * Enqueue jQuery UI dialog and convert template notices to modal dialogs.
+ */
+function hc_custom_jquery_are_you_sure() {
+	wp_enqueue_script( 'jquery-are-you-sure', trailingslashit( plugins_url() ) . 'hc-custom/includes/js/jquery.are-you-sure.js', array( 'jquery' ) );
+}
+add_action( 'wp_enqueue_scripts', 'hc_custom_jquery_are_you_sure' );
