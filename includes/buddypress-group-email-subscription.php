@@ -15,6 +15,35 @@ function hcommons_remove_bpges_actions() {
 add_action( 'bp_init', 'hcommons_remove_bpges_actions' );
 
 /**
+ * Add a template notice to warn users when they have no email setting for the current group.
+ */
+function hc_custom_bpges_add_no_settings_warning() {
+	$subs = groups_get_groupmeta( bp_get_current_group_id(), 'ass_subscribed_users' );
+
+	// Check if this user already has a subscription setting.
+	foreach ( $subs as $user_id => $type ) {
+		if ( get_current_user_id() === $user_id && 'no' !== $type ) {
+			return; // This user already has a subscription setting, leave them alone.
+		}
+	}
+
+	$notifications_settings_link = trailingslashit( bp_loggedin_user_domain() . bp_get_settings_slug() ) . 'notifications';
+
+	$message = 'You have not set a default group email setting and have no setting for this group.<br><br>';
+
+	$links = [
+		sprintf( '<a class="button" href="%s">Change email settings</a>', $notifications_settings_link ),
+	];
+
+	// Remove wp_kses filter to allow <br>.
+	remove_filter( 'bp_core_render_message_content', 'wp_kses_data', 5 );
+	remove_filter( 'bp_core_render_message_content', 'wpautop' );
+
+	bp_core_add_message( $message . implode( '<br><br>', $links ), 'warning' );
+}
+add_action( 'groups_screen_group_home', 'hc_custom_bpges_add_no_settings_warning' );
+
+/**
  * Add a line break after "Replying to this email will not..."
  * Assumes HTML email, plaintext not supported.
  *
