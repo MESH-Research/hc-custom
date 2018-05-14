@@ -1,4 +1,4 @@
-jQuery(function(){
+(function(){
 	var handle_response = function( data ) {
 		$( '#hc-bpges-disable-warning' ).closest( '.ui-dialog-content' ).dialog( 'close' );
 	}
