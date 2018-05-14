@@ -1063,13 +1063,13 @@ add_action( 'bp_after_email_footer', 'hc_custom_ass_bp_email_footer_html_unsubsc
  */
 function hc_custom_disable_subscription_settings_form() {
 
-	if ( !mla_is_group_committee( bp_get_current_group_id() ) ) {
+	if ( ! mla_is_group_committee( bp_get_current_group_id() ) ) {
 		remove_action( 'bp_after_group_settings_admin', 'ass_default_subscription_settings_form' );
 		remove_action( 'bp_after_group_settings_creation_step', 'ass_default_subscription_settings_form' );
 	}
 }
 
-add_action ( 'bp_after_group_settings_admin' , 'hc_custom_disable_subscription_settings_form', 0 );
+add_action( 'bp_after_group_settings_admin', 'hc_custom_disable_subscription_settings_form', 0 );
 add_action( 'bp_after_group_settings_creation_step', 'hc_custom_disable_subscription_settings_form', 0 );
 
 
