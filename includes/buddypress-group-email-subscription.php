@@ -15,35 +15,6 @@ function hcommons_remove_bpges_actions() {
 add_action( 'bp_init', 'hcommons_remove_bpges_actions' );
 
 /**
- * Add a template notice to warn users when they have no email setting for the current group.
- */
-function hc_custom_bpges_add_no_settings_warning() {
-	$subs = groups_get_groupmeta( bp_get_current_group_id(), 'ass_subscribed_users' );
-
-	// Check if this user already has a subscription setting.
-	foreach ( $subs as $user_id => $type ) {
-		if ( get_current_user_id() === $user_id && 'no' !== $type ) {
-			return; // This user already has a subscription setting, leave them alone.
-		}
-	}
-
-	$notifications_settings_link = trailingslashit( bp_loggedin_user_domain() . bp_get_settings_slug() ) . 'notifications';
-
-	$message = 'You have not set a default group email setting and have no setting for this group.<br><br>';
-
-	$links = [
-		sprintf( '<a class="button" href="%s">Change email settings</a>', $notifications_settings_link ),
-	];
-
-	// Remove wp_kses filter to allow <br>.
-	remove_filter( 'bp_core_render_message_content', 'wp_kses_data', 5 );
-	remove_filter( 'bp_core_render_message_content', 'wpautop' );
-
-	bp_core_add_message( $message . implode( '<br><br>', $links ), 'warning' );
-}
-add_action( 'groups_screen_group_home', 'hc_custom_bpges_add_no_settings_warning' );
-
-/**
  * Add a line break after "Replying to this email will not..."
  * Assumes HTML email, plaintext not supported.
  *
@@ -1160,9 +1131,68 @@ function hc_custom_update_newsletter_settings() {
 
 		update_user_meta( $user_id, 'newsletter_optin', $value );
 	}
-
 }
 add_action( 'bp_actions', 'hc_custom_update_newsletter_settings' );
+
+/**
+ * Add a template notice to warn users when they have no email setting for the current group.
+ */
+function hc_custom_bpges_add_no_settings_warning() {
+	// Ensure we're on a group homepage.
+	if ( ! bp_is_group_home() ) {
+		return;
+	}
+
+	// Check for an existing subscription setting.
+	$subs = groups_get_groupmeta( bp_get_current_group_id(), 'ass_subscribed_users' );
+	foreach ( $subs as $user_id => $type ) {
+		if ( get_current_user_id() === $user_id && 'no' !== $type ) {
+			return;
+		}
+	}
+
+	// Check whether this user has disabled this warning.
+	$pref = get_user_meta( get_current_user_id(), 'hc_bpges_no_settings_warning', true );
+	if ( ! empty( $pref ) && 'no' === $pref ) {
+		return;
+	}
+
+	// At this point we know we're going to show the warning, so enqueue the script.
+	$js_handle = 'hc-bpges-disable-warning';
+	$js_path = 'includes/js/bpges-disable-warning.js';
+	$js_version = filemtime( trailingslashit( plugin_dir_path( __DIR__ ) ) . $js_path );
+	wp_enqueue_script( $js_handle, plugins_url( $js_path, __DIR__ ), [], $js_version, true );
+
+	// Remove filters to preserve markup.
+	remove_filter( 'bp_core_render_message_content', 'wp_kses_data', 5 );
+	remove_filter( 'bp_core_render_message_content', 'wpautop' );
+
+	// Add notice.
+	$notifications_settings_href = trailingslashit( bp_loggedin_user_domain() . bp_get_settings_slug() ) . 'notifications';
+	$message  = 'You have not set a default group email setting and have no setting for this group.<br><br>';
+	$links = [
+		sprintf(
+			'<a class="button" href="%s">Visit email settings</a>',
+			$notifications_settings_href
+		),
+		sprintf(
+			'<a id="%s" href="%s">Disable this warning for all groups</a><br>',
+			$js_handle,
+			$notifications_settings_href
+		),
+	];
+	bp_core_add_message( $message . implode( '<br><br>', $links ), 'warning' );
+}
+add_action( 'bp_init', 'hc_custom_bpges_add_no_settings_warning' );
+
+/**
+ * Handle POST requests to admin-ajax.php to disable the BPGES warning.
+ */
+function hc_custom_bpges_handle_no_settings_warning_post() {
+	$meta_value = ( isset( $_POST['hc_bpges_no_settings_warning'] ) ) ? $_POST['hc_bpges_no_settings_warning'] : 'no';
+	update_user_meta( get_current_user_id(), 'hc_bpges_no_settings_warning', $meta_value );
+}
+add_action( 'wp_ajax_hc_custom_bpges_settings_warning', 'hc_custom_bpges_handle_no_settings_warning_post' );
 
 /**
  * Enqueue jQuery AreYouSure, monitors html forms and alerts users to unsaved changes.
