@@ -9,11 +9,11 @@
  * Enqueue jQuery UI dialog and convert template notices to modal dialogs.
  */
 function hc_custom_convert_template_notices_to_dialogs() {
-	$bp = buddypress();
+	$bp         = buddypress();
 	$js_handle  = 'hc-custom-template-notice-dialogs';
 	$js_path    = 'includes/js/template-notice-dialogs.js';
 	$js_version = filemtime( trailingslashit( plugin_dir_path( dirname( __DIR__ ) ) ) . $js_path );
-	$js_vars = [
+	$js_vars    = [
 		'template_message_type' => ucfirst( $bp->template_message_type ),
 	];
 	wp_enqueue_script( $js_handle, plugins_url( $js_path, dirname( __DIR__ ) ), [ 'jquery-ui-dialog' ], $js_version, true );
