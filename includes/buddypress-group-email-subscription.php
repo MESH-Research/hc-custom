@@ -1168,20 +1168,27 @@ function hc_custom_bpges_add_no_settings_warning() {
 	remove_filter( 'bp_core_render_message_content', 'wpautop' );
 
 	// Add notice.
-	$notifications_settings_href = trailingslashit( bp_loggedin_user_domain() . bp_get_settings_slug() ) . 'notifications';
-	$message                     = 'You have not set a default group email setting and have no setting for this group.<br><br>';
-	$links                       = [
+	$settings_href = trailingslashit( bp_loggedin_user_domain() . bp_get_settings_slug() ) . 'notifications';
+	$message       = 'Your default setting for groups is set to "no email." To get email notifications from this group, adjust your settings.<br><br>';
+	$links         = [
 		sprintf(
 			'<a class="button" href="%s">Visit email settings</a>',
-			$notifications_settings_href
+			$settings_href
 		),
 		sprintf(
 			'<a id="%s" href="%s">Disable this warning for all groups</a><br>',
 			$js_handle,
-			$notifications_settings_href
+			$settings_href
 		),
 	];
-	bp_core_add_message( $message . implode( '<br><br>', $links ), 'warning' );
+
+	/**
+	 * Instead of bp_core_add_message(), which sends Set-Cookie headers,
+	 * just set the template globals to be sure this message only appears on group home.
+	 */
+	$bp = buddypress();
+	$bp->template_message      = $message . implode( '<br><br>', $links );
+	$bp->template_message_type = 'warning';
 }
 add_action( 'bp_init', 'hc_custom_bpges_add_no_settings_warning' );
 
