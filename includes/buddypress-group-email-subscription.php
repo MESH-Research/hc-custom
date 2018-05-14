@@ -1158,8 +1158,8 @@ function hc_custom_bpges_add_no_settings_warning() {
 	}
 
 	// At this point we know we're going to show the warning, so enqueue the script.
-	$js_handle = 'hc-bpges-disable-warning';
-	$js_path = 'includes/js/bpges-disable-warning.js';
+	$js_handle  = 'hc-bpges-disable-warning';
+	$js_path    = 'includes/js/bpges-disable-warning.js';
 	$js_version = filemtime( trailingslashit( plugin_dir_path( __DIR__ ) ) . $js_path );
 	wp_enqueue_script( $js_handle, plugins_url( $js_path, __DIR__ ), [], $js_version, true );
 
@@ -1169,8 +1169,8 @@ function hc_custom_bpges_add_no_settings_warning() {
 
 	// Add notice.
 	$notifications_settings_href = trailingslashit( bp_loggedin_user_domain() . bp_get_settings_slug() ) . 'notifications';
-	$message  = 'You have not set a default group email setting and have no setting for this group.<br><br>';
-	$links = [
+	$message                     = 'You have not set a default group email setting and have no setting for this group.<br><br>';
+	$links                       = [
 		sprintf(
 			'<a class="button" href="%s">Visit email settings</a>',
 			$notifications_settings_href
