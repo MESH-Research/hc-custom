@@ -1186,7 +1186,7 @@ function hc_custom_bpges_add_no_settings_warning() {
 	 * Instead of bp_core_add_message(), which sends Set-Cookie headers,
 	 * just set the template globals to be sure this message only appears on group home.
 	 */
-	$bp = buddypress();
+	$bp                        = buddypress();
 	$bp->template_message      = $message . implode( '<br><br>', $links );
 	$bp->template_message_type = 'warning';
 }
