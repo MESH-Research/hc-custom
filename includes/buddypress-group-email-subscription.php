@@ -1143,6 +1143,11 @@ function hc_custom_bpges_add_no_settings_warning() {
 		return;
 	}
 
+	// Ensure this user is a member of the group.
+	if ( ! groups_is_user_member( get_current_user_id(), bp_get_current_group_id() ) ) {
+		return;
+	}
+
 	// Check for an existing subscription setting.
 	$subs = groups_get_groupmeta( bp_get_current_group_id(), 'ass_subscribed_users' );
 	foreach ( $subs as $user_id => $type ) {
