@@ -1126,14 +1126,14 @@ function hc_custom_newsletter_settings() {
 
 			<td class="no-newsletter gas-choice">
 				<input type="radio" name="newsletter-optin" value="yes"
-				<?php if ( 'yes' === $newsletter_optin ) : ?>
+				<?php if ( 'yes' === $newsletter_optin || ! $newsletter_optin ) : ?>
 					checked="checked"
 				<?php endif; ?>/>
 			</td>
 
 			<td class="yes-newsletter gas-choice">
 				<input type="radio" name="newsletter-optin" value="no"
-				<?php if ( 'no' === $newsletter_optin || ! $newsletter_optin ) : ?>
+				<?php if ( 'no' === $newsletter_optin ) : ?>
 					checked="checked"
 				<?php endif; ?>/>
 			</td>
