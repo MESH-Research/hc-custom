@@ -1137,7 +1137,7 @@ add_action( 'bp_actions', 'hc_custom_update_newsletter_settings' );
 /**
  * Add a template notice to warn users when they have no email setting for the current group.
  */
-function hc_custom_bpges_add_no_settings_warning() {
+function hc_custom_bpges_add_settings_warning() {
 	// Ensure we're on a group homepage.
 	if ( ! bp_is_group_home() ) {
 		return;
@@ -1157,8 +1157,12 @@ function hc_custom_bpges_add_no_settings_warning() {
 	}
 
 	// Check whether this user has disabled this warning.
-	$pref = get_user_meta( get_current_user_id(), 'hc_bpges_no_settings_warning', true );
-	if ( ! empty( $pref ) && 'no' === $pref ) {
+	$meta_key = 'hc_custom_bpges_setting_warning_group_ids';
+	$group_ids = get_user_meta( get_current_user_id(), $meta_key, true );
+	if (
+		! empty( $group_ids ) &&
+		( [ 0 ] === $group_ids || in_array( bp_get_current_group_id(), $group_ids ) )
+	) {
 		return;
 	}
 
@@ -1167,6 +1171,7 @@ function hc_custom_bpges_add_no_settings_warning() {
 	$js_path    = 'includes/js/bpges-disable-warning.js';
 	$js_version = filemtime( trailingslashit( plugin_dir_path( __DIR__ ) ) . $js_path );
 	wp_enqueue_script( $js_handle, plugins_url( $js_path, __DIR__ ), [], $js_version, true );
+	wp_localize_script( $js_handle, 'hc_custom_bpges_setting_warning_group_ids', [ bp_get_current_group_id() ] );
 
 	// Remove filters to preserve markup.
 	remove_filter( 'bp_core_render_message_content', 'wp_kses_data', 5 );
@@ -1174,15 +1179,18 @@ function hc_custom_bpges_add_no_settings_warning() {
 
 	// Add notice.
 	$settings_href = trailingslashit( bp_loggedin_user_domain() . bp_get_settings_slug() ) . 'notifications';
-	$message       = 'To change your default setting or this group\'s e-mail setting, visit your e-mail settings page.<br><br>';
+	$message       = 'You are not receiving e-mail notifications for this group. To change your default setting or this group\'s e-mail setting, visit your e-mail settings page.<br><br>';
 	$links         = [
 		sprintf(
-			'<a class="button" href="%s">Visit e-mail settings</a>',
+			'<a class="button" href="%s">Visit e-mail settings</a><br>',
 			$settings_href
 		),
 		sprintf(
-			'<a id="%s" href="%s">Disable this warning for all groups</a><br>',
-			$js_handle,
+			'<a id="hc-bpges-warning-disable-this" href="%s">Disable this warning for this group only</a>',
+			$settings_href
+		),
+		sprintf(
+			'<a id="hc-bpges-warning-disable-all" href="%s">Disable this warning for <strong>all</strong> groups</a>',
 			$settings_href
 		),
 	];
@@ -1195,16 +1203,26 @@ function hc_custom_bpges_add_no_settings_warning() {
 	$bp->template_message      = $message . implode( '<br><br>', $links );
 	$bp->template_message_type = 'warning';
 }
-add_action( 'bp_init', 'hc_custom_bpges_add_no_settings_warning' );
+add_action( 'bp_init', 'hc_custom_bpges_add_settings_warning' );
 
 /**
  * Handle POST requests to admin-ajax.php to disable the BPGES warning.
  */
-function hc_custom_bpges_handle_no_settings_warning_post() {
-	$meta_value = ( isset( $_POST['hc_bpges_no_settings_warning'] ) ) ? $_POST['hc_bpges_no_settings_warning'] : 'no';
-	update_user_meta( get_current_user_id(), 'hc_bpges_no_settings_warning', $meta_value );
+function hc_custom_bpges_handle_settings_warning_post() {
+	$meta_key = 'hc_custom_bpges_setting_warning_group_ids';
+	$old_meta_value = get_user_meta( get_current_user_id(), $meta_key, true );
+
+	if ( isset( $_POST[ $meta_key ] ) && is_array( $_POST[ $meta_key ] ) ) {
+		// Disable warning for this group.
+		$new_meta_value = array_merge( (array) $_POST[ $meta_key ], (array) $old_meta_value );
+	} else {
+		// Disable warning for all groups.
+		$new_meta_value = [ 0 ];
+	}
+
+	update_user_meta( get_current_user_id(), $meta_key, $new_meta_value, $old_meta_value );
 }
-add_action( 'wp_ajax_hc_custom_bpges_settings_warning', 'hc_custom_bpges_handle_no_settings_warning_post' );
+add_action( 'wp_ajax_hc_custom_bpges_settings_warning', 'hc_custom_bpges_handle_settings_warning_post' );
 
 /**
  * Enqueue jQuery AreYouSure, monitors html forms and alerts users to unsaved changes.
