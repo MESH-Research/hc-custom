@@ -1174,10 +1174,10 @@ function hc_custom_bpges_add_no_settings_warning() {
 
 	// Add notice.
 	$settings_href = trailingslashit( bp_loggedin_user_domain() . bp_get_settings_slug() ) . 'notifications';
-	$message       = 'Your default setting for groups is set to "no email." To get email notifications from this group, adjust your settings.<br><br>';
+	$message       = 'To change your default setting or this group\'s e-mail setting, visit your e-mail settings page.<br><br>';
 	$links         = [
 		sprintf(
-			'<a class="button" href="%s">Visit email settings</a>',
+			'<a class="button" href="%s">Visit e-mail settings</a>',
 			$settings_href
 		),
 		sprintf(
