@@ -1157,7 +1157,7 @@ function hc_custom_bpges_add_settings_warning() {
 	}
 
 	// Check whether this user has disabled this warning.
-	$meta_key = 'hc_custom_bpges_setting_warning_group_ids';
+	$meta_key  = 'hc_custom_bpges_setting_warning_group_ids';
 	$group_ids = get_user_meta( get_current_user_id(), $meta_key, true );
 	if (
 		! empty( $group_ids ) &&
@@ -1209,7 +1209,7 @@ add_action( 'bp_init', 'hc_custom_bpges_add_settings_warning' );
  * Handle POST requests to admin-ajax.php to disable the BPGES warning.
  */
 function hc_custom_bpges_handle_settings_warning_post() {
-	$meta_key = 'hc_custom_bpges_setting_warning_group_ids';
+	$meta_key       = 'hc_custom_bpges_setting_warning_group_ids';
 	$old_meta_value = get_user_meta( get_current_user_id(), $meta_key, true );
 
 	if ( isset( $_POST[ $meta_key ] ) && is_array( $_POST[ $meta_key ] ) ) {
