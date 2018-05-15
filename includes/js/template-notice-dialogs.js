@@ -1,4 +1,4 @@
-(function(){
+jQuery(function(){
 	$( "#message" )
 		.dialog( {
 			modal: true,
