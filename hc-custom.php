@@ -11,6 +11,7 @@
  *
  * @package         Hc_Custom
  */
+include_once( ABSPATH . 'wp-admin/includes/plugin.php');
 
 /**
  * BuddyPress actions & filters.
@@ -24,7 +25,9 @@ require_once trailingslashit( __DIR__ ) . 'includes/buddypress/bp-activity.php';
 /**
  * Plugin actions & filters.
  */
-require_once trailingslashit( __DIR__ ) . 'includes/avatar_privacy.php';
+if ( is_plugin_active( 'avatar-privacy' ) ) {
+	require_once trailingslashit( __DIR__ ) . 'includes/avatar-privacy.php';
+}
 require_once trailingslashit( __DIR__ ) . 'includes/bbpress.php';
 require_once trailingslashit( __DIR__ ) . 'includes/buddypress-followers.php';
 require_once trailingslashit( __DIR__ ) . 'includes/buddypress-group-email-subscription.php';
