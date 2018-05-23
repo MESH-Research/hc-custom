@@ -109,11 +109,11 @@ function validate_gravatar( $email = '', $age = 0, &$mimetype = null ) {
 	return ! empty( $result );
 }
 /**
-* Filters the result of Buddypress's fetch avatar function
-*
-* @param string $avatar_html  Image tag for the user's avatar.
-* @param array  $params       Arguments associated with the avatar request.
-**/
+ * Filters the result of Buddypress's fetch avatar function
+ *
+ * @param string $avatar_html  Image tag for the user's avatar.
+ * @param array  $params       Arguments associated with the avatar request.
+ **/
 function hc_custom_bp_core_fetch_avatar( $avatar_html, $params ) {
 	$mimetype = '';
 
