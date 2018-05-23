@@ -24,6 +24,7 @@ require_once trailingslashit( __DIR__ ) . 'includes/buddypress/bp-activity.php';
 /**
  * Plugin actions & filters.
  */
+require_once trailingslashit( __DIR__ ) . 'includes/avatar_privacy.php';
 require_once trailingslashit( __DIR__ ) . 'includes/bbpress.php';
 require_once trailingslashit( __DIR__ ) . 'includes/buddypress-followers.php';
 require_once trailingslashit( __DIR__ ) . 'includes/buddypress-group-email-subscription.php';
