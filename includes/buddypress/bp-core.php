@@ -23,13 +23,13 @@ function hc_custom_convert_template_notices_to_dialogs() {
 add_action( 'wp_enqueue_scripts', 'hc_custom_convert_template_notices_to_dialogs' );
 
 /**
- * Enlarge cover image width.
- * Boss scales cover images beyond the default 625px wide on larger displays - this prevents fuzziness.
+ * Enlarge cover images to better fit large displays.
  *
  * @param array $wh An associative array containing the width and height values.
  */
 function hc_custom_enlarge_cover_images( $wh ) {
-	$wh['width'] = 1250;
+	$wh['width']  = 1250;
+	$wh['height'] = 320;
 	return $wh;
 }
 add_filter( 'bp_attachments_get_cover_image_dimensions', 'hc_custom_enlarge_cover_images' );
