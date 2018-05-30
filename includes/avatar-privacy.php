@@ -10,14 +10,14 @@
  *
  * @return string
  */
-function get_salt() {
+function hc_custom_get_salt() {
 
-	$salt = \apply_filters( 'avatar_privacy_salt', '' );
+	$salt = apply_filters( 'avatar_privacy_salt', '' );
 
 	if ( empty( $salt ) ) {
 		// Let's try the network option next.
-		$network_id = ! empty( \get_current_network_id() );
-		$salt       = \get_network_option( $network_id, $raw ? $option : 'avatar_privacy_salt', $default );
+		$network_id = ! empty( get_current_network_id() );
+		$salt       = get_network_option( $network_id, $raw ? $option : 'avatar_privacy_salt', $default );
 
 		if ( is_array( $default ) && '' === $value ) {
 			$salt = [];
@@ -25,10 +25,10 @@ function get_salt() {
 
 		if ( empty( $salt ) ) {
 			// Still nothing? Generate a random value.
-			$salt = \mt_rand();
+			$salt = mt_rand();
 
 			// Save the generated salt.
-			\update_network_option( $network_id, $raw ? $option : 'avatar_privacy_salt', $value );
+			update_network_option( $network_id, $raw ? $option : 'avatar_privacy_salt', $value );
 		}
 	}
 
@@ -48,19 +48,19 @@ function get_salt() {
  *                          reached or answered with a different error code or if
  *                          no e-mail address was given.
  */
-function validate_gravatar( $email = '', $age = 0, &$mimetype = null ) {
+function hc_custom_validate_gravatar( $email = '', $age = 0, &$mimetype = null ) {
 	// Make sure we have a real address to check.
 	if ( empty( $email ) ) {
 		return false;
 	}
 
 	// Build the hash of the e-mail address.
-	$hash = \md5( \strtolower( \trim( $email ) ) );
+	$hash = md5( strtolower( trim( $email ) ) );
 
 	// Try to find it via transient cache. On multisite, we use site transients.
 	$transient_key = "avatar_privacy_check_{$hash}";
 
-	$result = \get_site_transient( $transient_key );
+	$result = get_site_transient( $transient_key );
 
 	if ( false !== $result ) {
 		$validate_gravatar_cache[ $hash ] = $result;
@@ -72,13 +72,13 @@ function validate_gravatar( $email = '', $age = 0, &$mimetype = null ) {
 	}
 
 	// Ask gravatar.com.
-	$response = \wp_remote_head( "https://gravatar.com/avatar/{$hash}?d=404" );
-	if ( $response instanceof \WP_Error ) {
+	$response = wp_remote_head( "https://gravatar.com/avatar/{$hash}?d=404" );
+	if ( $response instanceof WP_Error ) {
 		return false; // Don't cache the result.
 	}
 
-	if ( 200 === \wp_remote_retrieve_response_code( $response ) ) {
-		$result = \wp_remote_retrieve_header( $response, 'content-type' );
+	if ( 200 === wp_remote_retrieve_response_code( $response ) ) {
+		$result = wp_remote_retrieve_header( $response, 'content-type' );
 
 		if ( null !== $mimetype && ! empty( $result ) ) {
 			$mimetype = $result;
@@ -100,9 +100,9 @@ function validate_gravatar( $email = '', $age = 0, &$mimetype = null ) {
 	 * @param bool $result   The result of the validation check.
 	 * @param int  $age      The "age" (difference between now and the creation date) of a comment or post (in sceonds).
 	 */
-	$duration = \apply_filters( 'avatar_privacy_validate_gravatar_interval', $duration, ! empty( $result ), $age );
+	$duration = apply_filters( 'avatar_privacy_validate_gravatar_interval', $duration, ! empty( $result ), $age );
 
-	$set_site_transient = \set_site_transient( $transient_key, $value, $duration );
+	$set_site_transient = set_site_transient( $transient_key, $value, $duration );
 
 	$validate_gravatar_cache[ $hash ] = $result;
 
@@ -133,17 +133,17 @@ function hc_custom_bp_core_fetch_avatar( $avatar_html, $params ) {
 	$hash = '';
 
 	if ( ! empty( $user_id ) ) {
-		$hash = \get_user_meta( $user_id, 'avatar_privacy_hash', true );
+		$hash = get_user_meta( $user_id, 'avatar_privacy_hash', true );
 
 		if ( empty( $hash ) ) {
-			$user       = \get_user_by( 'ID', $user_id );
+			$user       = get_user_by( 'ID', $user_id );
 			$user_email = $user->user_email;
-			$hash       = \hash( 'sha256', "{get_salt()}{$user_email}" );
+			$hash       = hash( 'sha256', "{hc_custom_get_salt()}{$user_email}" );
 
-			\update_user_meta( $user_id, 'avatar_privacy_hash', $hash );
+			update_user_meta( $user_id, 'avatar_privacy_hash', $hash );
 		}
 	} elseif ( ! empty( $email ) ) {
-		$hash = \hash( 'sha256', "{get_salt()}{$email}" );
+		$hash = hash( 'sha256', "{hc_custom_get_salt()}{$email}" );
 	}
 
 	// Check if a gravatar exists for the e-mail address.
@@ -158,13 +158,13 @@ function hc_custom_bp_core_fetch_avatar( $avatar_html, $params ) {
 		 * @param string    $email        The email address.
 		 * @param int|false $user_id      A WordPress user ID (or false).
 		 */
-		if ( \apply_filters( 'avatar_privacy_enable_gravatar_check', true, $email, $user_id ) ) {
-			$show_gravatar = validate_gravatar( $email, $age, $mimetype );
+		if ( apply_filters( 'avatar_privacy_enable_gravatar_check', true, $email, $user_id ) ) {
+			$show_gravatar = hc_custom_validate_gravatar( $email, $age, $mimetype );
 		}
 	}
 
-	$url = \apply_filters(
-		'avatar_privacy_default_icon_url', \includes_url( 'images/blank.gif' ), $hash, $params['width'], [
+	$url = apply_filters(
+		'avatar_privacy_default_icon_url', includes_url( 'images/blank.gif' ), $hash, $params['width'], [
 			'default' => 'identicon',
 		]
 	);
@@ -175,7 +175,7 @@ function hc_custom_bp_core_fetch_avatar( $avatar_html, $params ) {
 			$mimetype = 'image/png';
 		}
 
-		$url = \apply_filters(
+		$url = apply_filters(
 			'avatar_privacy_gravatar_icon_url', $url, $hash, $params['width'], [
 				'user_id'  => $user_id,
 				'email'    => $email,
@@ -195,7 +195,6 @@ function hc_custom_bp_core_fetch_avatar( $avatar_html, $params ) {
 
 	return $content;
 }
-add_filter( 'bp_core_fetch_avatar', 'hc_custom_bp_core_fetch_avatar', 12, 2 );
 
 /**
  * Retrieve the avatar `<img>` tag for a user, email address, MD5 hash, comment, or post for bbpress.
@@ -216,17 +215,17 @@ function hc_custom_get_avatar( $avatar, $id_or_email, $size, $default, $alt ) {
 	} elseif ( is_string( $id_or_email ) ) {
 		// E-mail address.
 		$email = $id_or_email;
-	} elseif ( $id_or_email instanceof \WP_User ) {
+	} elseif ( $id_or_email instanceof WP_User ) {
 		// User object.
 		$user_id = $id_or_email->ID;
 		$email   = $id_or_email->user_email;
-	} elseif ( $id_or_email instanceof \WP_Post ) {
+	} elseif ( $id_or_email instanceof WP_Post ) {
 		// Post object.
 		$user_id = (int) $id_or_email->post_author;
-		$age     = \time() - \mysql2date( 'U', $id_or_email->post_date_gmt );
-	} elseif ( $id_or_email instanceof \WP_Comment ) {
+		$age     = time() - mysql2date( 'U', $id_or_email->post_date_gmt );
+	} elseif ( $id_or_email instanceof WP_Comment ) {
 		/** This filter is documented in wp-includes/pluggable.php */
-		$allowed_comment_types = \apply_filters( 'get_avatar_comment_types', [ 'comment' ] );
+		$allowed_comment_types = apply_filters( 'get_avatar_comment_types', [ 'comment' ] );
 
 		if ( ! empty( $id_or_email->comment_type ) && ! in_array( $id_or_email->comment_type, (array) $allowed_comment_types, true ) ) {
 			return [ false, '' ]; // Abort.
@@ -254,5 +253,8 @@ function hc_custom_get_avatar( $avatar, $id_or_email, $size, $default, $alt ) {
 	return $avatar;
 }
 
-add_filter( 'get_avatar', 'hc_custom_get_avatar', 10, 5 );
+if ( function_exists( 'run_avatar_privacy' ) ) {
+	add_filter( 'get_avatar', 'hc_custom_get_avatar', 10, 5 );
+	add_filter( 'bp_core_fetch_avatar', 'hc_custom_bp_core_fetch_avatar', 12, 2 );
+}
 
