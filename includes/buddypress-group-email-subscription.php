@@ -1231,3 +1231,12 @@ function hc_custom_jquery_are_you_sure() {
 	wp_enqueue_script( 'jquery-are-you-sure', trailingslashit( plugins_url() ) . 'hc-custom/includes/js/jquery.are-you-sure.js', array( 'jquery' ) );
 }
 add_action( 'wp_enqueue_scripts', 'hc_custom_jquery_are_you_sure' );
+
+/**
+ * Remove ability for group admins to change member default notification settings.
+ **/
+function hc_custom_ass_change_all_email_sub() {
+	remove_action( 'bp_after_group_manage_members_admin', 'ass_change_all_email_sub' );
+}
+
+add_action( 'bp_after_group_manage_members_admin', 'hc_custom_ass_change_all_email_sub', 0 );
