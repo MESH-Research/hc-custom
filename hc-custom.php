@@ -20,6 +20,8 @@ require_once trailingslashit( __DIR__ ) . 'includes/buddypress/bp-blogs.php';
 require_once trailingslashit( __DIR__ ) . 'includes/buddypress/bp-groups.php';
 require_once trailingslashit( __DIR__ ) . 'includes/buddypress/bp-members.php';
 require_once trailingslashit( __DIR__ ) . 'includes/buddypress/bp-activity.php';
+require_once trailingslashit( __DIR__ ) . 'includes/buddypress/buddypress-functions.php';
+
 
 /**
  * Plugin actions & filters.
