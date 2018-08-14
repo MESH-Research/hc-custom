@@ -77,7 +77,9 @@ function hcommons_filter_ass_digest_format_item_group( $group_message, $group_id
 	$topic_activity_map = array();
 
 	foreach ( $activity_ids as $activity_id ) {
-		$activity_item = ! empty( $bp->ass->items[ $activity_id ] ) ? $bp->ass->items[ $activity_id ] : false;
+		$activity_item = ! empty( $bp->ass->items[ $activity_id ] )
+			? $bp->ass->items[ $activity_id ]
+			: new BP_Activity_Activity( $activity_id );
 
 		switch ( $activity_item->type ) {
 			case 'bbp_topic_create':
