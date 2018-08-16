@@ -989,8 +989,12 @@ function hc_custom_ass_bp_email_footer_html_unsubscribe_links() {
 
 	remove_action( 'bp_after_email_footer', 'ass_bp_email_footer_html_unsubscribe_links' );
 
-	$userdomain    = strtok( $tokens['ges.unsubscribe'], '?' );
-	$settings_page = $userdomain . '/settings/notifications/';
+	if ( isset( $tokens['ges.settings-link'] ) ) {
+		$settings_page = $tokens['ges.settings-link'];
+	} else {
+		$userdomain    = strtok( $tokens['ges.unsubscribe'], '?' );
+		$settings_page = $userdomain . '/settings/notifications/';
+	}
 
 	$link_format  = '<a href="%1$s" title="%2$s" style="text-decoration: underline;">%3$s</a>';
 	$footer_links = array();
