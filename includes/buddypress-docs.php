@@ -85,24 +85,26 @@ function hc_custom_pre_get_posts( $query ) {
 		return $query;
 	}
 
-	if ( bp_docs_is_bp_docs_page() ) {
+	if ( function_exists( 'bp_docs_is_bp_docs_page' ) ) {
+		if ( bp_docs_is_bp_docs_page() ) {
 
-		$query->set(
-			'meta_query',
-			array(
-				'relation' => 'OR',
+			$query->set(
+				'meta_query',
 				array(
-					'key'     => 'bp_docs_orderby',
-					'compare' => 'EXISTS',
-				),
-				array(
-					'key'     => 'bp_docs_orderby',
-					'compare' => 'NOT EXISTS',
-				),
-			)
-		);
+					'relation' => 'OR',
+					array(
+						'key'     => 'bp_docs_orderby',
+						'compare' => 'EXISTS',
+					),
+					array(
+						'key'     => 'bp_docs_orderby',
+						'compare' => 'NOT EXISTS',
+					),
+				)
+			);
 
-		$query->set( 'orderby', 'meta_value_num post_title' );
+			$query->set( 'orderby', 'meta_value_num post_title' );
+		}
 	}
 
 	return $query;
