@@ -15,6 +15,24 @@ function hcommons_remove_bpges_actions() {
 add_action( 'bp_init', 'hcommons_remove_bpges_actions' );
 
 /**
+ * Prevent immediate notifications from being sent if the user has a digest subscription.
+ * This way users only get one notification of their self-post, in the digest.
+ *
+ * @param bool   $send_immediately  True to send an immediate email notification, false otherwise.
+ * @param object $activity          Activity object.
+ * @param int    $user_id           ID of the user.
+ * @param string $subscription_type Group subscription status for the current user.
+ */
+function hcommons_filter_bp_ass_send_activity_notification_for_user( $send_immediately, $activity, $user_id, $subscription_type ) {
+	if ( in_array( $subscription_type, [ 'dig', 'sum' ] ) ) {
+		$send_immediately = false;
+	}
+
+	return $send_immediately;
+}
+add_filter( 'bp_ass_send_activity_notification_for_user', 'hcommons_filter_bp_ass_send_activity_notification_for_user', 10, 4 );
+
+/**
  * Add a line break after "Replying to this email will not..."
  * Assumes HTML email, plaintext not supported.
  *
@@ -77,7 +95,9 @@ function hcommons_filter_ass_digest_format_item_group( $group_message, $group_id
 	$topic_activity_map = array();
 
 	foreach ( $activity_ids as $activity_id ) {
-		$activity_item = ! empty( $bp->ass->items[ $activity_id ] ) ? $bp->ass->items[ $activity_id ] : false;
+		$activity_item = ! empty( $bp->ass->items[ $activity_id ] )
+			? $bp->ass->items[ $activity_id ]
+			: new BP_Activity_Activity( $activity_id );
 
 		switch ( $activity_item->type ) {
 			case 'bbp_topic_create':
@@ -987,8 +1007,12 @@ function hc_custom_ass_bp_email_footer_html_unsubscribe_links() {
 
 	remove_action( 'bp_after_email_footer', 'ass_bp_email_footer_html_unsubscribe_links' );
 
-	$userdomain    = strtok( $tokens['ges.unsubscribe'], '?' );
-	$settings_page = $userdomain . '/settings/notifications/';
+	if ( isset( $tokens['ges.settings-link'] ) ) {
+		$settings_page = $tokens['ges.settings-link'];
+	} else {
+		$userdomain    = strtok( $tokens['ges.unsubscribe'], '?' );
+		$settings_page = $userdomain . '/settings/notifications/';
+	}
 
 	$link_format  = '<a href="%1$s" title="%2$s" style="text-decoration: underline;">%3$s</a>';
 	$footer_links = array();
