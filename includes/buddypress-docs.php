@@ -68,6 +68,8 @@ function hc_custom_bp_docs_after_save( $doc_id ) {
 
 	if ( is_numeric( $number ) ) {
 		update_post_meta( $doc_id, 'bp_docs_orderby', $number );
+	} else {
+		update_post_meta( $doc_id, 'bp_docs_orderby', 0 );
 	}
 }
 
@@ -81,25 +83,17 @@ add_action( 'bp_docs_after_save', 'hc_custom_bp_docs_after_save' );
  */
 function hc_custom_bp_docs_pre_query_args( $query_args, $bp_docs_query ) {
 
-	$query_args['meta_query'][] = array(
-		'relation' => 'OR',
-		array(
-			'key'     => 'bp_docs_orderby',
-			'compare' => 'EXISTS',
-		),
-		array(
-			'key'     => 'bp_docs_orderby',
-			'compare' => 'NOT EXISTS',
-		),
-	);
+	$posted_orderby = isset( $_GET['orderby'] ) ? $_GET['orderby'] : '';
 
-	$query_args['orderby'] = 'meta_value_num title';
+	if ( empty( $posted_orderby ) ) {
+		$query_args['orderby']  = 'meta_value_num title';
+		$query_args['meta_key'] = 'bp_docs_orderby';
+	}
 
 	return $query_args;
 }
 
 add_filter( 'bp_docs_pre_query_args', 'hc_custom_bp_docs_pre_query_args', 10, 2 );
-
 
 /**
  * Find out what the groups default orderby is or set the default.
@@ -165,3 +159,4 @@ function hc_custom_groups_settings_updated( $group_id ) {
 
 add_action( 'groups_settings_updated', 'hc_custom_groups_settings_updated' );
 
+add_filter( 'bp_docs_allow_comment_section', '__return_true', 999 );
