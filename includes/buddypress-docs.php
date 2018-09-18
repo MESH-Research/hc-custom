@@ -159,3 +159,4 @@ function hc_custom_groups_settings_updated( $group_id ) {
 
 add_action( 'groups_settings_updated', 'hc_custom_groups_settings_updated' );
 
+add_filter( 'bp_docs_allow_comment_section', '__return_true', 999 );
