@@ -10,8 +10,9 @@
  *
  * @return array Group ids.
  */
-function hcommons_core_member_groups_with_authorship() {
+function hcommons_core_member_groups_with_authorship( $current_groups = array() ) {
 
+	//$current_groups passed in not implemented
 	$committee_group_ids = array();
 	$args                = array(
 		'type'       => 'alphabetical',
