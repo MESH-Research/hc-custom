@@ -160,3 +160,53 @@ function hc_custom_groups_settings_updated( $group_id ) {
 add_action( 'groups_settings_updated', 'hc_custom_groups_settings_updated' );
 
 add_filter( 'bp_docs_allow_comment_section', '__return_true', 999 );
+
+/**
+ * Update post meta for folders.
+ *
+ * @param int    $post_id The post id.
+ * @param object $post The post object.
+ */
+function hc_custom_buddypress_docs_save_post( $post_id, $post ) {
+
+	if ( 'bp_docs_folder' === $post->post_type ) {
+
+		$post_title = $post->post_title;
+		$folder_id  = $post->ID;
+
+		preg_match_all( '!\d+!', $post_title, $matches );
+
+		$number = implode( ' ', $matches[0] );
+
+		if ( is_numeric( $number ) ) {
+			update_post_meta( $folder_id, 'bp_docs_orderby', $number );
+		} else {
+			update_post_meta( $folder_id, 'bp_docs_orderby', 0 );
+		}
+	}
+
+}
+
+add_action( 'save_post', 'hc_custom_buddypress_docs_save_post', 10, 2 );
+
+/**
+ * Sort numbered folder titles correctly.
+ *
+ * @param object $query The queried object.
+ */
+function hc_custom_pre_get_posts( $query ) {
+	// do not modify queries in the admin.
+	if ( is_admin() ) {
+		return $query;
+	}
+
+	if ( 'bp_docs_folder' === $query->get( 'post_type' ) ) {
+		if ( bp_docs_is_bp_docs_page() ) {
+			$query->set( 'orderby', 'meta_value_num title' );
+			$query->set( 'meta_key', 'bp_docs_orderby' );
+		}
+	}
+	return $query;
+}
+add_action( 'pre_get_posts', 'hc_custom_pre_get_posts' );
+
