@@ -203,5 +203,6 @@ function hc_custom_pre_get_posts( $query ) {
 	}
 	return $query;
 }
+
 add_action( 'pre_get_posts', 'hc_custom_pre_get_posts' );
 
