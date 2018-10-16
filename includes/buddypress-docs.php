@@ -195,11 +195,6 @@ add_action( 'save_post', 'hc_custom_buddypress_docs_save_post', 10, 2 );
  * @param object $query The queried object.
  */
 function hc_custom_pre_get_posts( $query ) {
-	// do not modify queries in the admin.
-	if ( is_admin() ) {
-		return $query;
-	}
-
 	if ( 'bp_docs_folder' === $query->get( 'post_type' ) ) {
 		if ( bp_docs_is_bp_docs_page() ) {
 			$query->set( 'orderby', 'meta_value_num title' );
@@ -208,5 +203,6 @@ function hc_custom_pre_get_posts( $query ) {
 	}
 	return $query;
 }
+
 add_action( 'pre_get_posts', 'hc_custom_pre_get_posts' );
 
