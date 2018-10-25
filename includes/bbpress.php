@@ -343,16 +343,16 @@ add_filter( 'bbp_reply_admin_links', 'hcommons_reply_admin_links' );
 /**
  * Filter who can edit forum replies.
  *
- * @param array  $statuses Array of statuses
+ * @param array $statuses Array of statuses.
  */
 function hc_custom_bbp_get_topic_statuses( $statuses ) {
 
 	return  array(
-        bbp_get_public_status_id() => _x( 'Open', 'Open the topic', 'bbpress' ),
-        bbp_get_closed_status_id() => _x( 'Closed', 'Close the topic', 'bbpress' ),
-        bbp_get_spam_status_id() => _x( 'Spam', 'Spam the topic', 'bbpress' ),
-        bbp_get_trash_status_id() => _x( 'Trash', 'Trash the topic', 'bbpress' ),
- 	);
+		bbp_get_public_status_id() => _x( 'Open', 'Open the topic', 'bbpress' ),
+		bbp_get_closed_status_id() => _x( 'Closed', 'Close the topic', 'bbpress' ),
+		bbp_get_spam_status_id()   => _x( 'Spam', 'Spam the topic', 'bbpress' ),
+		bbp_get_trash_status_id()  => _x( 'Trash', 'Trash the topic', 'bbpress' ),
+	);
 }
 
 add_filter( 'bbp_get_topic_statuses', 'hc_custom_bbp_get_topic_statuses' );
