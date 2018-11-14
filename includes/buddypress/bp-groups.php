@@ -20,7 +20,11 @@ add_filter( 'groups_activity_new_update_action', 'hcommons_filter_groups_activit
  * Adds join group button for non-society members
  */
 function hcommons_add_non_society_member_join_group_button() {
-	if ( ! is_super_admin() && hcommons_check_non_member_active_session() ) {
+	global $groups_template;
+	$group_id = $groups_template->group->id;
+	$is_committe = mla_is_group_committee($group_id);
+	$is_non_member = hcommons_check_non_member_active_session();
+	if ( ! is_super_admin() && $is_non_member && !$is_committe ) {
 		echo '<div class="disabled-button">Join Group</div>';
 	}
 }
