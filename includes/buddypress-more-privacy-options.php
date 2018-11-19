@@ -125,12 +125,10 @@ function more_privacy_options_blogs_get( $return_value, $args ) {
 //		$blog_ids_sql = implode( ',', $include_blog_ids );
 //		$include_sql  = " AND b.blog_id IN ({$blog_ids_sql})";
 //	}
-
+	$search_terms_sql = '';
 	if ( ! empty( $search_terms ) ) {
 		$search_terms_like = '%' . bp_esc_like( $search_terms ) . '%';
 		$search_terms_sql  = $wpdb->prepare( 'AND (bm_name.meta_value LIKE %s OR bm_description.meta_value LIKE %s)', $search_terms_like, $search_terms_like );
-	} else {
-		$search_terms_sql = '';
 	}
 	$site_sql = "AND wb.site_id = " . get_current_network_id();
 	$sql      = "FROM
