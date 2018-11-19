@@ -135,12 +135,12 @@ function more_privacy_options_blogs_get( $return_value, $args ) {
 	}
 	$site_sql = "AND wb.site_id = " . get_current_network_id();
 	$sql      = "FROM
-		  ".$bp_q->blogs->table_name." b
-		  LEFT JOIN ".$bp_q->blogs->table_name_blogmeta." bm ON (b.blog_id = bm.blog_id)
-		  LEFT JOIN ".$bp_q->blogs->table_name_blogmeta." bm_name ON (b.blog_id = bm_name.blog_id)
-		  LEFT JOIN ".$bp_q->blogs->table_name_blogmeta." bm_description ON (b.blog_id = bm_description.blog_id)
-		  LEFT JOIN ".$wpdb->base_prefix."blogs wb ON (b.blog_id = wb.blog_id $hidden_sql)
-		  LEFT JOIN ".$wpdb->users." u ON (b.user_id = u.ID)
+		  " . $bp_q->blogs->table_name . " b
+		  LEFT JOIN " . $bp_q->blogs->table_name_blogmeta . " bm ON (b.blog_id = bm.blog_id)
+		  LEFT JOIN " . $bp_q->blogs->table_name_blogmeta . " bm_name ON (b.blog_id = bm_name.blog_id)
+		  LEFT JOIN " . $bp_q->blogs->table_name_blogmeta . " bm_description ON (b.blog_id = bm_description.blog_id)
+		  LEFT JOIN " . $wpdb->base_prefix . "blogs wb ON (b.blog_id = wb.blog_id $hidden_sql)
+		  LEFT JOIN " . $wpdb->users . " u ON (b.user_id = u.ID)
 		WHERE
 		  wb.archived = '0' AND wb.spam = 0 AND wb.mature = 0 AND wb.deleted = 0  $site_sql
 		  AND bm.meta_key = 'last_activity' AND bm_name.meta_key = 'name' AND bm_description.meta_key = 'description'
@@ -156,8 +156,8 @@ function more_privacy_options_blogs_get( $return_value, $args ) {
 
 	$count_sql = "SELECT COUNT(DISTINCT b.blog_id)" . $sql;
 
-	$paged_blogs = $wpdb->get_results($search_sql);
-	$total_blogs = $wpdb->get_var($count_sql);
+	$paged_blogs = $wpdb->get_results( $search_sql );
+	$total_blogs = $wpdb->get_var( $count_sql );
 
 	$blog_ids = array();
 	foreach ( (array) $paged_blogs as $blog ) {
