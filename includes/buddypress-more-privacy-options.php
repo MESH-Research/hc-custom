@@ -18,7 +18,6 @@
  */
 function more_privacy_options_blogs_get( $return_value, $args ) {
 	global $wpdb;
-	global $bp;
 	/**
 	 * one of these things is not like the others...
 	 * all variables passed to BP_Blogs_Blog::get() match their names given in $args except "limit" - that's "per_page"
@@ -119,7 +118,7 @@ function more_privacy_options_blogs_get( $return_value, $args ) {
 			break;
 	}
 
-	$include_sql = '';
+//	$include_sql = '';
 //	$include_blog_ids = array_filter( wp_parse_id_list( $include_blog_ids ) );
 //
 //	if ( ! empty( $include_blog_ids ) ) {
