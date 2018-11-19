@@ -89,7 +89,6 @@ function more_privacy_options_blogs_get( $return_value, $args ) {
 				$perms      .= ", -3";
 			}
 			$hidden_sql = 'AND (wb.public in ( ' . $perms . ' ) OR b.blog_id in (' . implode( ",", $userblogs ) . ')) ';
-			error_log( $hidden_sql );
 			break;
 		case "Super Admins":
 			$hidden_sql = 'AND wb.public in ( 0, 1, -1, -2, -3 )';
