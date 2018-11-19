@@ -10,14 +10,12 @@
  *
  * @return array Group ids.
  */
-function hcommons_core_member_groups_with_authorship() {
+function hcommons_core_member_groups_with_authorship( $current_groups = array() ) {
 
+	//$current_groups passed in not implemented
 	$committee_group_ids = array();
-	//$society_id      = get_network_option( '', 'society_id' );
-
-	$args = array(
+	$args                = array(
 		'type'       => 'alphabetical',
-		//'group_type' => $society_id,
 		'meta_query' => array(
 			array(
 				'key'     => 'mla_oid',
@@ -28,15 +26,7 @@ function hcommons_core_member_groups_with_authorship() {
 		'per_page'   => '500',
 	);
 
-	/* Special case for now - remove committees.
-	$m_groups = groups_get_groups( $args );
-
-	foreach ( $m_groups['groups'] as $group ) {
-		$committee_group_ids[] = $group->id;
-	}
-	*/
-
-	return array_merge( $committee_group_ids, array( 296, 378, 444 ) );
+	return array_merge( $committee_group_ids, array( 296, 378, 444, 1002994 ) );
 
 }
 add_filter( 'humcore_member_groups_with_authorship', 'hcommons_core_member_groups_with_authorship' );
@@ -44,7 +34,7 @@ add_filter( 'humcore_member_groups_with_authorship', 'hcommons_core_member_group
 /**
  * Remove groups that are marked as committees from Core group list.
  *
- * @param array Groups.
+ * @param array $groups Groups.
  * @return array Groups with committees removed.
  */
 function hcommons_filter_humcore_groups_list( $groups ) {
@@ -62,8 +52,10 @@ function hcommons_filter_humcore_groups_list( $groups ) {
 add_filter( 'humcore_deposits_group_list', 'hcommons_filter_humcore_groups_list' );
 
 /**
- * change post type label for core deposits
+ * Change post type label for core deposits
  * TODO either update the actual post type data or put in humcore plugin
+ *
+ * @param array $labels Post type labels.
  */
 function hcommons_filter_post_type_labels_humcore_deposit( $labels ) {
 	$labels->name = 'CORE Deposits';

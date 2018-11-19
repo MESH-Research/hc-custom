@@ -1,4 +1,8 @@
 <?php
+/**
+ * Legacy.
+ * @codingStandardsIgnoreFile
+ */
 
 class MLA_Groups {
 
@@ -175,7 +179,7 @@ class MLA_Groups {
 
 function hcommons_init_mla_groups() {
 	if ( class_exists( 'Humanities_Commons' ) && 'mla' === Humanities_Commons::$society_id ) {
-		$MLA_Groups = new MLA_Groups;
+		$MLA_Groups = new MLA_Groups();
 	}
 }
 add_action( 'bp_init', 'hcommons_init_mla_groups' );
