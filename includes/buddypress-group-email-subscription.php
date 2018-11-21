@@ -23,7 +23,7 @@ add_action( 'bp_email_set_from', function( $from, $email_address, $name, $email_
 		$array = explode(".", network_site_url());
 		//expecting xxx.yyy.com when we only want yyy.com
 		$url = (array_key_exists(count($array) - 2, $array) ? $array[count($array) - 2] : "").".".$array[count($array) - 1];
-		$from = new BP_Email_Recipient( "noreply@".$url, "HC Commons Groups" );
+		$from = new BP_Email_Recipient( "noreply@".$url, $name );
 	}
 	return $from;
 }, 10, 4 );
