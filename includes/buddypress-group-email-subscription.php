@@ -7,6 +7,24 @@
 
 /**
  * Remove BPGES actions since we use crontab instead of WP cron.
+ * Spark doesn't like random emails that are not on it's white list.
+ * Welcome emails (on join group uses the first admin as the from email which errors out Spark.
+ * We replace this from email with a noreply email.
+ */
+function hcommons_filter_bp_mail_from( $from, $email_address, $name, $email_type) {
+	if ( $email_type->get('type') === "bp-ges-welcome" ) {
+		$sitename = strtolower( $_SERVER['SERVER_NAME'] );
+		if ( 'www.' == substr( $sitename, 0, 4 ) ) {
+			$sitename = substr( $sitename, 4 );
+		}
+		$from = new BP_Email_Recipient( "noreply@".$sitename, $name );
+	}
+	return $from;
+};
+add_action( 'bp_email_set_from', 'hcommons_filter_bp_mail_from', 10, 4 );
+
+/**
+ * Remove BPGES actions since we use crontab instead of WP cron.
  */
 function hcommons_remove_bpges_actions() {
 	remove_action( 'ass_digest_event', 'ass_daily_digest_fire' );
