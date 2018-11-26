@@ -21,7 +21,7 @@ add_filter( 'groups_activity_new_update_action', 'hcommons_filter_groups_activit
  */
 function hcommons_add_non_society_member_join_group_button() {
 	if ( ! is_super_admin() && hcommons_check_non_member_active_session() ) {
-		echo '<div class="disabled-button">Join Group</div>';
+		echo '<div class="disabled-button">Request Membership</div>';
 	}
 }
 add_action( 'bp_directory_groups_actions', 'hcommons_add_non_society_member_join_group_button' );
