@@ -470,8 +470,8 @@ checked="checked" <?php } ?>/>
 			bp_the_group();
 
 			$group_id       = bp_get_group_id();
-			$subscribers    = groups_get_groupmeta( $group_id, 'ass_subscribed_users' );
 			$user_id        = $bp->displayed_user->id;
+			$subscribers 	= ass_get_subscriptions_for_group( $group_id );
 			$current_status = $subscribers[ $user_id ];
 
 		?>
@@ -920,8 +920,10 @@ function hc_custom_update_group_subscribe_settings() {
 		return false;
 	}
 
+
 	// If the edit form has been submitted, save the edited details.
 	if ( isset( $_POST['group-notifications'] ) ) {
+
 		$user_id = bp_loggedin_user_id();
 
 		foreach ( $_POST['group-notifications'] as $group_id => $value ) {
