@@ -5,6 +5,14 @@
  * @package Hc_Custom
  */
 
+/**
+ * Adds new button labels for society members. For non society see hcommons_add_non_society_member_join_group_button()
+ *
+ * @param $button
+ * @param $group
+ *
+ * @return mixed
+ */
 function hcommons_filter_groups_button_labels ($button, $group) {
 	$status = $group->status;
 	if ( ! is_super_admin() && hcommons_check_non_member_active_session() ) {
