@@ -46,7 +46,7 @@ function hcommons_add_non_society_member_join_group_button() {
 			$group =& $groups_template->group;
 		}
 		$is_not_committee = strtolower( \groups_get_groupmeta( $group->id, 'society_group_type', true ) ) !== "committee";
-		error_log(print_r($group, true));
+
 		if($is_not_committee) {
 			echo '<div class="disabled-button">Request Membership</div>';
 		}
