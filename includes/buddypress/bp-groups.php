@@ -5,6 +5,24 @@
  * @package Hc_Custom
  */
 
+function hcommons_filter_groups_button_labels ($button, $group) {
+	$status = $group->status;
+	if ( ! is_super_admin() && hcommons_check_non_member_active_session() ) {
+		$button['link_class'] = "disabled-button";
+	}
+	switch($status) {
+		case 'public':
+			$button['link_text'] = "Join Group";
+			break;
+
+		case 'private':
+			$button['link_text'] = "Request Membership";
+			break;
+	}
+	return $button;
+}
+add_filter( 'bp_get_group_join_button', 'hcommons_filter_groups_button_labels', 10 , 2 );
+
 /**
  * Filters the action for the new group activity update.
  *
@@ -21,7 +39,17 @@ add_filter( 'groups_activity_new_update_action', 'hcommons_filter_groups_activit
  */
 function hcommons_add_non_society_member_join_group_button() {
 	if ( ! is_super_admin() && hcommons_check_non_member_active_session() ) {
-		echo '<div class="disabled-button">Request Membership</div>';
+		global $groups_template;
+
+		// Set group to current loop group if none passed.
+		if ( empty( $group ) ) {
+			$group =& $groups_template->group;
+		}
+		$is_committee = mla_is_group_committee( $group->id );
+		error_log(print_r($group, true));
+		if(!$is_committee) {
+			echo '<div class="disabled-button">Request Membership</div>';
+		}
 	}
 }
 add_action( 'bp_directory_groups_actions', 'hcommons_add_non_society_member_join_group_button' );
