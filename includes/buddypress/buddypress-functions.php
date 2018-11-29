@@ -21,10 +21,3 @@ function hc_custom_bp_legacy_object_template_path( $template_path ) {
 }
 
 add_filter( 'bp_legacy_object_template_path', 'hc_custom_bp_legacy_object_template_path' );
-
-/**
- * Disable group admin edit of the group email address in bp-rbe-new-topic.
- *
- * @param bool $retval Disable edit.
- */
-add_filter( 'bp_rbe_disable_admin_edit_group_email_address', '__return_true' );
