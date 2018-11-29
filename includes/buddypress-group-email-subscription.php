@@ -3,6 +3,7 @@
  * Customizations to buddypress-group-email-subscription.
  *
  * @package Hc_Custom
+ * @version 1.0.11272018
  */
 
 /**
@@ -22,6 +23,18 @@ function hcommons_filter_bp_mail_from( $from, $email_address, $name, $email_type
 	return $from;
 };
 add_action( 'bp_email_set_from', 'hcommons_filter_bp_mail_from', 10, 4 );
+
+/**
+ * Hide the send email to everyone notice
+ * @since 1.0.11272018
+ */
+add_action ('bp_group_email_subscription_enable_email_notice', function () { return false; });
+
+/**
+ * Hide the change topic email prefix in the group > manage > details screen
+ * @since 1.0.11272018
+ */
+add_filter('bp_rbe_new_topic_show_option_on_details_page', false);
 
 /**
  * Remove BPGES actions since we use crontab instead of WP cron.
