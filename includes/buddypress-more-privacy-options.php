@@ -117,13 +117,12 @@ function more_privacy_options_blogs_get( $return_value, $args ) {
 			break;
 	}
 
-//	$include_sql = '';
-//	$include_blog_ids = array_filter( wp_parse_id_list( $include_blog_ids ) );
-//
-//	if ( ! empty( $include_blog_ids ) ) {
-//		$blog_ids_sql = implode( ',', $include_blog_ids );
-//		$include_sql  = " AND b.blog_id IN ({$blog_ids_sql})";
-//	}
+	$include_sql = '';
+    $include_blog_ids = array_filter( wp_parse_id_list( $include_blog_ids ) );
+    if ( ! empty( $include_blog_ids ) ) {
+ 		$blog_ids_sql = implode( ',', $include_blog_ids );
+ 		$include_sql  = " AND b.blog_id IN ({$blog_ids_sql})";
+ 	}
 	$search_terms_sql = '';
 	if ( ! empty( $search_terms ) ) {
 		$search_terms_like = '%' . bp_esc_like( $search_terms ) . '%';
@@ -140,7 +139,7 @@ function more_privacy_options_blogs_get( $return_value, $args ) {
 		WHERE
 		  wb.archived = '0' AND wb.spam = 0 AND wb.mature = 0 AND wb.deleted = 0  $site_sql
 		  AND bm.meta_key = 'last_activity' AND bm_name.meta_key = 'name' AND bm_description.meta_key = 'description'
-		  $search_terms_sql";
+		  $search_terms_sql $include_sql";
 
 	$search_sql = "SELECT b.blog_id,
 		        b.user_id as admin_user_id,
