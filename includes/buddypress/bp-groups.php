@@ -18,15 +18,18 @@ function hcommons_filter_groups_button_labels ($button, $group) {
 	if ( ! is_super_admin() && hcommons_check_non_member_active_session() ) {
 		$button['link_class'] = "disabled-button";
 	}
-	switch($status) {
-		case 'public':
-			$button['link_text'] = "Join Group";
-			break;
+	if(empty(BP_Groups_Member::check_is_member(get_current_user_id(), $group->id))) {
+		switch($status) {
+			case 'public':
+				$button['link_text'] = "Join Group";
+				break;
 
-		case 'private':
-			$button['link_text'] = "Request Membership";
-			break;
+			case 'private':
+				$button['link_text'] = "Request Membership";
+				break;
+		}
 	}
+
 	return $button;
 }
 add_filter( 'bp_get_group_join_button', 'hcommons_filter_groups_button_labels', 10 , 2 );
