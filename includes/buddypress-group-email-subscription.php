@@ -3,7 +3,45 @@
  * Customizations to buddypress-group-email-subscription.
  *
  * @package Hc_Custom
+ * @version 1.0.11272018
  */
+
+/**
+ * Remove BPGES actions since we use crontab instead of WP cron.
+ * Spark doesn't like random emails that are not on it's white list.
+ * Welcome emails (on join group uses the first admin as the from email which errors out Spark.
+ * We replace this from email with a noreply email.
+ */
+function hcommons_filter_bp_mail_from( $from, $email_address, $name, $email_type ) {
+	if ( $email_type->get( 'type' ) === "bp-ges-welcome" ) {
+		$sitename = strtolower( $_SERVER['SERVER_NAME'] );
+		if ( 'www.' == substr( $sitename, 0, 4 ) ) {
+			$sitename = substr( $sitename, 4 );
+		}
+		$from = new BP_Email_Recipient( "noreply@" . $sitename, $name );
+	}
+
+	return $from;
+}
+
+;
+add_action( 'bp_email_set_from', 'hcommons_filter_bp_mail_from', 10, 4 );
+
+/**
+ * Hide the send email to everyone notice
+ *
+ * @since 1.0.11272018
+ */
+add_action( 'bp_group_email_subscription_enable_email_notice', function () {
+	return false;
+} );
+
+/**
+ * Hide the change topic email prefix in the group > manage > details screen
+ *
+ * @since 1.0.11272018
+ */
+add_filter( 'bp_rbe_new_topic_show_option_on_details_page', false );
 
 /**
  * Remove BPGES actions since we use crontab instead of WP cron.
@@ -27,12 +65,12 @@ add_action( 'bp_init', 'hcommons_remove_bpges_actions' );
 function hcommons_add_welcome_email_footer( $body, $group_id, $user ) {
 
 	if ( ! empty( $body ) ) {
-		$group_link           = bp_get_group_link( groups_get_group( $group_id ) );
+		$group_link             = bp_get_group_link( groups_get_group( $group_id ) );
 		$current_email_settings = ass_group_default_status( $user->ID );
-		$network              = network_site_url();
-		$url                  = "https://" . $network->domain . $network->path;
+		$network                = network_site_url();
+		$url                    = "https://" . $network->domain . $network->path;
 		$user_email_settings    = $url . "/members/$user->user_nicename/settings/notifications/";
-		$body                 .= <<<WELCOME_EMAIL
+		$body                   .= <<<WELCOME_EMAIL
         <br/>____________________
         This email is being sent by $group_link<br/>
         Your email setting for this group is: $current_email_settings<br/>
@@ -493,10 +531,12 @@ function hc_custom_default_group_forum_subscription_settings() {
 				while ( bp_groups() ) :
 					bp_the_group();
 
+
 					$group_id       = bp_get_group_id();
-					$subscribers    = groups_get_groupmeta( $group_id, 'ass_subscribed_users' );
 					$user_id        = $bp->displayed_user->id;
+					$subscribers    = ass_get_subscriptions_for_group( $group_id );
 					$current_status = $subscribers[ $user_id ];
+
 
 					?>
                     <tr>
@@ -1005,8 +1045,10 @@ function hc_custom_update_group_subscribe_settings() {
 		return false;
 	}
 
+
 	// If the edit form has been submitted, save the edited details.
 	if ( isset( $_POST['group-notifications'] ) ) {
+
 		$user_id = bp_loggedin_user_id();
 
 		foreach ( $_POST['group-notifications'] as $group_id => $value ) {
@@ -1278,7 +1320,7 @@ function hc_custom_bpges_add_settings_warning() {
 	}
 
 	// Check for an existing subscription setting.
-	$subs = groups_get_groupmeta( bp_get_current_group_id(), 'ass_subscribed_users' );
+	$subs = ass_get_subscriptions_for_group( bp_get_current_group_id() );
 	foreach ( $subs as $user_id => $type ) {
 		if ( get_current_user_id() === $user_id && 'no' !== $type ) {
 			return;
