@@ -62,22 +62,38 @@ add_action( 'bp_init', 'hcommons_remove_bpges_actions' );
  *
  * @return string
  */
-function hcommons_add_welcome_email_footer( $body, $group_id, $user ) {
+function hcommons_add_welcome_email_footer_proxy( $body, $group_id, $user ) {
+	add_action( 'bp_before_email_footer', 'hcommons_add_welcome_email_footer' );
+}
 
-	if ( ! empty( $body ) ) {
-		$group_link             = bp_get_group_link( groups_get_group( $group_id ) );
-		$current_email_settings = ass_group_default_status( $user->ID );
-		$network                = network_site_url();
-		$url                    = "https://" . $network->domain . $network->path;
-		$user_email_settings    = $url . "/members/$user->user_nicename/settings/notifications/";
-		$body                   .= <<<WELCOME_EMAIL
-        <br/>____________________
+function hcommons_add_welcome_email_footer( $body, $group_id, $user ) {
+	add_action( 'bp_before_email_footer', function () use ( $group_id, $user ) {
+		$group_link = bp_get_group_link( groups_get_group( $group_id ) );
+		switch ( ass_group_default_status( $user->ID ) ) {
+			case "supersub":
+				$current_email_settings = "All Emails";
+				break;
+			case "sub":
+				$current_email_settings = "No Topic Email";
+				break;
+			case "sum":
+				$current_email_settings = "Weekly Summary Email";
+				break;
+			case "dig":
+				$current_email_settings = "Daily Digest Email";
+				break;
+			case "no":
+			default:
+				$current_email_settings = "No Emails";
+				break;
+		}
+		$footer = <<<WELCOME_EMAIL
+        ____________________<br/>
         This email is being sent by $group_link<br/>
-        Your email setting for this group is: $current_email_settings<br/>
-        <br/><br/><br/>
-        <a href='$user_email_settings'>Change Email Settings</a> © 2018 Humanities Commons;
+        Your email setting for this group is: $current_email_settings<br/><br/>
 WELCOME_EMAIL;
-	}
+		echo $footer;
+	} );
 
 	return $body;
 }
