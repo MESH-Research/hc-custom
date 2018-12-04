@@ -62,9 +62,6 @@ add_action( 'bp_init', 'hcommons_remove_bpges_actions' );
  *
  * @return string
  */
-function hcommons_add_welcome_email_footer_proxy( $body, $group_id, $user ) {
-	add_action( 'bp_before_email_footer', 'hcommons_add_welcome_email_footer' );
-}
 
 function hcommons_add_welcome_email_footer( $body, $group_id, $user ) {
 	add_action( 'bp_before_email_footer', function () use ( $group_id, $user ) {
