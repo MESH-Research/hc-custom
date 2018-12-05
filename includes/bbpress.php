@@ -402,16 +402,19 @@ add_filter( 'user_has_cap', 'hc_custom_admin_cap_filter', 10, 3 );
  */
 function hc_custom_show_private_posts_for_admins( $query ) {
 
-	if ( is_admin() || ! bbp_is_single_forum() ) {
-		return;
-	}
+	if ( function_exists( 'bbp_is_single_forum' ) ) {
 
-	$user_id = get_current_user_id();
+		if ( is_admin() || ! bbp_is_single_forum() ) {
+			return;
+		}
 
-	$group_id = bp_get_current_group_id();
+		$user_id = get_current_user_id();
 
-	if ( groups_is_user_admin( $user_id, $group_id ) ) {
-		$query->set( 'post_status', array( 'private', 'publish' ) );
+		$group_id = bp_get_current_group_id();
+
+		if ( groups_is_user_admin( $user_id, $group_id ) ) {
+			$query->set( 'post_status', array( 'private', 'publish' ) );
+		}
 	}
 }
 
@@ -427,12 +430,15 @@ add_action( 'pre_get_posts', 'hc_custom_show_private_posts_for_admins' );
  */
 function hc_custom_get_view_all( $cap ) {
 
-	$user_id = get_current_user_id();
+	if ( function_exists( 'bbp_is_single_topic' ) ) {
 
-	$group_id = bp_get_current_group_id();
+		$user_id = get_current_user_id();
 
-	if ( groups_is_user_admin( $user_id, $group_id ) && bbp_is_single_topic() ) {
-		return true;
+		$group_id = bp_get_current_group_id();
+
+		if ( groups_is_user_admin( $user_id, $group_id ) && bbp_is_single_topic() ) {
+			return true;
+		}
 	}
 }
 
