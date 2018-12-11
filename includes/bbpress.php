@@ -443,3 +443,33 @@ function hc_custom_get_view_all( $cap ) {
 }
 
 add_action( 'bbp_get_view_all', 'hc_custom_get_view_all' );
+
+/**
+ * Change the private topic title prepend.
+ *
+ * @param string $prepend The current prepend string.
+ * @param object $post The post object.
+ */
+function hc_custom_private_title_format( $prepend, $post ) {
+	/* translators: %s: topic title */
+	$prepend = __( 'Admin Only: %s' );
+
+	return $prepend;
+}
+add_filter( 'private_title_format', 'hc_custom_private_title_format', 10, 2 );
+
+/**
+ * Don't show the reply form on private topics.
+ *
+ * @param bool $access The current prepend string.
+ */
+function filter_bbp_current_user_can_access_create_reply_form( $access ) {
+
+	if ( 'private' === get_post_status( bbp_get_topic_id() ) ) {
+		$access = false;
+	}
+	return $access;
+};
+
+add_filter( 'bbp_current_user_can_access_create_reply_form', 'filter_bbp_current_user_can_access_create_reply_form', 999 );
+
