@@ -349,7 +349,127 @@ function hc_custom_bbp_get_topic_statuses( $statuses ) {
 	// Remove Pending status by key.
 	unset( $statuses[ bbp_get_pending_status_id() ] );
 
+	// Add private to status.
+	$statuses = array_merge(
+		$statuses, array(
+			bbp_get_private_status_id() => _x( 'Admin Only', 'Viewable by Admins Only', 'bbpress' ),
+		)
+	);
+
 	return $statuses;
 }
 
 add_filter( 'bbp_get_topic_statuses', 'hc_custom_bbp_get_topic_statuses' );
+
+/**
+ *
+ * Filter on the current_user_can() function.
+ * This function is used to explicitly allow authors to edit contributors and other
+ * authors posts if they are published or pending.
+ *
+ * @param array $allcaps All the capabilities of the user.
+ * @param array $cap     [0] Required capability.
+ * @param array $args    [0] Requested capability.
+ *                       [1] User ID.
+ *                       [2] Associated object ID.
+ */
+function hc_custom_admin_cap_filter( $allcaps, $cap, $args ) {
+	// Bail out if we're not asking about topics.
+	if ( 'read_private_topics' == $args[0] || 'read_private_replies' == $args[0] ) {
+		// Load the post data.
+		$post = get_post( $args[2] );
+
+		$group_id = bp_get_current_group_id();
+
+		$new_caps = array(
+			$cap[0] => true,
+		);
+
+		if ( groups_is_user_admin( $args[1], $group_id ) ) {
+			$allcaps = array_merge( $allcaps, $new_caps );
+		}
+	}
+
+	return $allcaps;
+}
+
+add_filter( 'user_has_cap', 'hc_custom_admin_cap_filter', 10, 3 );
+
+/**
+ * Allow admins to see private topics on the view page.
+ *
+ * @param object $query Instance (passed by reference).
+ */
+function hc_custom_show_private_posts_for_admins( $query ) {
+
+	if ( function_exists( 'bbp_is_single_forum' ) ) {
+
+		if ( is_admin() || ! bbp_is_single_forum() ) {
+			return;
+		}
+
+		$user_id = get_current_user_id();
+
+		$group_id = bp_get_current_group_id();
+
+		if ( groups_is_user_admin( $user_id, $group_id ) ) {
+			$query->set( 'post_status', array( 'private', 'publish' ) );
+		}
+	}
+}
+
+add_action( 'pre_get_posts', 'hc_custom_show_private_posts_for_admins' );
+
+/**
+ * If current user can and is vewing all topics/replies
+ *
+ * @uses current_user_can() To check if the current user can moderate
+ * @uses apply_filters() Calls 'bbp_get_view_all' with the link and original link
+ * @param string $cap The requested capability.
+ * @return bool Whether current user can and is viewing all
+ */
+function hc_custom_get_view_all( $cap ) {
+
+	if ( function_exists( 'bbp_is_single_topic' ) ) {
+
+		$user_id = get_current_user_id();
+
+		$group_id = bp_get_current_group_id();
+
+		if ( groups_is_user_admin( $user_id, $group_id ) && bbp_is_single_topic() ) {
+			return true;
+		}
+	}
+}
+
+add_action( 'bbp_get_view_all', 'hc_custom_get_view_all' );
+
+/**
+ * Change the private topic title prepend.
+ *
+ * @param string $prepend The current prepend string.
+ * @param object $post The post object.
+ */
+function hc_custom_private_title_format( $prepend, $post ) {
+	/* translators: %s: topic title */
+	$prepend = __( 'Admin Only: %s' );
+
+	return $prepend;
+}
+add_filter( 'private_title_format', 'hc_custom_private_title_format', 10, 2 );
+
+/**
+ * Don't show the reply form on private topics.
+ *
+ * @param bool $access The current prepend string.
+ */
+function filter_bbp_current_user_can_access_create_reply_form( $access ) {
+
+	if ( 'private' === get_post_status( bbp_get_topic_id() ) ) {
+		$access = false;
+	}
+	return $access;
+};
+
+add_filter( 'bbp_current_user_can_access_create_reply_form', 'filter_bbp_current_user_can_access_create_reply_form', 999 );
+

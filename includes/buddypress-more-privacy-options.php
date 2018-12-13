@@ -17,7 +17,6 @@
  * @param array $args the args originally passed to BP_Blogs_Blog::get(), so we can reconstruct the query
  */
 function more_privacy_options_blogs_get( $return_value, $args ) {
-
 	global $wpdb;
 	/**
 	 * one of these things is not like the others...
@@ -27,23 +26,80 @@ function more_privacy_options_blogs_get( $return_value, $args ) {
 	extract( $args );
 	$limit = $per_page;
 
-	$bp = buddypress();
+	$bp_q = buddypress();
 
-	if ( is_user_logged_in() && bp_is_current_action( 'my-sites' ) ) {
-		$hidden_sql = 'AND wb.public in ( 0, 1, -1, -2 )'; // this accommodates More Privacy Options
-	} elseif ( bp_is_current_action( 'my-sites' ) && current_user_can( 'manage_options' ) || is_super_admin() ) {
-		$hidden_sql = ''; // this enables sites to users that are admin if the visibility is -3
-	} else {
-		if ( ! is_user_logged_in() || ! bp_current_user_can( 'bp_moderate' ) && ( bp_loggedin_user_id() != $user_id ) ) {
-			$hidden_sql = 'AND wb.public in ( 0, 1 ) '; // this does not consider any values of "public" added by MPO
-		} else {
-			$hidden_sql = '';
+	//	Visible(1)
+	//  No Search(0)
+	//  Network Users Only(-1)
+	//  Site Members Only(-2)
+	//  Site Admins Only(-3)
+	//  Super Admins - everything...
+
+
+	$visibility            = "public";
+	$visibility_configured = false;
+
+	if ( is_user_logged_in() ) {
+		$user_id    = get_current_user_id();
+		$visibility = "Visible";
+		if ( is_super_admin() && ! $visibility_configured ) {
+			$visibility = "Super Admins";
+		}
+		if ( is_super_admin() && ! $visibility_configured ) {
+			$visibility = "Site Admins";
+		}
+		$member_types             = bp_get_member_type( $user_id, false );
+		$search_member_type_array = array_combine( array_map( 'strtolower', $member_types ), $member_types );
+		$network_id               = Humanities_Commons::$society_id;
+		if ( ! empty( $search_member_type_array[ $network_id ] ) && ! $visibility_configured ) {
+			$visibility = "Network Users";
+		}
+
+		$blogs_user_belongs_to = get_blogs_of_user( $user_id );
+		$userblogs             = false;
+
+		if ( ! empty( $blogs_user_belongs_to ) && ! $visibility_configured ) {
+			$visibility = "Site Members";
+			$userblogs  = array();
+			$adminblogs = array();
+			foreach ( $blogs_user_belongs_to as $a ) {
+				$userblogs[] = $a->userblog_id;
+				if ( current_user_can_for_blog( $a->userblog_id, 'activate_plugins' ) ) {
+					$adminblogs[] = $a->userblog_id;
+				}
+			}
 		}
 	}
 
-	$pag_sql = ( $limit && $page ) ? $wpdb->prepare( ' LIMIT %d, %d', intval( ( $page - 1 ) * $limit ), intval( $limit ) ) : '';
 
-	$user_sql = ! empty( $user_id ) ? $wpdb->prepare( ' AND b.user_id = %d', $user_id ) : '';
+	switch ( $visibility ) {
+
+		case "No Search":
+			$hidden_sql = 'AND wb.public in ( 0, 1)';
+			break;
+		case "Network Users":
+			$hidden_sql = 'AND wb.public in ( 1, -1 )';
+			break;
+		case "Site Members":
+			$perms = "1, -2";
+			if ( ! empty( $adminblogs ) ) {
+				//Site Admins
+				$visibility = "Site Admins";
+				$userblogs  = array_merge( $userblogs, $adminblogs );
+				$perms      .= ", -3";
+			}
+			$hidden_sql = 'AND (wb.public in ( ' . $perms . ' ) OR b.blog_id in (' . implode( ",", $userblogs ) . ')) ';
+			break;
+		case "Super Admins":
+			$hidden_sql = 'AND wb.public in ( 0, 1, -1, -2, -3 )';
+			break;
+		case "Visible":
+		default:
+			$hidden_sql = 'AND wb.public in ( 1 )';
+			break;
+	}
+
+	$pag_sql = ( $limit && $page ) ? $wpdb->prepare( ' LIMIT %d, %d', intval( ( $page - 1 ) * $limit ), intval( $limit ) ) : '';
 
 	switch ( $type ) {
 		case 'active':
@@ -61,54 +117,42 @@ function more_privacy_options_blogs_get( $return_value, $args ) {
 			break;
 	}
 
-	$include_sql      = '';
-	$include_blog_ids = array_filter( wp_parse_id_list( $include_blog_ids ) );
-
-	if ( ! empty( $include_blog_ids ) ) {
-		$blog_ids_sql = implode( ',', $include_blog_ids );
-		$include_sql  = " AND b.blog_id IN ({$blog_ids_sql})";
-	}
-
+	$include_sql = '';
+    $include_blog_ids = array_filter( wp_parse_id_list( $include_blog_ids ) );
+    if ( ! empty( $include_blog_ids ) ) {
+ 		$blog_ids_sql = implode( ',', $include_blog_ids );
+ 		$include_sql  = " AND b.blog_id IN ({$blog_ids_sql})";
+ 	}
+	$search_terms_sql = '';
 	if ( ! empty( $search_terms ) ) {
 		$search_terms_like = '%' . bp_esc_like( $search_terms ) . '%';
 		$search_terms_sql  = $wpdb->prepare( 'AND (bm_name.meta_value LIKE %s OR bm_description.meta_value LIKE %s)', $search_terms_like, $search_terms_like );
-	} else {
-		$search_terms_sql = '';
 	}
-
-	$paged_blogs = $wpdb->get_results(
-		"
-		SELECT b.blog_id, b.user_id as admin_user_id, u.user_email as admin_user_email, wb.domain, wb.path, bm.meta_value as last_activity, bm_name.meta_value as name
-		FROM
-		  {$bp->blogs->table_name} b
-		  LEFT JOIN {$bp->blogs->table_name_blogmeta} bm ON (b.blog_id = bm.blog_id)
-		  LEFT JOIN {$bp->blogs->table_name_blogmeta} bm_name ON (b.blog_id = bm_name.blog_id)
-		  LEFT JOIN {$bp->blogs->table_name_blogmeta} bm_description ON (b.blog_id = bm_description.blog_id)
-		  LEFT JOIN {$wpdb->base_prefix}blogs wb ON (b.blog_id = wb.blog_id)
-		  LEFT JOIN {$wpdb->users} u ON (b.user_id = u.ID)
+	$site_sql = "AND wb.site_id = " . get_current_network_id();
+	$sql      = "FROM
+		  " . $bp_q->blogs->table_name . " b
+		  LEFT JOIN " . $bp_q->blogs->table_name_blogmeta . " bm ON (b.blog_id = bm.blog_id)
+		  LEFT JOIN " . $bp_q->blogs->table_name_blogmeta . " bm_name ON (b.blog_id = bm_name.blog_id)
+		  LEFT JOIN " . $bp_q->blogs->table_name_blogmeta . " bm_description ON (b.blog_id = bm_description.blog_id)
+		  LEFT JOIN " . $wpdb->base_prefix . "blogs wb ON (b.blog_id = wb.blog_id $hidden_sql)
+		  LEFT JOIN " . $wpdb->users . " u ON (b.user_id = u.ID)
 		WHERE
-		  wb.archived = '0' AND wb.spam = 0 AND wb.mature = 0 AND wb.deleted = 0 {$hidden_sql}
+		  wb.archived = '0' AND wb.spam = 0 AND wb.mature = 0 AND wb.deleted = 0  $site_sql
 		  AND bm.meta_key = 'last_activity' AND bm_name.meta_key = 'name' AND bm_description.meta_key = 'description'
-		  {$search_terms_sql} {$user_sql} {$include_sql}
-		GROUP BY b.blog_id {$order_sql} {$pag_sql}
-	"
-	);
+		  $search_terms_sql $include_sql";
 
-	$total_blogs = $wpdb->get_var(
-		"
-		SELECT COUNT(DISTINCT b.blog_id)
-		FROM
-		  {$bp->blogs->table_name} b
-		  LEFT JOIN {$wpdb->base_prefix}blogs wb ON (b.blog_id = wb.blog_id)
-		  LEFT JOIN {$bp->blogs->table_name_blogmeta} bm_name ON (b.blog_id = bm_name.blog_id)
-		  LEFT JOIN {$bp->blogs->table_name_blogmeta} bm_description ON (b.blog_id = bm_description.blog_id)
-		WHERE
-		  wb.archived = '0' AND wb.spam = 0 AND wb.mature = 0 AND wb.deleted = 0 {$hidden_sql}
-		  AND
-		  bm_name.meta_key = 'name' AND bm_description.meta_key = 'description'
-		  {$search_terms_sql} {$user_sql} {$include_sql}
-	"
-	);
+	$search_sql = "SELECT b.blog_id,
+		        b.user_id as admin_user_id,
+		        u.user_email as admin_user_email,
+		        wb.domain,
+		        wb.path,
+		        bm.meta_value as last_activity,
+		        bm_name.meta_value as name " . $sql . " GROUP BY b.blog_id $order_sql $pag_sql";
+
+	$count_sql = "SELECT COUNT(DISTINCT b.blog_id)" . $sql;
+
+	$paged_blogs = $wpdb->get_results( $search_sql );
+	$total_blogs = $wpdb->get_var( $count_sql );
 
 	$blog_ids = array();
 	foreach ( (array) $paged_blogs as $blog ) {
@@ -127,4 +171,5 @@ function more_privacy_options_blogs_get( $return_value, $args ) {
 	);
 
 }
+
 add_filter( 'bp_blogs_get_blogs', 'more_privacy_options_blogs_get', null, 3 );
