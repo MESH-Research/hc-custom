@@ -452,7 +452,7 @@ add_action( 'bbp_get_view_all', 'hc_custom_get_view_all' );
  */
 function hc_custom_private_title_format( $prepend, $post ) {
 	/* translators: %s: topic title */
-	$prepend = __( 'Admin Only: %s' );
+	$prepend = "<span class='badge-admin-only'>Admin Only </span>  " . __( ' %s' );
 
 	return $prepend;
 }
@@ -469,7 +469,7 @@ function filter_bbp_current_user_can_access_create_reply_form( $access ) {
 		$access = false;
 	}
 	return $access;
-};
+}
 
 add_filter( 'bbp_current_user_can_access_create_reply_form', 'filter_bbp_current_user_can_access_create_reply_form', 999 );
 
