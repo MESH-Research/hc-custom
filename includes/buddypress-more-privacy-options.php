@@ -67,8 +67,6 @@ function more_privacy_options_blogs_get( $return_value, $args ) {
 				}
 			}
 		}
-
-
 	}
 
 
