@@ -35,7 +35,7 @@ function more_privacy_options_blogs_get( $return_value, $args ) {
 	//  Site Admins Only(-3)
 	//  Super Admins - everything...
 
-
+	$user_sql 			   = '';
 	$visibility            = "public";
 	$visibility_configured = false;
 
