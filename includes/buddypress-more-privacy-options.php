@@ -34,28 +34,26 @@ function more_privacy_options_blogs_get( $return_value, $args ) {
 	//  Site Members Only(-2)
 	//  Site Admins Only(-3)
 	//  Super Admins - everything...
-
-
 	$visibility            = "public";
 	$visibility_configured = false;
 
+	$user_sql = ! empty( $user_id ) ? $wpdb->prepare( ' AND b.user_id = %d', $user_id ) : '';
+
+
 	if ( is_user_logged_in() ) {
-		$user_id    = get_current_user_id();
+		$logged_in_user_id    = get_current_user_id();
 		$visibility = "Visible";
 		if ( is_super_admin() && ! $visibility_configured ) {
 			$visibility = "Super Admins";
 		}
-		if ( is_super_admin() && ! $visibility_configured ) {
-			$visibility = "Site Admins";
-		}
-		$member_types             = bp_get_member_type( $user_id, false );
+		$member_types             = bp_get_member_type( $logged_in_user_id, false );
 		$search_member_type_array = array_combine( array_map( 'strtolower', $member_types ), $member_types );
 		$network_id               = Humanities_Commons::$society_id;
 		if ( ! empty( $search_member_type_array[ $network_id ] ) && ! $visibility_configured ) {
 			$visibility = "Network Users";
 		}
 
-		$blogs_user_belongs_to = get_blogs_of_user( $user_id );
+		$blogs_user_belongs_to = get_blogs_of_user( $logged_in_user_id );
 		$userblogs             = false;
 
 		if ( ! empty( $blogs_user_belongs_to ) && ! $visibility_configured ) {
@@ -101,6 +99,19 @@ function more_privacy_options_blogs_get( $return_value, $args ) {
 
 	$pag_sql = ( $limit && $page ) ? $wpdb->prepare( ' LIMIT %d, %d', intval( ( $page - 1 ) * $limit ), intval( $limit ) ) : '';
 
+
+	if ( is_user_logged_in() && bp_is_current_action( 'my-sites' ) ) {
+		$hidden_sql = 'AND wb.public in ( 0, 1, -1, -2 )'; // this accommodates More Privacy Options
+	} elseif ( bp_is_current_action( 'my-sites' ) && current_user_can( 'manage_options' ) || is_super_admin() ) {
+		$hidden_sql = ''; // this enables sites to users that are admin if the visibility is -3
+	} else {
+		if ( ! is_user_logged_in() || ! bp_current_user_can( 'bp_moderate' ) && ( bp_loggedin_user_id() != $user_id ) ) {
+			$hidden_sql = 'AND wb.public in ( 0, 1 ) '; // this does not consider any values of "public" added by MPO
+		} else {
+			$hidden_sql = '';
+		}
+	}
+
 	switch ( $type ) {
 		case 'active':
 		default:
@@ -139,7 +150,7 @@ function more_privacy_options_blogs_get( $return_value, $args ) {
 		WHERE
 		  wb.archived = '0' AND wb.spam = 0 AND wb.mature = 0 AND wb.deleted = 0  $site_sql
 		  AND bm.meta_key = 'last_activity' AND bm_name.meta_key = 'name' AND bm_description.meta_key = 'description'
-		  $search_terms_sql $include_sql";
+		  $search_terms_sql $user_sql $include_sql";
 
 	$search_sql = "SELECT b.blog_id,
 		        b.user_id as admin_user_id,
