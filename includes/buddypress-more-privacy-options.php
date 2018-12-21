@@ -35,7 +35,7 @@ function more_privacy_options_blogs_get( $return_value, $args ) {
 	//  Site Admins Only(-3)
 	//  Super Admins - everything...
 
-	$user_sql 			   = '';
+	$user_id               = '';
 	$visibility            = "public";
 	$visibility_configured = false;
 
@@ -66,10 +66,9 @@ function more_privacy_options_blogs_get( $return_value, $args ) {
 				}
 			}
 		}
-
-		$user_sql = ! empty( $user_id ) ? $wpdb->prepare( ' AND b.user_id = %d', $user_id ) : '';
 	}
 
+	$user_sql = ! empty( $user_id ) ? $wpdb->prepare( ' AND b.user_id = %d', $user_id ) : '';
 
 	switch ( $visibility ) {
 
