@@ -45,9 +45,6 @@ function more_privacy_options_blogs_get( $return_value, $args ) {
 		if ( is_super_admin() && ! $visibility_configured ) {
 			$visibility = "Super Admins";
 		}
-		if ( is_super_admin() && ! $visibility_configured ) {
-			$visibility = "Site Admins";
-		}
 		$member_types             = bp_get_member_type( $user_id, false );
 		$search_member_type_array = array_combine( array_map( 'strtolower', $member_types ), $member_types );
 		$network_id               = Humanities_Commons::$society_id;
@@ -69,6 +66,8 @@ function more_privacy_options_blogs_get( $return_value, $args ) {
 				}
 			}
 		}
+
+		$user_sql = ! empty( $user_id ) ? $wpdb->prepare( ' AND b.user_id = %d', $user_id ) : '';
 	}
 
 
@@ -139,7 +138,7 @@ function more_privacy_options_blogs_get( $return_value, $args ) {
 		WHERE
 		  wb.archived = '0' AND wb.spam = 0 AND wb.mature = 0 AND wb.deleted = 0  $site_sql
 		  AND bm.meta_key = 'last_activity' AND bm_name.meta_key = 'name' AND bm_description.meta_key = 'description'
-		  $search_terms_sql $include_sql";
+		  $search_terms_sql $user_sql $include_sql";
 
 	$search_sql = "SELECT b.blog_id,
 		        b.user_id as admin_user_id,
