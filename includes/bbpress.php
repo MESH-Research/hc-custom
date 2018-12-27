@@ -474,12 +474,10 @@ function filter_bbp_current_user_can_access_create_reply_form( $access ) {
 add_filter( 'bbp_current_user_can_access_create_reply_form', 'filter_bbp_current_user_can_access_create_reply_form', 999 );
 
 /**
- * @param $emails
- *
- * @return int
+ * Reduce the spam blokcer limit to 10 emails.
  */
-function filter_set_spam_blocker_to_10_in_a_day( $emails ) {
-	return 10;
-}
-
-add_filter('buddypress_messages_spamblocker_24d', 'filter_set_spam_blocker_to_10_in_a_day');
+add_filter('buddypress_messages_spamblocker_10m', 10);
+add_filter('buddypress_messages_spamblocker_30m', 10);
+add_filter('buddypress_messages_spamblocker_60m', 10);
+add_filter('buddypress_messages_spamblocker_12h', 10);
+add_filter('buddypress_messages_spamblocker_24d', 10);
