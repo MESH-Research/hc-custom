@@ -8,31 +8,31 @@
 /**
  * Adds new button labels for society members. For non society see hcommons_add_non_society_member_join_group_button()
  *
- * @param $button
- * @param $group
+ * @param string $button HTML button for joining a group.
+ * @param object $group BuddyPress group object.
  *
  * @return mixed
  */
-function hcommons_filter_groups_button_labels ($button, $group) {
+function hcommons_filter_groups_button_labels( $button, $group ) {
 	$status = $group->status;
 	if ( ! is_super_admin() && hcommons_check_non_member_active_session() ) {
-		$button['link_class'] = "disabled-button";
+		$button['link_class'] = 'disabled-button';
 	}
-	if(empty(BP_Groups_Member::check_is_member(get_current_user_id(), $group->id))) {
-		switch($status) {
+	if ( empty( BP_Groups_Member::check_is_member( get_current_user_id(), $group->id ) ) ) {
+		switch ( $status ) {
 			case 'public':
-				$button['link_text'] = "Join Group";
+				$button['link_text'] = 'Join Group';
 				break;
 
 			case 'private':
-				$button['link_text'] = "Request Membership";
+				$button['link_text'] = 'Request Membership';
 				break;
 		}
 	}
 
 	return $button;
 }
-add_filter( 'bp_get_group_join_button', 'hcommons_filter_groups_button_labels', 10 , 2 );
+add_filter( 'bp_get_group_join_button', 'hcommons_filter_groups_button_labels', 10, 2 );
 
 /**
  * Filters the action for the new group activity update.
@@ -56,14 +56,14 @@ function hcommons_add_non_society_member_join_group_button() {
 		if ( empty( $group ) ) {
 			$group =& $groups_template->group;
 		}
-		$is_not_committee = strtolower( \groups_get_groupmeta( $group->id, 'society_group_type', true ) ) !== "committee";
+		$is_not_committee = strtolower( \groups_get_groupmeta( $group->id, 'society_group_type', true ) ) !== 'committee';
 
-		if($is_not_committee) {
+		if ( $is_not_committee ) {
 			$message = 'Join Group';
-			if ($group->status === "private") {
+			if ( 'private' === $group->status ) {
 				$message = 'Request Membership</div>';
 			}
-			echo '<div class="disabled-button">'.$message.'</div>';
+			echo '<div class="disabled-button">' . $message . '</div>';
 		}
 	}
 }
@@ -115,11 +115,16 @@ function hcommons_override_config_group_nav() {
  * @param string $retval Navigation slug.
  */
 function hcommons_override_cbox_set_group_default_tab( $retval ) {
-		// Check if bbPress or legacy forums are active and configured properly.
+	$group_id = bp_get_current_group_id();
+
+	// If there is a landing page set, use it instead.
+	$retval = ! empty( groups_get_groupmeta( $group_id, 'group_landing_page' ) ) ? groups_get_groupmeta( $group_id, 'group_landing_page' ) : $retval;
+
+	// Check if bbPress or legacy forums are active and configured properly.
 	if ( ( function_exists( 'bbp_is_group_forums_active' ) && bbp_is_group_forums_active() ) ||
 				( function_exists( 'bp_forums_is_installed_correctly' ) && bp_forums_is_installed_correctly() ) ) {
 
-			// If current group does not have a forum attached, stop now!
+		// If current group does not have a forum attached, stop now!
 		if ( ! bp_group_is_forum_enabled( groups_get_current_group() ) ) {
 					return $retval;
 		}
@@ -133,7 +138,7 @@ function hcommons_override_cbox_set_group_default_tab( $retval ) {
 			add_action( 'bp_actions', 'hcommons_override_config_group_nav', 99 );
 
 			// Finally, use 'forum' as the default group tab.
-			return 'home';
+			return ! empty( groups_get_groupmeta( $group_id, 'group_landing_page' ) ) ? groups_get_groupmeta( $group_id, 'group_landing_page' ) : 'home';
 	}
 
 		return $retval;
@@ -245,3 +250,186 @@ function update_group_forum_visibility( BP_Groups_Group $group ) {
 }
 
 add_action( 'groups_group_after_save', 'update_group_forum_visibility' );
+
+/**
+ * Set forums' status to match the privacy status of the associated group.
+ *
+ * @param string $parent_slug The group slug.
+ */
+function hc_custom_get_options_nav( $parent_slug = '' ) {
+	global $bp;
+
+	?>
+	<h4><?php _e( 'Show or Hide Menu Items for Members', 'group_forum_menu' ); ?></h4>
+	<table class="group-nav-settings" >
+		<thead>
+			<tr>
+				<th class="icon"></th>
+				<th class="title"></th>
+				<th class="show gas-choice"><?php _e( 'Show', 'buddypress' ); ?></th>
+				<th class="hide gas-choice"><?php _e( 'Hide', 'buddypress' ); ?></th>
+			</tr>
+	</thead>
+	<tbody>
+
+	<?php
+
+	$group_id              = bp_get_group_id();
+	$current_item          = bp_current_item();
+	$single_item_component = bp_current_component();
+
+	// Adjust the selected nav item for the current single item if needed.
+	if ( ! empty( $parent_slug ) ) {
+		$current_item  = $parent_slug;
+		$selected_item = bp_action_variable( 0 );
+	}
+
+	// If the nav is not defined by the parent component, look in the Members nav.
+	if ( ! isset( $bp->{$single_item_component}->nav ) ) {
+		$secondary_nav_items = $bp->members->nav->get_secondary( array( 'parent_slug' => $current_item ) );
+	} else {
+		$secondary_nav_items = $bp->{$single_item_component}->nav->get_secondary( array( 'parent_slug' => $current_item ) );
+	}
+
+	if ( ! $secondary_nav_items ) {
+		return false;
+	}
+
+	foreach ( $secondary_nav_items as $subnav_item ) :
+
+		// List type depends on our current component.
+		$list_type = bp_is_group() ? 'groups' : 'personal';
+
+		if ( 'groups_screen_group_admin' === $subnav_item->screen_function ) {
+			continue;
+		}
+
+		$current_status = ! empty( groups_get_groupmeta( $group_id, $subnav_item->slug ) ) ? groups_get_groupmeta( $group_id, $subnav_item->slug ) : '';
+		?>
+
+		<tr>
+			<td></td>
+			<td>
+				<a href="<?php echo esc_url( $subnav_item->link ); ?>"> <?php echo $subnav_item->name; ?> </a>
+			</td>
+
+			<td class="show gas-choice">
+				<input type="radio" name="group-nav-settings[<?php echo $subnav_item->slug; ?>]" value="show"
+					<?php
+					if ( 'show' == $current_status || ! $current_status ) {
+						?>
+						checked="checked" <?php } ?>/>
+			</td>
+
+			<td class="hide gas-choice">
+				<input type="radio" name="group-nav-settings[<?php echo $subnav_item->slug; ?>]" value="hide"
+					<?php
+					if ( 'hide' == $current_status ) {
+						?>
+						checked="checked" <?php } ?>/>
+			</td>
+		</tr>
+		<?php endforeach; ?>
+
+		</tbody>
+	</table>
+
+	<?php
+
+}
+
+/**
+ * Save group nav settings.
+ *
+ * @param int $group_id The group id.
+ */
+function hc_custom_groups_nav_settings( $group_id ) {
+
+	$group_nav_settings = isset( $_POST['group-nav-settings'] ) ? $_POST['group-nav-settings'] : '';
+	$group_landing_page = isset( $_POST['group-landing-page-select'] ) ? $_POST['group-landing-page-select'] : '';
+	$group              = groups_get_group( array( 'group_id' => $group_id ) );
+	$group_slug         = $group->slug;
+
+	if ( ! empty( $group_nav_settings ) ) {
+
+		foreach ( $_POST['group-nav-settings'] as $menu_item => $value ) {
+			groups_update_groupmeta( $group_id, $menu_item, $value );
+		}
+	}
+
+	if ( ! empty( $group_landing_page ) ) {
+		groups_update_groupmeta( $group_id, 'group_landing_page', $group_landing_page );
+	}
+
+}
+add_action( 'groups_settings_updated', 'hc_custom_groups_nav_settings' );
+
+/**
+ * Remove tabs based on group settings.
+ */
+function hc_custom_remove_group_manager_subnav_tabs() {
+	global $bp;
+
+	// Site admins will see all tabs.
+	if ( ! bp_is_group() || is_super_admin() ) {
+		return;
+	}
+
+	$group_id = bp_get_current_group_id();
+
+	// Group admins will see all tabs.
+	if ( ! $group_id || groups_is_user_admin( get_current_user_id(), $group_id ) ) {
+		return;
+	}
+
+	$parent_nav_slug     = bp_get_current_group_slug();
+	$secondary_nav_items = $bp->groups->nav->get_secondary( array( 'parent_slug' => $parent_nav_slug ) );
+
+	// Remove the nav items. Not stored, just unsets it.
+	foreach ( $secondary_nav_items as $subnav_item ) {
+		if ( 'hide' === groups_get_groupmeta( $group_id, $subnav_item->slug ) ) {
+
+			bp_core_remove_subnav_item( $parent_nav_slug, $subnav_item->slug, 'groups' );
+		}
+	}
+}
+add_action( 'bp_actions', 'hc_custom_remove_group_manager_subnav_tabs' );
+
+/**
+ * Allow group admin to change the default landing page.
+ */
+function hc_custom_choose_landing_page() {
+	global $bp;
+
+	$group_id        = bp_get_group_id();
+	$parent_nav_slug = bp_get_current_group_slug();
+	$selected        = groups_get_groupmeta( $group_id, 'group_landing_page' );
+
+	$parent_nav_slug     = bp_current_item();
+	$secondary_nav_items = $bp->groups->nav->get_secondary( array( 'parent_slug' => $parent_nav_slug ) );
+
+	?>
+		<h4><?php _e( 'Select Default Landing Page for Group', 'group_forum_menu' ); ?></h4>
+
+		<select name="group-landing-page-select" id="group-landing-page-select">
+
+			<?php foreach ( $secondary_nav_items as $subnav_item ) : ?>
+
+				<?php
+
+				if ( 'groups_screen_group_admin' === $subnav_item->screen_function ) {
+					continue;
+				}
+				?>
+
+				<option value="<?php echo esc_attr( $subnav_item->slug ); ?>"<?php selected( $subnav_item->slug, $selected ); ?>><?php echo $subnav_item->name; ?></option>
+
+			<?php endforeach; ?>
+
+		</select>
+
+	<?php
+
+}
+
+
