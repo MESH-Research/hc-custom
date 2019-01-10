@@ -413,16 +413,17 @@ function hc_custom_choose_landing_page() {
 
 		<select name="group-landing-page-select" id="group-landing-page-select">
 
-			<?php foreach ( $secondary_nav_items as $subnav_item ) :
+			<?php
+			foreach ( $secondary_nav_items as $subnav_item ) :
 
-				$name = preg_replace('/\d/', '', $subnav_item->name );
+				$name = preg_replace( '/\d/', '', $subnav_item->name );
 
 				if ( 'groups_screen_group_admin' === $subnav_item->screen_function ) {
 					continue;
 				}
 				?>
 
-				<option value="<?php echo esc_attr( $subnav_item->slug ); ?>"<?php selected( $subnav_item->slug, $selected ); ?>><?php echo $name ?></option>
+				<option value="<?php echo esc_attr( $subnav_item->slug ); ?>"<?php selected( $subnav_item->slug, $selected ); ?>><?php echo $name; ?></option>
 
 			<?php endforeach; ?>
 
@@ -433,9 +434,11 @@ function hc_custom_choose_landing_page() {
 }
 
 /**
- * Hide the request membership tab for MLA committees.
+ * Grey out group navs if they are hidden.
  *
  * @param string $string Unchanged filter string.
+ * @param array  $subnav_item Array of nav item.
+ * @param string $selected_item Currently selected nav item.
  */
 function hc_custom_modify_nav( $string, $subnav_item, $selected_item ) {
 	global $bp;
@@ -448,58 +451,105 @@ function hc_custom_modify_nav( $string, $subnav_item, $selected_item ) {
 	$group_id = bp_get_current_group_id();
 
 	// Group admins will see all tabs.
-	if ( ! $group_id && ( !groups_is_user_admin( get_current_user_id(), $group_id ) || ! is_super_admin() ) ) {
+	if ( ! $group_id && ( ! groups_is_user_admin( get_current_user_id(), $group_id ) || ! is_super_admin() ) ) {
 
 		return $string;
 	}
 
 	if ( 'hide' === groups_get_groupmeta( $group_id, $subnav_item->slug ) ) {
-		$string = '<li id="' . esc_attr( $subnav_item->css_id . '-groups-li' ) . '" ' . $selected_item . '><span class="disabled-nav"> '. $subnav_item->name . '</span></li>';
+		$string = '<li id="' . esc_attr( $subnav_item->css_id . '-groups-li' ) . '" ' . $selected_item . '><span class="disabled-nav"> ' . $subnav_item->name . '</span></li>';
 	}
 
 	return $string;
 }
 
+/**
+ * Fiter for home nav.
+ *
+ * @param string $string Unchanged filter string.
+ * @param array  $subnav_item Array of nav item.
+ * @param string $selected_item Currently selected nav item.
+ */
 function hc_custom_modify_home_nav( $string, $subnav_item, $selected_item ) {
-	return hc_custom_modify_nav($string, $subnav_item, $selected_item);
+	return hc_custom_modify_nav( $string, $subnav_item, $selected_item );
 }
 
 add_filter( 'bp_get_options_nav_home', 'hc_custom_modify_home_nav', 10, 3 );
 
+/**
+ * Fiter for home nav.
+ *
+ * @param string $string Unchanged filter string.
+ * @param array  $subnav_item Array of nav item.
+ * @param string $selected_item Currently selected nav item.
+ */
 function hc_custom_modify_forum_nav( $string, $subnav_item, $selected_item ) {
-	return hc_custom_modify_nav($string, $subnav_item, $selected_item);
+	return hc_custom_modify_nav( $string, $subnav_item, $selected_item );
 }
 
 add_filter( 'bp_get_options_nav_nav-forum', 'hc_custom_modify_forum_nav', 10, 3 );
 
+/**
+ * Fiter for home nav.
+ *
+ * @param string $string Unchanged filter string.
+ * @param array  $subnav_item Array of nav item.
+ * @param string $selected_item Currently selected nav item.
+ */
 function hc_custom_modify_events_nav( $string, $subnav_item, $selected_item ) {
-	return hc_custom_modify_nav($string, $subnav_item, $selected_item);
+	return hc_custom_modify_nav( $string, $subnav_item, $selected_item );
 }
 
 add_filter( 'bp_get_options_nav_nav-events', 'hc_custom_modify_events_nav', 10, 3 );
 
-
+/**
+ * Fiter for Core deposits nav.
+ *
+ * @param string $string Unchanged filter string.
+ * @param array  $subnav_item Array of nav item.
+ * @param string $selected_item Currently selected nav item.
+ */
 function hc_custom_modify_deposits_nav( $string, $subnav_item, $selected_item ) {
-	return hc_custom_modify_nav($string, $subnav_item, $selected_item);
+	return hc_custom_modify_nav( $string, $subnav_item, $selected_item );
 }
 
 add_filter( 'bp_get_options_nav_deposits', 'hc_custom_modify_deposits_nav', 10, 3 );
 
-
+/**
+ * Fiter for docs nav.
+ *
+ * @param string $string Unchanged filter string.
+ * @param array  $subnav_item Array of nav item.
+ * @param string $selected_item Currently selected nav item.
+ */
 function hc_custom_modify_docs_nav( $string, $subnav_item, $selected_item ) {
-	return hc_custom_modify_nav($string, $subnav_item, $selected_item);
+	return hc_custom_modify_nav( $string, $subnav_item, $selected_item );
 }
 
 add_filter( 'bp_get_options_nav_nav-docs', 'hc_custom_modify_docs_nav', 10, 3 );
 
+/**
+ * Fiter for documents nav.
+ *
+ * @param string $string Unchanged filter string.
+ * @param array  $subnav_item Array of nav item.
+ * @param string $selected_item Currently selected nav item.
+ */
 function hc_custom_modify_documents_nav( $string, $subnav_item, $selected_item ) {
-	return hc_custom_modify_nav($string, $subnav_item, $selected_item);
+	return hc_custom_modify_nav( $string, $subnav_item, $selected_item );
 }
 
 add_filter( 'bp_get_options_nav_nav-documents', 'hc_custom_modify_documents_nav', 10, 3 );
 
+/**
+ * Fiter for blog nav.
+ *
+ * @param string $string Unchanged filter string.
+ * @param array  $subnav_item Array of nav item.
+ * @param string $selected_item Currently selected nav item.
+ */
 function hc_custom_modify_blog_nav( $string, $subnav_item, $selected_item ) {
-	return hc_custom_modify_nav($string, $subnav_item, $selected_item);
+	return hc_custom_modify_nav( $string, $subnav_item, $selected_item );
 }
 
 add_filter( 'bp_get_options_nav_nav-group-blog', 'hc_custom_modify_blog_nav', 10, 3 );
