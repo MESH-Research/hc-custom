@@ -201,6 +201,13 @@ function hc_custom_pre_get_posts( $query ) {
 			$query->set( 'meta_key', 'bp_docs_orderby' );
 		}
 	}
+
+	if ( 'attachment' === $query->get( 'post_type' ) ) {
+		if ( bp_docs_is_bp_docs_page() ) {
+			$query->set( 'posts_per_page', -1 );
+		}
+	}
+
 	return $query;
 }
 
