@@ -457,7 +457,7 @@ function hc_custom_modify_nav( $string, $subnav_item, $selected_item ) {
 	}
 
 	if ( 'hide' === groups_get_groupmeta( $group_id, $subnav_item->slug ) ) {
-		$string = '<li class="hideshow" id="' . esc_attr( $subnav_item->css_id . '-groups-li' ) . '" ' . $selected_item . '><span class="disabled-nav"> ' . $subnav_item->name . '</span></li>';
+		$string = '<li class="disabled-group-nav" id="' . esc_attr( $subnav_item->css_id . '-groups-li' ) . '" ' . $selected_item . '><span class="disabled-nav"> ' . $subnav_item->name . '</span></li>';
 	}
 
 	return $string;
