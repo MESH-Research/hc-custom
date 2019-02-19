@@ -170,3 +170,30 @@ function more_privacy_options_blogs_get( $return_value, $args ) {
 }
 
 add_filter( 'bp_blogs_get_blogs', 'more_privacy_options_blogs_get', null, 3 );
+
+
+function mla_add_privacy_options($options) { ?>
+<br />
+<h3>Visibility Settings</h3>
+<label class="checkbox" for="blog_public_on">
+	<input type="radio" id="blog_public_on" name="blog_public" value="1" checked="checked" class="styled">
+	<strong>Public and allow search engines to index this site. <i style="font-weight: normal">Note: it is up to search
+			engines to honor your request. The site will appear in public listings around HUMANITIES COMMONS.</i></strong>
+</label>
+<label class="checkbox" for="blog_public_off"><br>
+	<input type="radio" id="blog_public_off" name="blog_public" value="0" class="styled">
+	<strong>Public but discourage search engines from index this site. <i style="font-weight: normal">Note: this option
+			does not block access to your site — it is up to search engines to honor your request. The site will appear in
+			public listings around HUMANITIES COMMONS</i></strong>
+</label><br />
+
+<?php 
+}
+
+add_action( 'wp_head', 'mla_add_privacy_options_action' );
+function mla_add_privacy_options_action(){
+	//remove_action('blog_privacy_selector','add_privacy_options');
+	add_action('wpmueditblogaction','mla_add_privacy_options', 1);
+	add_action('blog_privacy_selector','mla_add_privacy_options', 1);
+	add_action('signup_blogform','mla_add_privacy_options', 1);
+}
