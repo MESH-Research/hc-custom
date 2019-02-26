@@ -171,7 +171,9 @@ function more_privacy_options_blogs_get( $return_value, $args ) {
 
 add_filter( 'bp_blogs_get_blogs', 'more_privacy_options_blogs_get', null, 3 );
 
-
+/**
+ * @param $options
+ */
 function mla_add_privacy_options($options) { ?>
 <br />
 <h3>Visibility Settings</h3>
@@ -190,6 +192,9 @@ function mla_add_privacy_options($options) { ?>
 <?php 
 }
 
+/**
+ * load the actions of mpo visibility
+ */
 add_action( 'wp_head', 'mla_add_privacy_options_action' );
 function mla_add_privacy_options_action(){
 	add_action('wpmueditblogaction','mla_add_privacy_options', 1);
@@ -197,7 +202,14 @@ function mla_add_privacy_options_action(){
 	add_action('signup_blogform','mla_add_privacy_options', 1);
 }
 
+/**
+ *
+ */
 add_action( 'admin_head', 'mla_add_admin_js');
 function mla_add_admin_js () {
-
+	global $pagenow;
+	$page = 'options-reading.php';
+	if($pagenow === $page) {
+	    wp_enqueue_script('hc_custom_mpo_admin_script', plugins_url('js/admin-mpo.js', __FILE__), array('jquery'));
+    }
 }
