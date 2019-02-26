@@ -18,7 +18,7 @@ jQuery(function($){
       };
       return 'HUMANITIES COMMONS';
    };
-   
+
    $('.option-site-visibility').children()[1].innerHTML = '<td><label class="checkbox" for="blog_public_on">' +
           '<input type="radio" id="blog_public_on" name="blog_public" value="1" checked="checked" class="styled">' +
           '<strong>Public and allow search engines to index this site. <i style="font-weight: normal">Note: it is up to search' +
@@ -32,7 +32,7 @@ jQuery(function($){
        '</label><br/>' +
        '<label class="checkbox" for="blog-private-1"><input id="blog-private-1" type="radio" name="blog_public" value="-1" class="styled"><strong>Visible only to registered users of '+ society() +'</strong></label>' +
        '<br/>' +
-       '<label class="checkbox" for="blog-private-2"><input id="blog-private-2" type="radio" name="blog_public" value="-2" class="styled"><strong>Visible only to registered users of this site</strong></label>' +
+       '<label class="checkbox" for="blog-private-2"><input id="blog-private-2" type="radio" name="blog_public" value="-2" class="styled"><strong>Visible only to registered users of your site</strong></label>' +
        '<br/>' +
-       '<label class="checkbox" for="blog-private-3"><input id="blog-private-3" type="radio" name="blog_public" value="-3" class="styled"><strong>Visible only to administrators of this site</strong></label></td>';
+       '<label class="checkbox" for="blog-private-3"><input id="blog-private-3" type="radio" name="blog_public" value="-3" class="styled"><strong>Visible only to administrators of your site</strong></label></td>';
 });
