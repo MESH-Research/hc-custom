@@ -192,8 +192,12 @@ function mla_add_privacy_options($options) { ?>
 
 add_action( 'wp_head', 'mla_add_privacy_options_action' );
 function mla_add_privacy_options_action(){
-	//remove_action('blog_privacy_selector','add_privacy_options');
 	add_action('wpmueditblogaction','mla_add_privacy_options', 1);
-	add_action('blog_privacy_selector','mla_add_privacy_options', 1);
+	//add_action('blog_privacy_selector','mla_add_privacy_options', 1);
 	add_action('signup_blogform','mla_add_privacy_options', 1);
+}
+
+add_action( 'admin_head', 'mla_add_admin_js');
+function mla_add_admin_js () {
+
 }
