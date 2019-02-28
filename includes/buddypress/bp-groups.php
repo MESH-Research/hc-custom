@@ -554,4 +554,15 @@ function hc_custom_modify_blog_nav( $string, $subnav_item, $selected_item ) {
 
 add_filter( 'bp_get_options_nav_nav-group-blog', 'hc_custom_modify_blog_nav', 10, 3 );
 
+function hc_custom_intercept_join_button_for_private_auto_accept_groups() {
+	$bp = buddypress();
+	$group_id = $bp->groups->current_group->id;
+	$group_status = $bp->groups->current_group->status;
+	$user = bp_loggedin_user_id();
+	$group_auto_accept = get_metadata( 'group', $group_id, 'auto-join', true);
 
+    if($group_status === 'private' && !empty($group_auto_accept)) {
+        groups_join_group( $group_id, $user);
+    }
+}
+add_action( 'bp_actions', 'hc_custom_intercept_join_button_for_private_auto_accept_groups', 1 );
