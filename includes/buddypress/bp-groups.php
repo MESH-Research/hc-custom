@@ -303,10 +303,6 @@ function hc_custom_get_options_nav( $parent_slug = '' ) {
 			continue;
 		}
 
-		if ( 'groups_screen_group_admin' === $subnav_item->screen_function || 'members' === $subnav_item->slug || 'invite-anyone' == $subnav_item->slug || 'notifications' === $subnav_item->slug ) {
-			continue;
-		}
-
 		$current_status = ! empty( groups_get_groupmeta( $group_id, $subnav_item->slug ) ) ? groups_get_groupmeta( $group_id, $subnav_item->slug ) : '';
 		?>
 
