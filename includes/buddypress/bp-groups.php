@@ -561,8 +561,65 @@ function hc_custom_intercept_join_button_for_private_auto_accept_groups() {
 	$user = bp_loggedin_user_id();
 	$group_auto_accept = get_metadata( 'group', $group_id, 'auto-join', true);
 
-    if($group_status === 'private' && !empty($group_auto_accept)) {
+    if( 'private' === $group_status && !empty($group_auto_accept) ) {
         groups_join_group( $group_id, $user);
     }
 }
 add_action( 'bp_actions', 'hc_custom_intercept_join_button_for_private_auto_accept_groups', 1 );
+
+function hc_add_auto_accept_option_to_group_settings_page () {
+	$bp = buddypress();
+	$group_id = $bp->groups->current_group->id;
+	$group_auto_accept = get_metadata( 'group', $group_id, 'auto_accept', true);
+
+	?>
+        <label>
+            <input type="radio" name="group-auto-accept" value="true" <?php checked( $group_auto_accept, 'true', true ); ?>/>
+            <strong>Auto accept all membership request.</strong>
+        </label>
+        <br/>
+        <label>
+            <input type="radio" name="group-auto-accept" value="false" <?php checked( $group_auto_accept, 'false', true ); ?>/>
+            <strong>Manually review all membership request.</strong>
+        </label>
+
+    <?php
+}
+add_action( 'bp_groups_admin_load', 'hc_add_auto_accept_option_to_group_settings_page' );
+
+/**
+ * Add admin page option for auto accept on a particular group
+ */
+function hc_add_auto_accept_option_to_group_settings_page_meta_box() {
+	if( is_admin() && $_GET['page'] == 'bp-groups' ) {
+
+		add_meta_box(
+			'hc_auto_accept_option',
+			_x( 'Group Options', 'Group Options', 'hc_group_options' ),
+			'hc_add_auto_accept_option_to_group_settings_page',
+			get_current_screen()->id,
+			'side',
+			'core'
+		);
+
+	}
+}
+add_action( 'bp_groups_admin_meta_boxes', 'hc_add_auto_accept_option_to_group_settings_page_meta_box' );
+
+/**
+ * @param $group_id
+ *
+ * @return bool
+ */
+function hc_save_auto_accept_settings ($group_id) {
+	//displays what action we are in
+	$action = bp_admin_list_table_current_bulk_action();
+
+	//lets check if the request method and action are on post and save
+	if( $action == 'save' ) {
+		$group_auto_accept = isset( $_POST['group-auto-accept'] ) ? $_POST['group-auto-accept'] : 'false';
+
+		groups_update_groupmeta( $group_id, 'auto_accept', $group_auto_accept );
+	}
+}
+add_action( 'groups_settings_updated', 'hc_save_auto_accept_settings' );
