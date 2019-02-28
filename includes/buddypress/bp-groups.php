@@ -299,7 +299,7 @@ function hc_custom_get_options_nav( $parent_slug = '' ) {
 		// List type depends on our current component.
 		$list_type = bp_is_group() ? 'groups' : 'personal';
 
-		if ( 'groups_screen_group_admin' === $subnav_item->screen_function || 'members' === $subnav_item->slug || 'invite-anyone' == $subnav_item->slug || 'notifications' === $subnav_item->slug ) {
+		if ( 'groups_screen_group_admin' === $subnav_item->screen_function || 'members' === $subnav_item->slug || 'invite-anyone' == $subnav_item->slug || 'notifications' === $subnav_item->slug || 'deposits' === $subnav_item->slug ) {
 			continue;
 		}
 
@@ -417,6 +417,10 @@ function hc_custom_choose_landing_page() {
 			foreach ( $secondary_nav_items as $subnav_item ) :
 
 				$name = preg_replace( '/\d/', '', $subnav_item->name );
+
+				if ( 'hide' === groups_get_groupmeta( $group_id, $subnav_item->slug ) ) {
+					continue;
+				}
 
 				if ( 'groups_screen_group_admin' === $subnav_item->screen_function ) {
 					continue;
