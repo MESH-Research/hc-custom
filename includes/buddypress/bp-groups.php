@@ -313,7 +313,7 @@ function hc_custom_get_options_nav( $parent_slug = '' ) {
 			</td>
 
 			<td class="show gas-choice">
-				<input type="radio" name="group-nav-settings[<?php echo $subnav_item->slug; ?>]" value="show"
+				<input type="radio" data-slug="<?php echo $subnav_item->slug; ?>" id="hide-or-show-menu" name="group-nav-settings[<?php echo $subnav_item->slug; ?>]" value="show"
 					<?php
 					if ( 'show' == $current_status || ! $current_status ) {
 						?>
@@ -321,7 +321,7 @@ function hc_custom_get_options_nav( $parent_slug = '' ) {
 			</td>
 
 			<td class="hide gas-choice">
-				<input type="radio" name="group-nav-settings[<?php echo $subnav_item->slug; ?>]" value="hide"
+				<input type="radio" data-slug="<?php echo $subnav_item->slug; ?>" id="hide-or-show-menu" name="group-nav-settings[<?php echo $subnav_item->slug; ?>]" value="hide"
 					<?php
 					if ( 'hide' == $current_status ) {
 						?>
@@ -401,41 +401,67 @@ add_action( 'bp_actions', 'hc_custom_remove_group_manager_subnav_tabs' );
 function hc_custom_choose_landing_page() {
 	global $bp;
 
-	$group_id        = bp_get_group_id();
-	$parent_nav_slug = bp_get_current_group_slug();
-	$selected        = groups_get_groupmeta( $group_id, 'group_landing_page' );
+	$group_id = ! empty( $_POST['group_id'] ) && isset( $_POST['group_id'] ) ? $_POST['group_id'] : '';
 
-	$parent_nav_slug     = bp_current_item();
+	if ( empty( $group_id ) ) {
+		die( '-1' );
+	}
+
+	$parent_nav_slug = ! empty( $_POST['group_slug'] ) && isset( $_POST['group_slug'] ) ? $_POST['group_slug'] : '';
+
+	$selected            = groups_get_groupmeta( $group_id, 'group_landing_page' );
 	$secondary_nav_items = $bp->groups->nav->get_secondary( array( 'parent_slug' => $parent_nav_slug ) );
 
-	?>
-		<h4><?php _e( 'Select Default Landing Page for Group', 'group_forum_menu' ); ?></h4>
+	$html = '';
 
-		<select name="group-landing-page-select" id="group-landing-page-select">
+	if ( isset( $_POST['menu_option_value'] ) && ! empty( $_POST['menu_option_value'] ) ) {
 
-			<?php
-			foreach ( $secondary_nav_items as $subnav_item ) :
+		if ( isset( $_POST['menu_option_slug'] ) && ! empty( $_POST['menu_option_slug'] ) ) {
+			$menu_item = $_POST['menu_option_slug'];
+			$value     = $_POST['menu_option_value'];
 
-				$name = preg_replace( '/\d/', '', $subnav_item->name );
+			groups_update_groupmeta( $group_id, $menu_item, $value );
+		}
+	}
 
-				if ( 'hide' === groups_get_groupmeta( $group_id, $subnav_item->slug ) ) {
+	foreach ( $secondary_nav_items as $subnav_item ) {
+
+		$name = preg_replace( '/\d/', '', $subnav_item->name );
+
+		if ( 'Home' === $name ) {
+			$name = 'Activity';
+		}
+
+		if ( 'hide' === groups_get_groupmeta( $group_id, $subnav_item->slug ) ) {
+			continue;
+		}
+
+		if ( 'groups_screen_group_admin' === $subnav_item->screen_function ) {
+			continue;
+		}
+
+		if ( isset( $_POST['menu_option_value'] ) && ! empty( $_POST['menu_option_value'] ) ) {
+
+			if ( isset( $_POST['menu_option_slug'] ) && ! empty( $_POST['menu_option_slug'] ) ) {
+
+				if ( $subnav_item->slug === $_POST['menu_option_slug'] && 'hide' === $_POST['menu_option_value'] ) {
 					continue;
 				}
+			}
+		}
 
-				if ( 'groups_screen_group_admin' === $subnav_item->screen_function ) {
-					continue;
-				}
-				?>
+		$html .= '<option value="' . esc_attr( $subnav_item->slug ) . '"' . selected( $subnav_item->slug, $selected ) . '>' . $name . '</option>';
 
-				<option value="<?php echo esc_attr( $subnav_item->slug ); ?>"<?php selected( $subnav_item->slug, $selected ); ?>><?php echo $name; ?></option>
+	}
+	echo $html;
 
-			<?php endforeach; ?>
-
-		</select>
-
-	<?php
+	die();
 
 }
+
+add_action( 'wp_ajax_nopriv_generate_menu_options_dropdown', 'hc_custom_choose_landing_page' );
+add_action( 'wp_ajax_generate_menu_options_dropdown', 'hc_custom_choose_landing_page' );
+
 
 /**
  * Grey out group navs if they are hidden.
