@@ -561,6 +561,8 @@ function hc_custom_intercept_join_button_for_private_auto_accept_groups() {
 		$user              = bp_loggedin_user_id();
 		$group_auto_accept = groups_get_groupmeta( $bp->groups->current_group->id, 'auto_accept' );
 
+		// Todo Maybe add a condition that makes sure user is part of same society as group.
+
 		if ( ! empty( $group_auto_accept ) ) {
 			groups_join_group( $bp->groups->current_group->id, $user );
 			// the groups_join_group function will add user to group and also
