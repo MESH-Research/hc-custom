@@ -436,6 +436,10 @@ function hc_custom_choose_landing_page() {
 			continue;
 		}
 
+		if ( 'invite-anyone' == $subnav_item->slug ) {
+			continue;
+		}
+
 		if ( 'groups_screen_group_admin' === $subnav_item->screen_function ) {
 			continue;
 		}
