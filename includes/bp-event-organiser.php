@@ -114,8 +114,8 @@ function hc_custom_bpeo_group_event_meta_cap( $caps, $cap, $user_id, $args ) {
 
 	switch ( $cap ) {
 		case 'read_private_events':
-		case 'read_event' :
-			// we've already parsed this logic in bpeo_map_basic_meta_caps()
+		case 'read_event':
+			// we've already parsed this logic in bpeo_map_basic_meta_caps().
 			if ( 'exist' === $caps[0] ) {
 				return $caps;
 			}
@@ -128,13 +128,13 @@ function hc_custom_bpeo_group_event_meta_cap( $caps, $cap, $user_id, $args ) {
 				$caps = array( 'read' );
 			}
 
-		// @todo group admins / mods permissions
-		case 'edit_event' :
+			// @todo group admins / mods permissions
+		case 'edit_event':
 			break;
 
-		case 'connect_event_to_group' :
+		case 'connect_event_to_group':
 			$group_id = $args[0];
-			$setting = bpeo_get_group_minimum_member_role_for_connection( $group_id );
+			$setting  = bpeo_get_group_minimum_member_role_for_connection( $group_id );
 
 			if ( 'admin_mod' === $setting ) {
 				$can_connect = groups_is_user_admin( $user_id, $group_id ) || groups_is_user_mod( $user_id, $group_id );
@@ -151,4 +151,4 @@ function hc_custom_bpeo_group_event_meta_cap( $caps, $cap, $user_id, $args ) {
 
 	return $caps;
 }
-add_filter( 'map_meta_cap', 'hc_custom_bpeo_group_event_meta_cap', 20, 5);
+add_filter( 'map_meta_cap', 'hc_custom_bpeo_group_event_meta_cap', 20, 5 );
