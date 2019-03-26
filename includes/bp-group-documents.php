@@ -14,3 +14,4 @@ function hc_custom_bp_group_documents_email_notification() {
 }
 
 add_action( 'bp_group_documents_add_success' , 'hc_custom_bp_group_documents_email_notification' , 0 ) ;
+

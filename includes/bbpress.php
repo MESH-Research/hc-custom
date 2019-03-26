@@ -474,10 +474,19 @@ function filter_bbp_current_user_can_access_create_reply_form( $access ) {
 add_filter( 'bbp_current_user_can_access_create_reply_form', 'filter_bbp_current_user_can_access_create_reply_form', 999 );
 
 /**
+ * Return default for buddypress messages spamblocker.
+ * @param int $max The maximum number of emails.
+ */
+function hc_custom_buddypress_messages_spamblocker( $max ) {
+        $max = 10;
+        return $max;
+}
+
+/**
  * Reduce the spam blokcer limit to 10 emails.
  */
-add_filter('buddypress_messages_spamblocker_10m', 10);
-add_filter('buddypress_messages_spamblocker_30m', 10);
-add_filter('buddypress_messages_spamblocker_60m', 10);
-add_filter('buddypress_messages_spamblocker_12h', 10);
-add_filter('buddypress_messages_spamblocker_24d', 10);
+add_filter( 'buddypress_messages_spamblocker_10m', 'hc_custom_buddypress_messages_spamblocker' );
+add_filter( 'buddypress_messages_spamblocker_30m', 'hc_custom_buddypress_messages_spamblocker' );
+add_filter( 'buddypress_messages_spamblocker_60m', 'hc_custom_buddypress_messages_spamblocker' );
+add_filter( 'buddypress_messages_spamblocker_12h', 'hc_custom_buddypress_messages_spamblocker' );
+add_filter( 'buddypress_messages_spamblocker_24d', 'hc_custom_buddypress_messages_spamblocker' );
