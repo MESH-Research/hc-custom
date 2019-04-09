@@ -452,9 +452,13 @@ add_action( 'bbp_get_view_all', 'hc_custom_get_view_all' );
  */
 function hc_custom_private_title_format( $prepend, $post ) {
 	/* translators: %s: topic title */
-	$prepend = "<span class='badge-admin-only'>Admin Only </span>  " . __( ' %s' );
-
+	if( 'topic' === $post->post_type ) {
+	    $prepend = "<span class='badge-admin-only'>Admin Only </span>  " . __( ' %s' );
+	
 	return $prepend;
+	} else {
+	  return $post->post_title;
+	}
 }
 add_filter( 'private_title_format', 'hc_custom_private_title_format', 10, 2 );
 
