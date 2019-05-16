@@ -597,25 +597,6 @@ function hc_custom_modify_blog_nav( $string, $subnav_item, $selected_item ) {
 
 add_filter( 'bp_get_options_nav_nav-group-blog', 'hc_custom_modify_blog_nav', 10, 3 );
 
-
-function hc_custom_intercept_join_button_for_private_auto_accept_groups() {
-	$bp = buddypress();
-	if( 'private' === $bp->groups->current_group->status ) {
-	    // no need to call any other functions if this is not a private group.
-		$user              = bp_loggedin_user_id();
-		$group_auto_accept = groups_get_groupmeta( $bp->groups->current_group->id, 'auto_accept' );
-
-		// Todo Maybe add a condition that makes sure user is part of same society as group.
-
-		if ( ! empty( $group_auto_accept ) ) {
-			groups_join_group( $bp->groups->current_group->id, $user );
-			// the groups_join_group function will add user to group and also
-            // remove any pending approvals or invites to that group for that user.
-		}
-	}
-}
-//add_action( 'bp_actions', 'hc_custom_intercept_join_button_for_private_auto_accept_groups', 1 );
-
 /**
  * Meta box html for private group options
  */
