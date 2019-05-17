@@ -42,7 +42,6 @@ require_once trailingslashit( __DIR__ ) . 'includes/humcore.php';
 require_once trailingslashit( __DIR__ ) . 'includes/mashsharer.php';
 require_once trailingslashit( __DIR__ ) . 'includes/siteorigin-panels.php';
 require_once trailingslashit( __DIR__ ) . 'includes/wp-to-twitter.php';
-require_once trailingslashit( __DIR__ ) . 'includes/newsletter-plugin.php';
 
 
 /**
