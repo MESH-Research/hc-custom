@@ -15,6 +15,10 @@
  */
 function hcommons_filter_groups_button_labels( $button, $group ) {
 	$status = $group->status;
+
+	$user              = bp_loggedin_user_id();
+	$group_auto_accept = groups_get_groupmeta( $group->id, 'auto_accept' );
+
 	if ( ! is_super_admin() && hcommons_check_non_member_active_session() ) {
 		$button['link_class'] = 'disabled-button';
 	}
@@ -25,7 +29,12 @@ function hcommons_filter_groups_button_labels( $button, $group ) {
 				break;
 
 			case 'private':
-				$button['link_text'] = 'Request Membership';
+				if ( ! empty( $group_auto_accept ) ) {
+					$button['link_text'] = 'Join Group';
+					$button['link_href'] = wp_nonce_url( trailingslashit( bp_get_group_permalink( $group ) . 'join' ), 'groups_join_group' );
+				} else {
+					$button['link_text'] = 'Request Membership';
+				}
 				break;
 		}
 	}
@@ -395,6 +404,7 @@ function hc_custom_remove_group_manager_subnav_tabs() {
 }
 add_action( 'bp_actions', 'hc_custom_remove_group_manager_subnav_tabs' );
 
+
 /**
  * Allow group admin to change the default landing page.
  */
@@ -588,4 +598,284 @@ function hc_custom_modify_blog_nav( $string, $subnav_item, $selected_item ) {
 
 add_filter( 'bp_get_options_nav_nav-group-blog', 'hc_custom_modify_blog_nav', 10, 3 );
 
+/**
+ * Meta box html for private group options
+ */
+function hc_add_auto_accept_option_to_group_settings_page() {
+	$group_id          = filter_var( $_GET['gid'], FILTER_VALIDATE_INT );
+	$group_auto_accept = groups_get_groupmeta( $group_id, 'auto_accept' ) ?: 'is_false';
 
+	?>
+		<label>
+			<input type="radio" name="group-auto-accept" value="is_true" <?php checked( $group_auto_accept, 'is_true', true ); ?>/>
+			<strong>Auto accept all membership request.</strong>
+		</label>
+		<br/>
+		<label>
+			<input type="radio" name="group-auto-accept" value="is_false" <?php checked( $group_auto_accept, 'is_false', true ); ?>/>
+			<strong>Manually review all membership request.</strong>
+		</label>
+
+	<?php
+}
+
+/**
+ * Add admin page option for auto accept on a private group
+ */
+function hc_add_auto_accept_option_to_group_settings_page_meta_box() {
+	if ( 'bp-groups' == is_admin() && $_GET['page'] ) {
+
+		$group_id = filter_var( $_GET['gid'], FILTER_VALIDATE_INT );
+		$group    = groups_get_group( $group_id );
+
+		if ( 'private' === $group->status ) {
+			// Only show this meta box on private groups.
+			add_meta_box(
+				'hc_auto_accept_option',
+				_x( 'Private Group Options', 'Private Group Options', 'hc_private_group_options' ),
+				'hc_add_auto_accept_option_to_group_settings_page',
+				get_current_screen()->id,
+				'side',
+				'core'
+			);
+		}
+	}
+}
+add_action( 'bp_groups_admin_meta_boxes', 'hc_add_auto_accept_option_to_group_settings_page_meta_box' );
+
+/**
+ * Save the auto-accept metadata.
+ *
+ * @param string $action Current $_GET action being performed in admin screen.
+ */
+function hc_save_auto_accept_settings( $action ) {
+	// displays what action we are in.
+	$bp       = buddypress();
+	$group_id = filter_var( $_GET['gid'], FILTER_VALIDATE_INT );
+
+	// lets check if the request method and action are on post and save.
+	if ( 'save' == $action ) {
+		$group_auto_accept = ! empty( $_POST['group-auto-accept'] ) ? $_POST['group-auto-accept'] : 'is_false';
+
+		groups_update_groupmeta( $group_id, 'auto_accept', $group_auto_accept );
+	}
+}
+
+add_action( 'bp_groups_admin_load', 'hc_save_auto_accept_settings' );
+
+/**
+ * Join or leave a group when clicking the "join/leave" button via a POST request.
+ *
+ * @return string HTML
+ */
+function hc_custom_bp_legacy_theme_ajax_joinleave_group() {
+	// Bail if not a POST action.
+	if ( 'POST' !== strtoupper( $_SERVER['REQUEST_METHOD'] ) ) {
+		error_log( 'Request Method failed' );
+		return;
+	}
+
+	// Cast gid as integer.
+	$group_id = (int) $_POST['gid'];
+
+	if ( groups_is_user_banned( bp_loggedin_user_id(), $group_id ) ) {
+		return;
+	}
+
+	$group = groups_get_group( $group_id );
+
+	if ( ! $group ) {
+		return;
+	}
+
+	$user              = bp_loggedin_user_id();
+	$group_auto_accept = groups_get_groupmeta( $group->id, 'auto_accept' );
+
+	$society_id  = bp_groups_get_group_type( $group->id, true );
+	$member_type = bp_get_member_type( $user );
+
+	if ( ! groups_is_user_member( bp_loggedin_user_id(), $group->id ) ) {
+		if ( 'public' == $group->status ) {
+			check_ajax_referer( 'groups_join_group' );
+
+			if ( ! groups_join_group( $group->id ) ) {
+				_e( 'Error joining group', 'buddypress' );
+			} else {
+				echo '<a id="group-' . esc_attr( $group->id ) . '" class="group-button leave-group" rel="leave" href="' . wp_nonce_url( bp_get_group_permalink( $group ) . 'leave-group', 'groups_leave_group' ) . '">' . __( 'Leave Group', 'buddypress' ) . '</a>';
+			}
+		} elseif ( 'private' == $group->status ) {
+
+			if ( ! empty( $group_auto_accept ) && $member_type === $society_id ) {
+				if ( ! groups_join_group( $group->id ) ) {
+					_e( 'Error joining group', 'buddypress' );
+				} else {
+					echo '<a id="group-' . esc_attr( $group->id ) . '" class="group-button leave-group" rel="leave" href="' . wp_nonce_url( bp_get_group_permalink( $group ) . 'leave-group', 'groups_leave_group' ) . '">' . __( 'Leave Group', 'buddypress' ) . '</a>';
+				}
+
+				exit;
+			}
+
+			// If the user has already been invited, then this is
+			// an Accept Invitation button.
+			if ( groups_check_user_has_invite( bp_loggedin_user_id(), $group->id ) ) {
+				check_ajax_referer( 'groups_accept_invite' );
+
+				if ( ! groups_accept_invite( bp_loggedin_user_id(), $group->id ) ) {
+					_e( 'Error requesting membership', 'buddypress' );
+				} else {
+					echo '<a id="group-' . esc_attr( $group->id ) . '" class="group-button leave-group" rel="leave" href="' . wp_nonce_url( bp_get_group_permalink( $group ) . 'leave-group', 'groups_leave_group' ) . '">' . __( 'Leave Group', 'buddypress' ) . '</a>';
+				}
+
+				// Otherwise, it's a Request Membership button.
+			} else {
+				check_ajax_referer( 'groups_request_membership' );
+
+				if ( ! groups_send_membership_request( bp_loggedin_user_id(), $group->id ) ) {
+					_e( 'Error requesting membership', 'buddypress' );
+				} else {
+					echo '<a id="group-' . esc_attr( $group->id ) . '" class="group-button disabled pending membership-requested" rel="membership-requested" href="' . bp_get_group_permalink( $group ) . '">' . __( 'Request Sent', 'buddypress' ) . '</a>';
+				}
+			}
+		}
+	} else {
+		check_ajax_referer( 'groups_leave_group' );
+
+		if ( ! groups_leave_group( $group->id ) ) {
+			_e( 'Error leaving group', 'buddypress' );
+		} elseif ( 'public' == $group->status || ( ! empty( $group_auto_accept ) && $member_type === $society_id ) ) {
+			echo '<a id="group-' . esc_attr( $group->id ) . '" class="group-button join-group" rel="join" href="' . wp_nonce_url( bp_get_group_permalink( $group ) . 'join', 'groups_join_group' ) . '">' . __( 'Join Group', 'buddypress' ) . '</a>';
+		} elseif ( 'private' == $group->status ) {
+			echo '<a id="group-' . esc_attr( $group->id ) . '" class="group-button request-membership" rel="join" href="' . wp_nonce_url( bp_get_group_permalink( $group ) . 'request-membership', 'groups_request_membership' ) . '">' . __( 'Request Membership', 'buddypress' ) . '</a>';
+		}
+	}
+
+	exit;
+}
+
+add_action( 'wp_ajax_joinleave_group', 'hc_custom_bp_legacy_theme_ajax_joinleave_group', 0 );
+
+/**
+ * Prints a message if the group is not visible to the current user (it is a
+ * private group, but the user can join).
+ *
+ * @global BP_Groups_Template $groups_template Groups template object.
+ *
+ * @param string      $message The message to be displayed to the user.
+ * @param object|null $group Group to get status message for. Optional; defaults to current group.
+ */
+function hc_custom_bp_group_status_message( $message, $group ) {
+	$user              = bp_loggedin_user_id();
+	$group_auto_accept = groups_get_groupmeta( $group->id, 'auto_accept' );
+
+	$society_id  = bp_groups_get_group_type( $group->id, true );
+	$member_type = bp_get_member_type( $user );
+
+	if ( ! empty( $group_auto_accept ) && $member_type === $society_id ) {
+		$message = sprintf( "This is a private group that automatically accepts %s members. Click the 'Join Group' button to join.", strtoupper( $society_id ), $member_type );
+	}
+
+	return $message;
+}
+
+add_filter( 'bp_group_status_message', 'hc_custom_bp_group_status_message', 10, 2 );
+
+/**
+ * Remove the request-membership tab if the user can join automatically.
+ */
+function hc_custom_remove_group_request_membership() {
+	global $bp;
+
+	$group_id = bp_get_current_group_id();
+
+	// Group admins will see all tabs.
+	if ( ! $group_id ) {
+		return;
+	}
+
+	$user              = bp_loggedin_user_id();
+	$group_auto_accept = groups_get_groupmeta( $group_id, 'auto_accept' );
+
+	$parent_nav_slug     = bp_get_current_group_slug();
+	$secondary_nav_items = $bp->groups->nav->get_secondary( array( 'parent_slug' => $parent_nav_slug ) );
+
+	$selected_item = null;
+
+	// Remove the nav items. Not stored, just unsets it.
+	foreach ( $secondary_nav_items as $subnav_item ) {
+		if ( ! empty( $group_auto_accept ) ) {
+
+			bp_core_remove_subnav_item( $parent_nav_slug, 'request-membership', 'groups' );
+		}
+	}
+}
+add_action( 'bp_actions', 'hc_custom_remove_group_request_membership' );
+
+/**
+ * Catch and process "Join Group" button clicks.
+ *
+ * @since 1.0.0
+ *
+ * @return bool
+ */
+function hc_custom_groups_action_join_group() {
+
+	if ( ! bp_is_single_item() || ! bp_is_groups_component() || ! bp_is_current_action( 'join' ) ) {
+		return false;
+	}
+
+	// Nonce check.
+	if ( ! check_admin_referer( 'groups_join_group' ) ) {
+		return false;
+	}
+
+	$bp = buddypress();
+
+	$user              = bp_loggedin_user_id();
+	$group_auto_accept = groups_get_groupmeta( $bp->groups->current_group->id, 'auto_accept' );
+
+	// Skip if banned or already a member.
+	if ( ! groups_is_user_member( bp_loggedin_user_id(), $bp->groups->current_group->id ) && ! groups_is_user_banned( bp_loggedin_user_id(), $bp->groups->current_group->id ) ) {
+
+		// User wants to join a group that is not public.
+		if ( 'public' != $bp->groups->current_group->status ) {
+			$society_id  = bp_groups_get_group_type( $bp->groups->current_group->id, true );
+			$member_type = bp_get_member_type( $user );
+
+			if ( ! empty( $group_auto_accept ) && $member_type === $society_id ) {
+
+				if ( ! groups_join_group( $bp->groups->current_group->id ) ) {
+					bp_core_add_message( __( 'There was an error joining the group.', 'buddypress' ), 'error' );
+				} else {
+					bp_core_add_message( __( 'You joined the group!', 'buddypress' ) );
+				}
+
+				bp_core_redirect( bp_get_group_permalink( $bp->groups->current_group ) );
+			}
+
+			if ( ! groups_check_user_has_invite( bp_loggedin_user_id(), $bp->groups->current_group->id ) ) {
+				bp_core_add_message( __( 'There was an error joining the group.', 'buddypress' ), 'error' );
+				bp_core_redirect( bp_get_group_permalink( $bp->groups->current_group ) );
+			}
+		}
+
+		// User wants to join any group.
+		if ( ! groups_join_group( $bp->groups->current_group->id ) ) {
+			bp_core_add_message( __( 'There was an error joining the group.', 'buddypress' ), 'error' );
+		} else {
+			bp_core_add_message( __( 'You joined the group!', 'buddypress' ) );
+		}
+
+		bp_core_redirect( bp_get_group_permalink( $bp->groups->current_group ) );
+	}
+
+	/**
+	 * Filters the template to load for the single group screen.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $value Path to the single group template to load.
+	 */
+	bp_core_load_template( apply_filters( 'groups_template_group_home', 'groups/single/home' ) );
+}
+
+add_action( 'bp_actions', 'hc_custom_groups_action_join_group', 0 );
