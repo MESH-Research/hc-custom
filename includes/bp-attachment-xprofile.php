@@ -10,6 +10,7 @@
  *
  */
 function hc_custom_delete_file() {
+	check_ajax_referer( 'settings_general_nonce', 'nonce' );
 
 	$file_to_delete = !empty( $_POST[ 'file_to_delete'] ) ? $_POST['file_to_delete'] : '';
 	$field_id_to_delete = !empty( $_POST[ 'field_id_to_delete'] ) ? $_POST['field_id_to_delete'] : '';
