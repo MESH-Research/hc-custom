@@ -33,6 +33,7 @@ require_once trailingslashit( __DIR__ ) . 'includes/buddypress-docs.php';
 require_once trailingslashit( __DIR__ ) . 'includes/bp-groupblog.php';
 require_once trailingslashit( __DIR__ ) . 'includes/bp-group-documents.php';
 require_once trailingslashit( __DIR__ ) . 'includes/bp-event-organiser.php';
+require_once trailingslashit( __DIR__ ) . 'includes/bp-attachment-xprofile.php';
 require_once trailingslashit( __DIR__ ) . 'includes/buddypress-followers.php';
 require_once trailingslashit( __DIR__ ) . 'includes/buddypress-group-email-subscription.php';
 require_once trailingslashit( __DIR__ ) . 'includes/buddypress-more-privacy-options.php';
