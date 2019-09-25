@@ -98,25 +98,6 @@ WELCOME_EMAIL;
 add_action( 'ass_welcome_email', 'hcommons_add_welcome_email_footer', 10, 3 );
 
 /**
- * Prevent immediate notifications from being sent if the user has a digest subscription.
- * This way users only get one notification of their self-post, in the digest.
- *
- * @param bool   $send_immediately  True to send an immediate email notification, false otherwise.
- * @param object $activity          Activity object.
- * @param int    $user_id           ID of the user.
- * @param string $subscription_type Group subscription status for the current user.
- */
-function hcommons_filter_bp_ass_send_activity_notification_for_user( $send_immediately, $activity, $user_id, $subscription_type ) {
-	if ( in_array( $subscription_type, [ 'dig', 'sum' ] ) ) {
-		$send_immediately = false;
-	}
-
-	return $send_immediately;
-}
-
-add_filter( 'bp_ass_send_activity_notification_for_user', 'hcommons_filter_bp_ass_send_activity_notification_for_user', 10, 4 );
-
-/**
  * Add a line break after "Replying to this email will not..."
  * Assumes HTML email, plaintext not supported.
  *
