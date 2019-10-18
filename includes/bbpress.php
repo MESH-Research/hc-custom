@@ -162,7 +162,7 @@ function hcommons_bbp_format_buddypress_notifications( $action, $item_id, $secon
 	return $return;
 }
 remove_filter( 'bp_notifications_get_notifications_for_user', 'bbp_format_buddypress_notifications' );
-add_filter( 'bp_notifications_get_notifications_for_user', 'hcommons_bbp_format_buddypress_notifications', 10, 8 );
+add_filter( 'bp_notifications_get_notifications_for_user', 'hcommons_bbp_format_buddypress_notifications', 999, 8 );
 
 /**
  * Fix multinetwork forum permalinks in multiforum bbp_create_topic activities.
