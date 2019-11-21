@@ -219,8 +219,8 @@ function mla_is_group_committee( $group_id = 0 ) {
 		$group_id = bp_get_current_group_id();
 	}
 
-	// 2018 and 2019 MLA Conventions are a committee according to the OID but are not in fact a committee.
-	if ( in_array( $group_id, array( 1001221, 1003090 ) ) ) {
+	// 2018, 2019 and 2020 MLA Conventions are a committee according to the OID but are not in fact a committee.
+	if ( in_array( $group_id, array( 1001221, 1003090, 1003475 ) ) ) {
 		return false;
 	}
 
