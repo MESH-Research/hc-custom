@@ -65,14 +65,6 @@ function hc_get_template_location() {
 }
 
 /**
- * Register HC above BP in the stack.
- */
-function hc_register_bp_template_stack() {
-	bp_register_template_stack( 'hc_get_template_location', 8 );
-}
-add_filter( 'bp_init', 'hc_register_bp_template_stack' );
-
-/**
  * Find templates in plugin when using bp_core_load_template.
  */
 function hc_load_template_filter( $found_template, $templates ) {
@@ -88,15 +80,27 @@ function hc_load_template_filter( $found_template, $templates ) {
 		} elseif ( file_exists( hc_get_template_location() . $template ) ) {
 			$filtered_template = hc_get_template_location() . $template;
 			break;
-		} elseif ( file_exists( get_stylesheet_directory() . '/' . $template ) ) {
-			$filtered_template = get_stylesheet_directory() . '/' . $template;
-			break;
-		} elseif ( file_exists( get_template_directory() . '/' . $template ) ) {
-			$filtered_template = get_template_directory() . '/' . $template;
-			break;
 		}
 	}
 
 	return apply_filters( 'hc_load_template_filter', $filtered_template );
 }
-add_filter( 'bp_located_template', 'hc_load_template_filter', 10, 2 );
+
+/**
+ * Filter template parts
+ */
+function hc_template_part_filter( $templates, $slug, $name ) {
+	//we may try to move template parts if this gets worked on again.
+    return $templates;
+}
+
+/**
+ * Register HC templates overrides
+ */
+function hc_templates_overrides() {
+	bp_register_template_stack( 'hc_get_template_location', 9 );
+	add_filter( 'bp_located_template', 'hc_load_template_filter', 10, 2 );
+	add_filter( 'bp_get_template_part', 'hc_template_part_filter', 10, 3 );
+}
+add_filter( 'bp_init', 'hc_templates_overrides' );
+
