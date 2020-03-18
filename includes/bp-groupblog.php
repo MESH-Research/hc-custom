@@ -60,13 +60,15 @@ add_action( 'wp_insert_site', 'hcommons_wp_insert_site' ,0);
 
 function hcommons_wp_insert_site( $new_site ){
     global $wpdb;
+      
+     if ( '1' == $_POST['is_classsite'] ) {
+	$user = wp_get_current_user();
 
-      if ( '1' == $_POST['is_classsite'] ) {
         $domain_parts = explode('.', $new_site->domain);
 
         $partial_domain = array_slice($domain_parts, 1);
 
-        $append_domain = array($domain_parts[0] . '-classsite');
+        $append_domain = array($user->user_login.'-'.$domain_parts[0]);
 
         $corrected_domain = array_merge($append_domain, $partial_domain);
 
