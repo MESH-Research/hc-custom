@@ -26,7 +26,7 @@ function hcommons_core_member_groups_with_authorship( $current_groups = array() 
 		'per_page'   => '500',
 	);
 
-	return array_merge( $committee_group_ids, array( 184, 296, 378, 444, 1002994, 1003452, 1003458, 1001245 ) );
+	return array_merge( $committee_group_ids, array( 184, 296, 378, 444, 1002994, 1003452, 1003458, 1001245, 1003565 ) );
 
 }
 add_filter( 'humcore_member_groups_with_authorship', 'hcommons_core_member_groups_with_authorship' );
