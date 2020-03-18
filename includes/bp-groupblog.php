@@ -41,8 +41,8 @@ function hcommons_signup_create_blog_meta( $blog_meta_defaults ) {
 
     if ( '1' == $_POST['is_classsite'] ) {
 	
-	$blog_meta_defaults['template'] = 'wp-bootstrap-starter';
-	$blog_meta_defaults['stylesheet'] = 'wp-bootstrap-starter';
+	$blog_meta_defaults['template'] = 'learningspace';
+	$blog_meta_defaults['stylesheet'] = 'learningspace';
     }
   
     return $blog_meta_defaults; 
