@@ -40,16 +40,22 @@ function more_privacy_options_blogs_get( $return_value, $args ) {
 	$user_sql = ! empty( $user_id ) ? $wpdb->prepare( ' AND b.user_id = %d', $user_id ) : '';
 
 	if ( is_user_logged_in() ) {
+		
 		$logged_in_user_id    = get_current_user_id();
 		$visibility = "Visible";
+
 		if ( is_super_admin() && ! $visibility_configured ) {
 			$visibility = "Super Admins";
+			$visibility_configured = true;
 		}
+
 		$member_types             = bp_get_member_type( $logged_in_user_id, false );
+	
 		$search_member_type_array = array_combine( array_map( 'strtolower', $member_types ), $member_types );
 		$network_id               = Humanities_Commons::$society_id;
 		if ( ! empty( $search_member_type_array[ $network_id ] ) && ! $visibility_configured ) {
 			$visibility = "Network Users";
+			$visibility_configured = true;
 		}
 
 		$blogs_user_belongs_to = get_blogs_of_user( $logged_in_user_id );
