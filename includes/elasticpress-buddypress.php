@@ -166,6 +166,7 @@ add_filter( 'ep_post_sync_kill', 'hcommons_filter_ep_post_sync_kill', 10, 3 );
 add_filter( 'ep_bp_show_network_facet_6', '__return_false' ); // UP.
 add_filter( 'ep_bp_show_network_facet_7', '__return_false' ); // MSU.
 add_filter( 'ep_bp_show_network_facet_8', '__return_false' ); // ARLIS.
+add_filter( 'ep_bp_show_network_facet_10', '__return_false' ); // SAH.
 add_filter( 'ep_bp_show_post_type_facet_post', '__return_false' );
 add_filter( 'ep_bp_show_post_type_facet_page', '__return_false' );
 add_filter( 'ep_bp_show_post_type_facet_attachment', '__return_false' );
