@@ -25,7 +25,6 @@ function more_privacy_options_blogs_get( $return_value, $args ) {
 
 	extract( $args );
 	$limit = $per_page;
-
 	$bp_q = buddypress();
 
 	//	Visible(1)
@@ -34,35 +33,31 @@ function more_privacy_options_blogs_get( $return_value, $args ) {
 	//  Site Members Only(-2)
 	//  Site Admins Only(-3)
 	//  Super Admins - everything...
-	$visibility            = "public";
-	$visibility_configured = false;
+	$vsibilities = array();
 
 	$user_sql = ! empty( $user_id ) ? $wpdb->prepare( ' AND b.user_id = %d', $user_id ) : '';
 
 	if ( is_user_logged_in() ) {
-		
-		$logged_in_user_id    = get_current_user_id();
-		$visibility = "Visible";
 
-		if ( is_super_admin() && ! $visibility_configured ) {
-			$visibility = "Super Admins";
-			$visibility_configured = true;
+		$logged_in_user_id    = get_current_user_id();
+
+		if ( is_super_admin() ) {
+			$visibilities[] = "Super Admins";
 		}
 
 		$member_types             = bp_get_member_type( $logged_in_user_id, false );
-	
+
 		$search_member_type_array = array_combine( array_map( 'strtolower', $member_types ), $member_types );
 		$network_id               = Humanities_Commons::$society_id;
-		if ( ! empty( $search_member_type_array[ $network_id ] ) && ! $visibility_configured ) {
-			$visibility = "Network Users";
-			$visibility_configured = true;
+		if ( ! empty( $search_member_type_array[ $network_id ] ) ) {
+			$visibilities[] = "Network Users";
 		}
 
 		$blogs_user_belongs_to = get_blogs_of_user( $logged_in_user_id );
 		$userblogs             = false;
 
-		if ( ! empty( $blogs_user_belongs_to ) && ! $visibility_configured ) {
-			$visibility = "Site Members";
+		if ( ! empty( $blogs_user_belongs_to ) ) {
+			$visibilities[] = "Site Members";
 			$userblogs  = array();
 			$adminblogs = array();
 			foreach ( $blogs_user_belongs_to as $a ) {
@@ -73,33 +68,35 @@ function more_privacy_options_blogs_get( $return_value, $args ) {
 			}
 		}
 	}
+	
 
+	$visibility_array = array( 0 , 1 );
+   	if ( in_array( 'Super Admins' , $visibilities ) ) {
+		array_push( $visibility_array, -1, -2, -3 );
+	} else {
 
-	switch ( $visibility ) {
+	    foreach ( $visibilities as $visibility ) {
+		
+		switch ( $visibility ) {
+		  case "Network Users":
+                        array_push( $visibility_array, -1 );
+                        break;
+                  case "Site Members":
+                        array_push( $visibility_array, -2 );
+                        if ( ! empty( $adminblogs ) ) {
+                                //Site Admins
+                                $userblogs  = array_merge( $userblogs, $adminblogs );
+                                array_push( $visibility_array, -3 );
+                        }
+                        break;
+	    	}
+	    }
+	}
 
-		case "No Search":
-			$hidden_sql = 'AND wb.public in ( 0, 1)';
-			break;
-		case "Network Users":
-			$hidden_sql = 'AND wb.public in ( 1, -1 )';
-			break;
-		case "Site Members":
-			$perms = "1, -2";
-			if ( ! empty( $adminblogs ) ) {
-				//Site Admins
-				$visibility = "Site Admins";
-				$userblogs  = array_merge( $userblogs, $adminblogs );
-				$perms      .= ", -3";
-			}
-			$hidden_sql = 'AND (wb.public in ( ' . $perms . ' ) OR b.blog_id in (' . implode( ",", $userblogs ) . ')) ';
-			break;
-		case "Super Admins":
-			$hidden_sql = 'AND wb.public in ( 0, 1, -1, -2, -3 )';
-			break;
-		case "Visible":
-		default:
-			$hidden_sql = 'AND wb.public in ( 1 )';
-			break;
+	if ( in_array( 'Site Members' , $visibilities ) ) {
+	    $hidden_sql = 'AND (wb.public in ( ' . implode(",", $visibility_array)  . ' ) OR b.blog_id in (' . implode( ",", $userblogs ) . ')) ';
+	} else {
+	    $hidden_sql = 'AND (wb.public in ( ' . implode(",", $visibility_array) . ')) ';
 	}
 
 	$pag_sql = ( $limit && $page ) ? $wpdb->prepare( ' LIMIT %d, %d', intval( ( $page - 1 ) * $limit ), intval( $limit ) ) : '';
