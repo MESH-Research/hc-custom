@@ -28,3 +28,14 @@ function hcommons_add_non_society_member_disclaimer_member() {
 	}
 }
 add_action( 'bp_before_directory_members_content', 'hcommons_add_non_society_member_disclaimer_member' );
+
+/**
+ * Add info to the members loop
+ */
+function hcommons_add_info_to_members_loop() {
+	$field_content = bp_get_member_profile_data( array( 'field' => 'Institutional or Other Affiliation' ) );
+	if( $field_content != false ) {
+		echo $field_content;
+	}
+}
+add_action( 'bp_directory_members_item', 'hcommons_add_info_to_members_loop' );
