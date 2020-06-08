@@ -1,3 +1,4 @@
+
 <?php
 /**
  * Customizations to BuddyPress Groups.
@@ -443,7 +444,9 @@ function hc_custom_choose_landing_page() {
 		$name = preg_replace( '/\d/', '', $subnav_item->name );
 
 		if ( 'Home' === $name ) {
-			$name = 'Activity';
+			if( 1003628 != $group_id ) {
+			    $name = 'Activity';
+			}
 		}
 
 		if ( 'hide' === groups_get_groupmeta( $group_id, $subnav_item->slug ) ) {
