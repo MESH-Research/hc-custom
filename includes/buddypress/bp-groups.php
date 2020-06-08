@@ -60,7 +60,6 @@ add_filter( 'groups_activity_new_update_action', 'hcommons_filter_groups_activit
 function hcommons_add_non_society_member_join_group_button() {
 	if ( ! is_super_admin() && hcommons_check_non_member_active_session() ) {
 		global $groups_template;
-
 		// Set group to current loop group if none passed.
 		if ( empty( $group ) ) {
 			$group =& $groups_template->group;
@@ -101,20 +100,24 @@ add_action( 'bp_before_directory_groups_content', 'hcommons_add_non_society_memb
  */
 function hcommons_override_config_group_nav() {
 		$group_slug = bp_current_item();
+		$group_id = bp_get_current_group_id();
 
 		// BP 2.6+.
 	if ( function_exists( 'bp_rest_api_init' ) ) {
 			buddypress()->groups->nav->edit_nav( array( 'position' => 1 ), 'forum', $group_slug );
 			buddypress()->groups->nav->edit_nav( array( 'position' => 0 ), 'home', $group_slug );
-			buddypress()->groups->nav->edit_nav( array( 'name' => __( 'Activity', 'buddypress' ) ), 'home', $group_slug );
 
+		      if ( 1003628 == $group_id ) {
+                           buddypress()->groups->nav->edit_nav( array( 'name' => __( 'Home', 'buddypress' ) ), 'home', $group_slug );
+		      } else {
+			   buddypress()->groups->nav->edit_nav( array( 'name' => __( 'Activity', 'buddypress' ) ), 'home', $group_slug );
+		      }
 		// Older versions of BP.
 	} else {
 			buddypress()->bp_options_nav[ $group_slug ]['home']['position']  = 0;
 			buddypress()->bp_options_nav[ $group_slug ]['forum']['position'] = 1;
-			buddypress()->bp_options_nav[ $group_slug ]['home']['name']      = __( 'Activity', 'buddypress' );
+			buddypress()->bp_options_nav[ $group_slug ]['home']['name']      = __( 'Activitys', 'buddypress' );
 	}
-
 }
 
 /**
@@ -309,6 +312,7 @@ function hc_custom_get_options_nav( $parent_slug = '' ) {
 		$list_type = bp_is_group() ? 'groups' : 'personal';
 
 		if ( 'groups_screen_group_admin' === $subnav_item->screen_function || 'members' === $subnav_item->slug || 'invite-anyone' == $subnav_item->slug || 'notifications' === $subnav_item->slug || 'deposits' === $subnav_item->slug ) {
+			if ( 'deposits' !== $subnav_item->slug && 1003628 !== $group_id )
 			continue;
 		}
 
