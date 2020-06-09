@@ -311,10 +311,15 @@ function hc_custom_get_options_nav( $parent_slug = '' ) {
 	foreach ( $secondary_nav_items as $subnav_item ) :
 		// List type depends on our current component.
 		$list_type = bp_is_group() ? 'groups' : 'personal';
+		
+		if ( 'deposits' === $subnav_item->slug ) {
+			if(  1003628 != $group_id )
+			    continue;
+		}
 
-		if ( 'groups_screen_group_admin' === $subnav_item->screen_function || 'members' === $subnav_item->slug || 'invite-anyone' == $subnav_item->slug || 'notifications' === $subnav_item->slug || 'deposits' === $subnav_item->slug ) {
-			if ( 'deposits' !== $subnav_item->slug && 1003628 !== $group_id )
-			continue;
+		if ( 'groups_screen_group_admin' === $subnav_item->screen_function || 'members' === $subnav_item->slug || 'invite-anyone' == $subnav_item->slug || 'notifications' === $subnav_item->slug ) {
+                        continue;
+
 		}
 
 		$current_status = ! empty( groups_get_groupmeta( $group_id, $subnav_item->slug ) ) ? groups_get_groupmeta( $group_id, $subnav_item->slug ) : '';
