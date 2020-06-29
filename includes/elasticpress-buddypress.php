@@ -256,3 +256,20 @@ function humcore_filter_post_type_link( $post_link, $post ) {
 	return $post_link;
 }
 add_filter( 'post_type_link', 'humcore_filter_post_type_link', 10, 2 );
+// define the the_permalink callback
+
+function filter_the_permalink( $get_permalink ) {
+
+	$society_mapped_domain_constant = strtoupper( Humanities_Commons::$society_id ) . '_MAPPED_URL';
+	$society_site_domain_constant = strtoupper( Humanities_Commons::$society_id ) . '_SITE_URL';
+	if ( defined( constant( $society_mapped_domain_constant ) ) ) {
+		if ( false !== strstr( $get_permalink, 'https://' .  constant( $society_mapped_domain_constant ) ) ) {
+			$get_permalink = str_replace( constant( $society_site_domain_constant ), constant( $society_mapped_domain_constant ), $get_permalink );
+		}
+	}
+	return $get_permalink;
+};
+
+// add the filter
+add_filter( 'the_permalink', 'filter_the_permalink', 10, 1 );
+
