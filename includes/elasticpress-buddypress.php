@@ -262,7 +262,7 @@ function filter_the_permalink( $get_permalink ) {
 
 	$society_mapped_domain_constant = strtoupper( Humanities_Commons::$society_id ) . '_MAPPED_URL';
 	$society_site_domain_constant = strtoupper( Humanities_Commons::$society_id ) . '_SITE_URL';
-	if ( defined( constant( $society_mapped_domain_constant ) ) ) {
+	if ( defined( $society_mapped_domain_constant ) ) {
 		if ( false !== strstr( $get_permalink, 'https://' .  constant( $society_mapped_domain_constant ) ) ) {
 			$get_permalink = str_replace( constant( $society_site_domain_constant ), constant( $society_mapped_domain_constant ), $get_permalink );
 		}
