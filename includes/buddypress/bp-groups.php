@@ -1,4 +1,3 @@
-
 <?php
 /**
  * Customizations to BuddyPress Groups.
