@@ -6,6 +6,23 @@
  */
 
 /**
+ * Modifies the BP DOCS attachment url
+ *
+ */
+function hc_bp_docs_attachment_url_base( $att_url, $attachment ) {
+
+        global $wpdb;
+        $url = $att_url;
+        $society_id = Humanities_Commons::$society_id;
+        if ( 'hc' !== $society_id ) {
+                $url_components = parse_url( $att_url ); 
+                $url = $url_components['scheme'] . '://' . $society_id . '.' . $url_components['host'] . $url_components['path'];
+        }
+        return $url;
+}
+add_filter( 'bp_docs_attachment_url_base', 'hc_bp_docs_attachment_url_base', 10, 2 );
+
+/**
  * Modifies the default sort order. If it isn't set in the admin
  * settings it will default to title.
  *
