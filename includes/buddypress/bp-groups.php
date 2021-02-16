@@ -703,7 +703,7 @@ function hc_custom_bp_legacy_theme_ajax_joinleave_group() {
 	$group_auto_accept = groups_get_groupmeta( $group->id, 'auto_accept' );
 
 	$society_id  = bp_groups_get_group_type( $group->id, true );
-	$member_type = bp_get_member_type( $user );
+	$member_types = bp_get_member_type( $user, false );
 
 	if ( ! groups_is_user_member( bp_loggedin_user_id(), $group->id ) ) {
 		if ( 'public' == $group->status ) {
@@ -716,7 +716,7 @@ function hc_custom_bp_legacy_theme_ajax_joinleave_group() {
 			}
 		} elseif ( 'private' == $group->status ) {
 
-			if ( ! empty( $group_auto_accept ) && $member_type === $society_id ) {
+			if ( ! empty( $group_auto_accept ) && in_array( $society_id, $member_types ) ) {
 				if ( ! groups_join_group( $group->id ) ) {
 					_e( 'Error joining group', 'buddypress' );
 				} else {
@@ -753,7 +753,7 @@ function hc_custom_bp_legacy_theme_ajax_joinleave_group() {
 
 		if ( ! groups_leave_group( $group->id ) ) {
 			_e( 'Error leaving group', 'buddypress' );
-		} elseif ( 'public' == $group->status || ( ! empty( $group_auto_accept ) && $member_type === $society_id ) ) {
+		} elseif ( 'public' == $group->status || ( ! empty( $group_auto_accept ) && in_array( $society_id, $member_types ) ) ) {
 			echo '<a id="group-' . esc_attr( $group->id ) . '" class="group-button join-group" rel="join" href="' . wp_nonce_url( bp_get_group_permalink( $group ) . 'join', 'groups_join_group' ) . '">' . __( 'Join Group', 'buddypress' ) . '</a>';
 		} elseif ( 'private' == $group->status ) {
 			echo '<a id="group-' . esc_attr( $group->id ) . '" class="group-button request-membership" rel="join" href="' . wp_nonce_url( bp_get_group_permalink( $group ) . 'request-membership', 'groups_request_membership' ) . '">' . __( 'Request Membership', 'buddypress' ) . '</a>';
@@ -779,10 +779,10 @@ function hc_custom_bp_group_status_message( $message, $group ) {
 	$group_auto_accept = groups_get_groupmeta( $group->id, 'auto_accept' );
 
 	$society_id  = bp_groups_get_group_type( $group->id, true );
-	$member_type = bp_get_member_type( $user );
+	$member_types = bp_get_member_type( $user, false );
 
-	if ( ! empty( $group_auto_accept ) && $member_type === $society_id ) {
-		$message = sprintf( "This is a private group that automatically accepts %s members. Click the 'Join Group' button to join.", strtoupper( $society_id ), $member_type );
+	if ( ! empty( $group_auto_accept ) && in_array( $society_id, $member_types ) ) {
+		$message = sprintf( "This is a private group that automatically accepts %s members. Click the 'Join Group' button to join.", strtoupper( $society_id ) );
 	}
 
 	return $message;
@@ -850,9 +850,9 @@ function hc_custom_groups_action_join_group() {
 		// User wants to join a group that is not public.
 		if ( 'public' != $bp->groups->current_group->status ) {
 			$society_id  = bp_groups_get_group_type( $bp->groups->current_group->id, true );
-			$member_type = bp_get_member_type( $user );
+			$member_types = bp_get_member_type( $user, false );
 
-			if ( ! empty( $group_auto_accept ) && $member_type === $society_id ) {
+			if ( ! empty( $group_auto_accept ) && in_array( $society_id, $member_types ) ) {
 
 				if ( ! groups_join_group( $bp->groups->current_group->id ) ) {
 					bp_core_add_message( __( 'There was an error joining the group.', 'buddypress' ), 'error' );
