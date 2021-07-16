@@ -33,7 +33,7 @@ function more_privacy_options_blogs_get( $return_value, $args ) {
 	//  Site Members Only(-2)
 	//  Site Admins Only(-3)
 	//  Super Admins - everything...
-	$vsibilities = array();
+	$visibilities = array();
 
 	$user_sql = ! empty( $user_id ) ? $wpdb->prepare( ' AND b.user_id = %d', $user_id ) : '';
 
