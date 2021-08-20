@@ -397,3 +397,27 @@ function hc_custom_bp_docs_folders_meta_box() {
 
 	<?php
 }
+
+/**
+ * Prevent duplicate and delayed buddypress notifications from showing.
+ *
+ * This addresses @link https://github.com/MESH-Research/commons/issues/77
+ *
+ * This function is not called directly. It is called through the
+ * 'bp_core_render_message' action, which occurs immediately after a buddypress
+ * notification has been displayed.
+ * @see buddypress/bp-core/bp-core-functions.php bp_core_render_message()
+ *
+ * @author Mike Thicke
+ *
+ * @global $bp The BuddyPress object.
+ */
+function hcommons_prevent_bp_message_duplicates() {
+	global $bp;
+	$bp->template_message = null; //Prevent message from being shown twice.
+
+	// Prevent message from being shown on next page load.
+	@setcookie( 'bp-message', false, time() - 1000, COOKIEPATH, COOKIE_DOMAIN, is_ssl() );
+	@setcookie( 'bp-message-type', false, time() - 1000, COOKIEPATH, COOKIE_DOMAIN, is_ssl() );
+}
+add_action( 'bp_core_render_message', array( $this, 'prevent_bp_message_duplicates' ), 10 );
