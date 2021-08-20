@@ -420,4 +420,4 @@ function hcommons_prevent_bp_message_duplicates() {
 	@setcookie( 'bp-message', false, time() - 1000, COOKIEPATH, COOKIE_DOMAIN, is_ssl() );
 	@setcookie( 'bp-message-type', false, time() - 1000, COOKIEPATH, COOKIE_DOMAIN, is_ssl() );
 }
-add_action( 'bp_core_render_message', array( $this, 'prevent_bp_message_duplicates' ), 10 );
+add_action( 'bp_core_render_message', 'hcommons_prevent_bp_message_duplicates', 10 );
