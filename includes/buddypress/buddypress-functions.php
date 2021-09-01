@@ -56,8 +56,8 @@ function hc_custom_bp_show_blog_signup_form($blogname = '', $blog_title = '', $e
         }
     } 
     
-    if ( ! isset( $_POST['submit'] ) || false === $blog_id || is_wp_error( $blog_id ) ) {
-        if ( is_wp_error( $blog_id ) ) {
+    if ( ! isset( $_POST['submit'] ) || ! isset( $blog_id ) || false === $blog_id || is_wp_error( $blog_id ) ) {
+        if ( isset( $blog_id ) && is_wp_error( $blog_id ) ) {
 			$errors = $blog_id;
 		} elseif ( ! is_wp_error($errors) ) {
             $errors = new WP_Error();
