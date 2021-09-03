@@ -309,7 +309,7 @@ function hc_custom_bpeo_maybe_hook_ics_attachments( $args, $email_type ) {
 	);
 
 	if ( 200 !== wp_remote_retrieve_response_code( $request ) ) {
-		return;
+		return $args;
 	}
 
 	$GLOBALS['bpeo_event_ical'] = wp_remote_retrieve_body( $request );
