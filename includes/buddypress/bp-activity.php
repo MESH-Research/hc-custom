@@ -34,5 +34,30 @@ function hc_custom_template_part_filter( $templates, $slug, $name ) {
 
 	return $templates;
 }
-
 add_filter( 'bp_get_template_part', 'hc_custom_template_part_filter', 10, 3 );
+
+/**
+ * Mark messages as spam that Akismet might have missed but we know are spam.
+ *
+ * Note: this is a temporary fix, and we probably want a more robust way of doing this.
+ *
+ * @author Mike Thicke
+ *
+ * @param BP_Activity_Activity $activity The activity item to check.
+ */
+function hc_custom_check_activity( $activity ) {
+	if ( empty( $activity->content ) ) {
+		return;
+	}
+
+	$blocked_patterns = [
+		'/We recom­mend testing our new project –/',
+	];
+
+	foreach ( $blocked_patterns as $pattern ) {
+		if ( preg_match( $pattern, $activity->content ) ) {
+			bp_activity_mark_as_spam( $activity );
+		}
+	}
+}
+add_action( 'bp_activity_before_save', 'hc_custom_check_activity', 10, 1 );
