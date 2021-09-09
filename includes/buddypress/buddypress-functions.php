@@ -35,9 +35,31 @@ function hc_custom_bp_show_blog_signup_form($blogname = '', $blog_title = '', $e
  global $current_user;
 
     if ( isset($_POST['submit']) ) {
-        bp_blogs_validate_blog_signup();
-    } else {
-        if ( ! is_wp_error($errors) ) {
+        // Updated for BP 9.0.0 compatibility, following /srv/www/commons/current/web/app/plugins/buddypress/bp-blogs/bp-blogs-template.php
+        $blog_id = bp_blogs_validate_blog_signup();
+        if ( is_numeric( $blog_id ) ) {
+            $site = get_site( $blog_id );
+
+            if ( isset( $site->id ) && $site->id ) {
+                $current_user = wp_get_current_user();
+
+                bp_blogs_confirm_blog_signup(
+                    $site->domain,
+                    $site->path,
+                    $site->blogname,
+                    $current_user->user_login,
+                    $current_user->user_email,
+                    '',
+                    $site->id
+                );
+            }
+        }
+    } 
+    
+    if ( ! isset( $_POST['submit'] ) || ! isset( $blog_id ) || false === $blog_id || is_wp_error( $blog_id ) ) {
+        if ( isset( $blog_id ) && is_wp_error( $blog_id ) ) {
+			$errors = $blog_id;
+		} elseif ( ! is_wp_error($errors) ) {
             $errors = new WP_Error();
         }
 
