@@ -51,12 +51,13 @@ function hc_custom_check_activity( $activity ) {
 	}
 
 	$blocked_patterns = [
-		'/We recom­mend testing our new project –/',
+		'/We recom­mend testing our new project –/i',
 	];
 
 	foreach ( $blocked_patterns as $pattern ) {
 		if ( preg_match( $pattern, $activity->content ) ) {
 			bp_activity_mark_as_spam( $activity );
+			break;
 		}
 	}
 }
