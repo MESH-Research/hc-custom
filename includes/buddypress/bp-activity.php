@@ -51,7 +51,7 @@ function hc_custom_check_activity( $activity ) {
 	}
 
 	$blocked_patterns = [
-		'/We recom­mend testing our new project –/i',
+		'/mend testing our new project -.*http:\/\//i',
 	];
 
 	foreach ( $blocked_patterns as $pattern ) {
