@@ -69,7 +69,7 @@ function hcommons_add_non_society_member_join_group_button() {
 		if ( $is_not_committee ) {
 			$message = 'Join Group';
 			if ( 'private' === $group->status ) {
-				$message = 'Request Membership</div>';
+				$message = 'Request Membership';
 			}
 			echo '<div class="disabled-button">' . $message . '</div>';
 		}
