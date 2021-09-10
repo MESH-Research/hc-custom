@@ -23,12 +23,23 @@ function hc_custom_get_object_property( $obj, $property, $default ) {
 function hc_custom_get_group_type() {
 	global $groups_template;
 
-	if ( $groups_template && hc_custom_get_object_property( $groups_template, 'group', false ) ) {
-		$bp_id = $groups_template->group->id;
-		return strtolower( \groups_get_groupmeta( $bp_id, 'society_group_type', true ) );
+	if ( ! $groups_template || ! property_exists( $groups_template, 'group' ) ) {
+		return '';
 	}
 
-	return 0;
+	$group_type = '';
+
+	$group_type = strtolower( \groups_get_groupmeta( $groups_template->group->id, 'society_group_type', true ) );
+
+	if ( mla_is_group_committee( $groups_template->group->id ) ) {
+		$group_type = 'committee';
+	}
+
+	if ( ! $group_type ) {
+		$group_type = strtolower( $groups_template->group->status );
+	}
+
+	return $group_type;
 }
 
 /**
@@ -38,7 +49,6 @@ function hc_custom_get_group_type() {
  * @param BP_Groups_Group $group BuddyPress group.
  */
 function hc_custom_hide_join_button( $group ) {
-
 	$user_id    = \bp_loggedin_user_id();
 	$group_type = hc_custom_get_group_type();
 
@@ -55,6 +65,12 @@ function hc_custom_hide_join_button( $group ) {
 	$is_forum_admin = ( 'forum' === $group_type && \groups_is_user_admin( $user_id, \bp_get_group_id() ) );
 
 	if ( $is_committee || $is_forum_admin ) {
+		return;
+	}
+
+	// If a user is a non-society member, then the join button logic is handled
+	// by bp-groups.php::hcommons_add_non_society_member_join_group_button
+	if ( ! is_super_admin() && hcommons_check_non_member_active_session() ) {
 		return;
 	}
 

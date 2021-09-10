@@ -64,7 +64,7 @@ function hcommons_add_non_society_member_join_group_button() {
 		if ( empty( $group ) ) {
 			$group =& $groups_template->group;
 		}
-		$is_not_committee = strtolower( \groups_get_groupmeta( $group->id, 'society_group_type', true ) ) !== 'committee';
+		$is_not_committee = hc_custom_get_group_type() !== 'committee';
 
 		if ( $is_not_committee ) {
 			$message = 'Join Group';
