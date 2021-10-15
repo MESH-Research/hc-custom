@@ -155,7 +155,7 @@
 
     if (!settings.silent && !window.aysUnloadSet) {
       window.aysUnloadSet = true;
-      $(window).bind('beforeunload', function() {
+      $(window).on('beforeunload', function() {
         $dirtyForms = $("form").filter('.' + settings.dirtyClass);
         if ($dirtyForms.length == 0) {
           return;
