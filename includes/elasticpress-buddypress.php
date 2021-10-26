@@ -149,16 +149,21 @@ add_filter( 'ep_search_results_array', 'hcommons_filter_ep_search_results_array'
 
 /**
  * Filter out humcore child posts from indexing.
- *
- * @param bool  $kill Prevent this post from being indexed (or not).
- * @param array $post_args Return value of ep_prepare_post( $post_id ).
- * @param int   $post_id Post ID.
+ * 
+ * @see elasticpress - SyncManager::action_queue_meta_sync
+ * 
+ * @param bool  $skip      True means kill sync for post
+ * @param int   $object_id ID of post
+ * @param int   $__        ID of post (repeated)
+ * @return bool New value for $skip
  */
-function hcommons_filter_ep_post_sync_kill( bool $kill, array $post_args, int $post_id ) {
-	if ( 'humcore_deposit' === $post_args['post_type'] && 0 !== $post_args['post_parent'] ) {
-		$kill = true;
+function hcommons_filter_ep_post_sync_kill( bool $skip, int $object_id, int $__ ) {
+	$the_post = get_post( $object_id );
+
+	if ( 'humcore_deposit' === $the_post->post_type && 0 !== $the_post->post_parent ) {
+		$skip = true;
 	}
-	return $kill;
+	return $skip;
 }
 add_filter( 'ep_post_sync_kill', 'hcommons_filter_ep_post_sync_kill', 10, 3 );
 
