@@ -241,7 +241,7 @@ function humcore_filter_post_type_link( $post_link, $post ) {
 	if ( 'humcore_deposit' === get_post_type() ) {
 
 		// Hope index has the correct permalink or fall back to meta otherwise.
-		if ( false !== strpos( $post->permalink, ':' ) ) {
+		if ( false !== strpos( $post->permalink, 'hc:' ) ) {
 			$post_link = $post->permalink;
 		} else {
 			$meta = get_post_meta( get_the_ID() );
@@ -264,7 +264,7 @@ function humcore_filter_post_type_link( $post_link, $post ) {
 
 	return $post_link;
 }
-add_filter( 'post_type_link', 'humcore_filter_post_type_link', 10, 2 );
+add_filter( 'post_type_link', 'humcore_filter_post_type_link', 20, 2 );
 // define the the_permalink callback
 
 function filter_the_permalink( $get_permalink ) {
