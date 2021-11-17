@@ -413,7 +413,7 @@ function hc_custom_show_private_posts_for_admins( $query ) {
 		$group_id = bp_get_current_group_id();
 
 		if ( groups_is_user_admin( $user_id, $group_id ) ) {
-			$query->set( 'post_status', array( 'private', 'publish', 'closed' ) );
+			$query->set( 'post_status', array( 'private', 'publish', 'closed', 'hidden' ) );
 		}
 	}
 }
