@@ -705,6 +705,10 @@ function hc_custom_bp_legacy_theme_ajax_joinleave_group() {
 	$society_id  = bp_groups_get_group_type( $group->id, true );
 	$member_types = bp_get_member_type( $user, false );
 
+	if ( hcommons_check_non_member_active_session() ) {
+		wp_die();
+	}
+
 	if ( ! groups_is_user_member( bp_loggedin_user_id(), $group->id ) ) {
 		if ( 'public' == $group->status ) {
 			check_ajax_referer( 'groups_join_group' );
@@ -832,6 +836,10 @@ function hc_custom_groups_action_join_group() {
 
 	if ( ! bp_is_single_item() || ! bp_is_groups_component() || ! bp_is_current_action( 'join' ) ) {
 		return false;
+	}
+
+	if ( hcommons_check_non_member_active_session() ) {
+		bp_core_redirect( bp_get_group_permalink( $bp->groups->current_group ) );
 	}
 
 	// Nonce check.
