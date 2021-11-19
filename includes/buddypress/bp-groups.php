@@ -898,3 +898,14 @@ function hc_custom_groups_action_join_group() {
 }
 
 add_action( 'bp_actions', 'hc_custom_groups_action_join_group', 0 );
+
+function hc_custom_group_creation_only_for_society_members( $can_create, $restricted ) {
+	if ( ! $can_create ) {
+		return false;
+	}
+
+	if ( hcommons_check_non_member_active_session() && ! is_super_admin() ) {
+		return false;
+	}
+}
+add_filter( 'bp_user_can_create_groups', 'hc_custom_group_creation_only_for_society_members', 10, 2 );
