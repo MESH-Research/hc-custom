@@ -406,6 +406,7 @@ function hc_custom_bp_docs_folders_meta_box() {
  * This function is not called directly. It is called through the
  * 'bp_core_render_message' action, which occurs immediately after a buddypress
  * notification has been displayed.
+ * 
  * @see buddypress/bp-core/bp-core-functions.php bp_core_render_message()
  *
  * @author Mike Thicke
@@ -421,3 +422,37 @@ function hcommons_prevent_bp_message_duplicates() {
 	@setcookie( 'bp-message-type', false, time() - 1000, COOKIEPATH, COOKIE_DOMAIN, is_ssl() );
 }
 add_action( 'bp_core_render_message', 'hcommons_prevent_bp_message_duplicates', 10 );
+
+function hcommons_restricted_comment_terms_doc_fallback( $terms, $term_query ) {
+	if (
+		isset( $term_query->query_vars['taxonomy'] ) && 
+		is_array( $term_query->query_vars['taxonomy'] ) &&
+		count( $term_query->query_vars['taxonomy'] ) > 0 &&
+		$term_query->query_vars['taxonomy'][0] === 'bp_docs_comment_access' 
+	) {
+		if ( array_key_exists( 'slug', $term_query->query_vars ) ) {
+			if ( in_array( 'default-term-query-in-progress', $term_query->query_vars['slug'] ) ) {
+				return;
+			} else {
+				$term_query_copy = clone( $term_query );
+				$term_query->query_vars['slug'][] = 'default-term-query-in-progress';
+				$term_query->get_terms();
+				if ( true ) {
+					$slugs = $term_query_copy->query_vars['slug'];
+					foreach ( $slugs as $slug ) {
+						$doc_slug = str_replace( 'comment_', '', $slug );
+						if ( $doc_slug != $slug ) {
+							$term_query_copy->query_vars['slug'][] = $doc_slug;
+						}
+					}
+					$term_query_copy->query_vars['taxonomy'][0] = 'bp_docs_access';
+					$term_query_copy->get_terms();
+					unset( $term_query_copy->query_vars['slug']['default-term-query-in-progress'] );
+					return $term_query_copy->terms;
+				}
+			}
+		}
+	}
+	return null;
+}
+add_action( 'terms_pre_query', 'hcommons_restricted_comment_terms_doc_fallback', 10, 2 );
