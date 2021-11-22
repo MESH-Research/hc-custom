@@ -705,6 +705,7 @@ function hc_custom_bp_legacy_theme_ajax_joinleave_group() {
 	$society_id  = bp_groups_get_group_type( $group->id, true );
 	$member_types = bp_get_member_type( $user, false );
 
+	// If the user isn't a member of the society, they can't join a group in that society.
 	if ( hcommons_check_non_member_active_session() ) {
 		wp_die();
 	}
@@ -838,6 +839,7 @@ function hc_custom_groups_action_join_group() {
 		return false;
 	}
 
+	// If a user is not a member of a society, they cannot join a group in that society.
 	if ( hcommons_check_non_member_active_session() ) {
 		bp_core_redirect( bp_get_group_permalink( $bp->groups->current_group ) );
 	}
@@ -899,6 +901,19 @@ function hc_custom_groups_action_join_group() {
 
 add_action( 'bp_actions', 'hc_custom_groups_action_join_group', 0 );
 
+/**
+ * Ensures that only society members can create society groups.
+ *
+ * This is a filter called upon group creation by Buddypress.
+ * @see bp-groups/bp-groups-template.php
+ *
+ * @author Mike Thicke
+ *
+ * @param bool can_create Whether the user can create groups.
+ * @param bool restricted Whether group creation is restricted.
+ * 
+ * @return bool Whether user can create a society group.
+ */
 function hc_custom_group_creation_only_for_society_members( $can_create, $restricted ) {
 	if ( ! $can_create ) {
 		return false;
