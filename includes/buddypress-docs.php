@@ -435,6 +435,9 @@ function hcommons_restricted_comment_terms_doc_fallback( $terms, $term_query ) {
 				return;
 			} else {
 				$term_query_copy = clone( $term_query );
+				if ( ! is_array( $term_query->query_vars['slug'] ) ) {
+					$term_query->query_vars['slug'] = [];
+				}
 				$term_query->query_vars['slug'][] = 'default-term-query-in-progress';
 				$term_query->get_terms();
 				if ( true ) {
