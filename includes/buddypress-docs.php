@@ -459,3 +459,11 @@ function hcommons_restricted_comment_terms_doc_fallback( $terms, $term_query ) {
 	return null;
 }
 add_action( 'terms_pre_query', 'hcommons_restricted_comment_terms_doc_fallback', 10, 2 );
+
+/**
+ * Enqueue buddypress-docs js
+ */
+function enqueue_buddypress_docs_js() {
+	wp_enqueue_script( 'hc-buddypress-docs-js', trailingslashit( plugins_url() ) . 'hc-custom/includes/js/buddypress-docs.js', array( 'jquery' ) );
+}
+add_action( 'wp_enqueue_scripts', 'enqueue_buddypress_docs_js', 10, 0 );
