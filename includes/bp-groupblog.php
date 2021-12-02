@@ -82,14 +82,3 @@ function wporg_wpmu_new_blog_example( $blog_id, $user_id, $domain, $path, $site_
     }
 }
 add_action( 'wpmu_new_blog', 'wporg_wpmu_new_blog_example', 10, 6 );
-
-function hcommons_signup_hidden_fields( $signup_nonce_fields ) {
-?>
-<label class="checkbox" for="is-classsite">
-  <input type="checkbox" id="is_classsite" name="is_classsite" value="1" <?php if( isset( $_POST['is_classsite'] ) || '1' == $_POST['is_classsite'] ) { ?>checked="checked"<?php } ?> />
-      <strong><?php _e( 'Is this a course site?' , 'buddypress'); ?></strong><br><br>
-</label>
-<?php
-}
-
-add_action( 'signup_hidden_fields', 'hcommons_signup_hidden_fields', 10, 1 );

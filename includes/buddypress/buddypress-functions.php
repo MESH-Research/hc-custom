@@ -83,22 +83,13 @@ function hc_custom_bp_show_blog_signup_form($blogname = '', $blog_title = '', $e
             echo "<p>" . __('There was a problem; please correct the form below and try again.', 'buddyboss') . "</p>";
         }
         ?>
-        <p><?php printf(__("By filling out the form below, you can <strong>add a site to your account</strong>. There is no limit to the number of sites that you can have, so create to your heart's content, but blog responsibly!", 'buddyboss'), $current_user->display_name) ?></p>
- 
-        <p><?php _e("If you're not going to use a great domain, leave it for a new user.<br><br>Also bear in mind that many domains may create ambiguity; rather than 'hist101' you might include institution and semester information to avoid conflicts, such as 'msuhist101s20'.<br> Please note that if you check off 'Is this a course site,' below, the Learning Space theme will be activated and the site url will be prefixed with your username (e.g. hcadmin-learningspace.hcommons.org).", 'buddyboss') ?></p>
- 
+        <p><?php _e("By filling out the form below, you can <strong>add a site to your account</strong>. There is no limit to the number of sites that you can have, so create to your heart's content, but create responsibly!</p>", 'buddyboss'); ?>
+        <p><?php _e("<strong>Note:</strong> If you're not going to use a great domain, leave it for a new user.</p>", 'buddyboss'); ?>
+        
         <form class="standard-form" id="setupform" method="post" action="">
  
             <input type="hidden" name="stage" value="gimmeanotherblog" />
-            <?php
- 
-            /**
-             * Fires after the default hidden fields in blog signup form markup.
-             *
-             * @since BuddyPress 1.0.0
-             */
-            //do_action( 'signup_hidden_fields' ); ?>
- 
+            
             <?php hc_custom_bp_blogs_signup_blog($blogname, $blog_title, $errors); ?>
 
             <p>
@@ -111,42 +102,102 @@ function hc_custom_bp_show_blog_signup_form($blogname = '', $blog_title = '', $e
     }
 }
 
-function hc_custom_bp_blogs_signup_blog( $blogname = '', $blog_title = '', $errors = '' ) {
+/**
+ * This creates a custom site privacy form. 
+ *
+ * It replaces the one created by the More Privacy Options plugin. This form
+ * appears in two places: on the 'Create a Site' page and on the group site
+ * creation page. A separate function (@see admin-mpo.js) is used to create the
+ * form in the WordPress admin.
+ *
+ * @author Mike Thicke
+ */
+function hc_custom_signup_blogform() {
+    global $details,$options;
+        $society_id = strtoupper( Humanities_Commons::$society_id );
+		?>
+        <p><strong>Site Privacy</strong></p>
+        <p>These settings may be changed in your admin panel under "Settings/Reading/Site Visibility."</p>
+        <fieldset class="create-site">
+            <label class="checkbox">
+                <input type="radio" name="blog_public" value="1" <?php if( !isset( $_POST['blog_public'] ) || '1' == $_POST['blog_public'] ) { ?>checked="checked"<?php } ?> />
+                <?php _e( 'Public and allow search engines to index this site. (Note: It is up to search engines to honor your request. The site will appear in public listings around Humanities Commons.)' , 'buddyboss'); ?>
+            </label>
+            <label class="checkbox">
+                <input type="radio" name="blog_public" value="0" <?php if( !isset( $_POST['blog_public'] ) || '0' == $_POST['blog_public'] ) { ?>checked="checked"<?php } ?> />
+                <?php _e( 'Public but discourage search engines from index this site. (Note: This option does not block access to your site — it is up to search engines to honor your request. The site will appear in public listings around Humanities Commons.)' , 'buddyboss'); ?>
+            </label>
+            <label class="checkbox">
+                <input type="radio" name="blog_public" value="-1" <?php if( !isset( $_POST['blog_public'] ) || '-1' == $_POST['blog_public'] ) { ?>checked="checked"<?php } ?> />
+                <?php 
+                _e( 'Visible only to registered users of ' , 'buddyboss'); 
+                echo( $society_id );
+                ?>
+            </label>
+            <label class="checkbox">
+                <input type="radio" name="blog_public" value="-2" <?php if( !isset( $_POST['blog_public'] ) || '-2' == $_POST['blog_public'] ) { ?>checked="checked"<?php } ?> />
+                <?php _e( 'Visible only to registered users of this site' , 'buddyboss'); ?>
+            </label>
+            <label class="checkbox">
+                <input type="radio" name="blog_public" value="-3" <?php if( !isset( $_POST['blog_public'] ) || '-3' == $_POST['blog_public'] ) { ?>checked="checked"<?php } ?> />
+                <?php _e( 'Visible only to administrators of this site' , 'buddyboss'); ?>
+            </label>
+        </fieldset>
+		<?php
+}
+add_action( 'signup_blogform', 'hc_custom_signup_blogform', 10, 0 );
+
+/**
+ * This removes the More Privacy Options blog signup form, which is then
+ * replaced by hc_custom_signup_blogform().
+ *
+ * @author Mike Thicke
+ */
+function hc_custom_remove_more_privacy_signup_blogform() {
+    global $wp_filter;
+    if ( isset( $wp_filter['signup_blogform']->callbacks ) ) {
+        foreach ( $wp_filter['signup_blogform']->callbacks as $callback ) {
+            if ( is_array( $callback ) ) {
+                foreach ( $callback as $callback_item ) {
+                    if ( is_array( $callback_item ) && is_a( $callback_item['function'][0], 'DS_More_Privacy_Options' ) ) {
+                        remove_action( 'signup_blogform', [ $callback_item['function'][0], 'add_privacy_options' ] );
+                        return;
+                    }
+                }
+            }
+        }
+    }
+}
+add_action( 'signup_blogform', 'hc_custom_remove_more_privacy_signup_blogform', 1, 0 );
+
+/**
+ * This displays the 'Create a Site' page.
+ */
+function hc_custom_bp_blogs_signup_blog( $blogname = '', $blog_title = '', $errors = null ) {
     global $current_site;
+    hc_custom_remove_more_privacy_signup_blogform();
  
     // Blog name.
     if( !is_subdomain_install() )
-        echo '<label for="blogname">' . __('Site Name:', 'buddyboss') . '</label>';
+        echo '<strong><label for="blogname">' . __('Site Name:', 'buddyboss') . '</label></strong>';
     else
-        echo '<label for="blogname">' . __('Site Domain:', 'buddyboss') . '</label>';
+        echo '<strong><label for="blogname">' . __('Site Domain:', 'buddyboss') . '</label></strong>';
  
-    if ( $errmsg = $errors->get_error_message('blogname') ) { ?>
- 
+    if ( $errors ) { 
+        $errmsg = $errors->get_error_message('blogname');
+        ?>
         <p class="error"><?php echo $errmsg ?></p>
- 
-    <?php }
+        <?php 
+    }
  
     if ( !is_subdomain_install() )
         echo '<span class="prefix_address">' . $current_site->domain . $current_site->path . '</span> <input name="blogname" type="text" id="blogname" value="'.$blogname.'" maxlength="63" /><br />';
     else
         echo '<input name="blogname" type="text" id="blogname" value="'.$blogname.'" maxlength="63" ' . bp_get_form_field_attributes( 'blogname' ) . '/> <span class="suffix_address">.' . bp_signup_get_subdomain_base() . '</span><br />';
  
-    if ( !is_user_logged_in() ) {
-        print '(<strong>' . __( 'Your address will be ' , 'buddyboss');
- 
-        if ( !is_subdomain_install() ) {
-            print $current_site->domain . $current_site->path . __( 'blogname' , 'buddyboss');
-        } else {
-            print __( 'domain.' , 'buddyboss') . $current_site->domain . $current_site->path;
-        }
- 
-        echo '.</strong> ' . __( 'Must be at least 4 characters, letters and numbers only. It cannot be changed so choose carefully!)' , 'buddyboss') . '</p>';
-    }
- 
-    // Blog Title.
     ?>
  
-    <label for="blog_title"><?php _e('Site Title:', 'buddyboss') ?></label>
+    <label for="blog_title"><strong><?php _e('Site Title:', 'buddyboss') ?></strong></label>
  
     <?php if ( $errmsg = $errors->get_error_message('blog_title') ) { ?>
  
@@ -155,22 +206,18 @@ function hc_custom_bp_blogs_signup_blog( $blogname = '', $blog_title = '', $erro
     <?php }
     echo '<input name="blog_title" type="text" id="blog_title" value="'.esc_html($blog_title, 1).'" /></p>';
     ?>
-    
+
+    <p><strong><?php _e("Are you an instructor? Is this a course site?", 'buddyboss'); ?></strong></p>
+    <p><?php _e('Keep in mind that many domains may create ambiguity; rather than "hist101" you might include institution and semester information to avoid conflicts, such as "msuhist101s20."', 'buddyboss'); ?></p>
+    <p><strong><?php _e('Note:', 'buddyboss'); ?></strong> <?php _e('If you check off "This is a course site," below, the Learning Space theme will be activated and the site url will be prefixed with your username (e.g. hcadmin-learningspace.hcommons.org).', 'buddyboss') ?></p>
+
+    <label class="checkbox" for="is-classsite">
+    <input type="checkbox" id="is_classsite" name="is_classsite" value="1" <?php if( isset( $_POST['is_classsite'] ) || '1' == $_POST['is_classsite'] ) { ?>checked="checked"<?php } ?> />
+        <strong><?php _e( 'This is a course site' , 'buddypress'); ?></strong><br><br>
+    </label>
+
     <?php do_action( 'signup_hidden_fields' ); ?>
 
-    <fieldset class="create-site">
-        <legend class="label"><?php _e('Privacy: I would like my site to appear in search engines, and in public listings around this network', 'buddyboss') ?></legend>
- 
-        <label class="checkbox" for="blog_public_on">
-            <input type="radio" id="blog_public_on" name="blog_public" value="1" <?php if( !isset( $_POST['blog_public'] ) || '1' == $_POST['blog_public'] ) { ?>checked="checked"<?php } ?> />
-            <strong><?php _e( 'Yes' , 'buddyboss'); ?></strong>
-        </label>
-        <label class="checkbox" for="blog_public_off">
-            <input type="radio" id="blog_public_off" name="blog_public" value="0" <?php if( isset( $_POST['blog_public'] ) && '0' == $_POST['blog_public'] ) { ?>checked="checked"<?php } ?> />
-            <strong><?php _e( 'No' , 'buddyboss'); ?></strong>
-        </label>
-    </fieldset>
- 
     <?php
  
     /**
