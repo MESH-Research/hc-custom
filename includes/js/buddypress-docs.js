@@ -12,7 +12,9 @@
     };
 	
 	$(function() {
-		$('#insert-media-button').addClass('disabled');
+		if ( typeof( doc_id ) == 'undefined' || doc_id == 0 ) {
+			$('#insert-media-button').addClass('disabled');
+		}
 
 		$(document).on('change', 'input#doc_id', function() {
 			var doc_id = $(this).val();
