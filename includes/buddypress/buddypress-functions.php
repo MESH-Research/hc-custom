@@ -95,6 +95,17 @@ function hc_custom_bp_show_blog_signup_form($blogname = '', $blog_title = '', $e
             <p>
                 <input id="submit" type="submit" name="submit" class="submit" value="<?php esc_attr_e('Create Site', 'buddyboss') ?>" />
             </p>
+
+            <?php
+            $society_id = strtoupper( Humanities_Commons::$society_id );
+            if ( $society_id == 'HC' || $society_id == 'MSU') {
+                $acceptable_use_link = 'https://' . bp_signup_get_subdomain_base() . 'website-policy';
+                echo Humanities_Commons::society_name();
+                echo "<a href='$acceptable_use_link'> ";
+                _e( 'acceptable use policy', 'buddypress' );
+                echo "</a>.";
+            }
+            ?>
  
             <?php wp_nonce_field( 'bp_blog_signup_form' ) ?>
         </form>
