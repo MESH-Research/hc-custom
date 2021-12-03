@@ -240,3 +240,23 @@ function hc_custom_bp_blogs_signup_blog( $blogname = '', $blog_title = '', $erro
      */
     do_action('signup_blogform', $errors);
 }
+
+/**
+ * Ensures that a new site has a domain set. It addresses an issue encountered
+ * with new MSU sites.
+ *
+ * This is a hack because the source of the problem can't be found. 
+ * @see https://github.com/MESH-Research/hc-admin-docs-support/issues/102
+ *
+ * @author Mike Thicke
+ * 
+ * @param Array $result Result of blog validation (@see ms-functions.php::wpmu_validate_blog_signup)
+ * @return Array Fixed result
+ */
+function hc_custom_ensure_site_has_domain( $result ) {
+    if ( substr( $result['domain'], -1 ) == '.' ) {
+        $result['domain'] = $result['domain'] . $_SERVER['HTTP_HOST'];
+    }
+    return $result;
+}
+add_filter( 'wpmu_validate_blog_signup', 'hc_custom_ensure_site_has_domain', 10, 1 );
