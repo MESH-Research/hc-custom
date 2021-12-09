@@ -494,3 +494,18 @@ add_filter( 'buddypress_messages_spamblocker_30m', 'hc_custom_buddypress_message
 add_filter( 'buddypress_messages_spamblocker_60m', 'hc_custom_buddypress_messages_spamblocker' );
 add_filter( 'buddypress_messages_spamblocker_12h', 'hc_custom_buddypress_messages_spamblocker' );
 add_filter( 'buddypress_messages_spamblocker_24d', 'hc_custom_buddypress_messages_spamblocker' );
+
+/**
+ * Bypass the bbPress comment moderation feature.
+ *
+ * There is not a good interface for comment moderation, so it is better to
+ * bypass it unless spam starts to become a problem.
+ * 
+ * @see https://github.com/MESH-Research/boss-child/issues/113
+ *
+ * @see bbpress/includes/common/functions.php::bbp_check_for_moderation()
+ */
+function hc_custom_bypass_moderation( $false, $anonymous_data, $author_id, $title, $content, $strict ) {
+	return True;
+}
+add_filter( 'bbp_bypass_check_for_moderation', 'hc_custom_bypass_moderation', 10, 6 );
