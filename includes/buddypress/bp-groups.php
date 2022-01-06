@@ -922,5 +922,7 @@ function hc_custom_group_creation_only_for_society_members( $can_create, $restri
 	if ( hcommons_check_non_member_active_session() && ! is_super_admin() ) {
 		return false;
 	}
+
+	return true;
 }
 add_filter( 'bp_user_can_create_groups', 'hc_custom_group_creation_only_for_society_members', 10, 2 );
