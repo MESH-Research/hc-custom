@@ -167,11 +167,29 @@ function hcommons_filter_ep_post_sync_kill( bool $skip, int $object_id, int $__ 
 }
 add_filter( 'ep_post_sync_kill', 'hcommons_filter_ep_post_sync_kill', 10, 3 );
 
+/*
+ * Networks ( Jan 2022 )
+ * '1 : MLA Commons',
+ * '2 : Humanities Commons',
+ * '3 : AJS Commons',
+ * '4 : ASEEES Commons',
+ * '5 : CAA Commons',
+ * '6 : UP Commons',
+ * '7 : MSU Commons',
+ * '8 : ARLIS/NA Commons',
+ * '10 : SAH Commons',
+ * '11 : Commons Hub',
+ * '12 : SocSci Commons',
+ * '13 : STEM Commons'
+ */
+
 // Hide some networks & post types from search facets.
-add_filter( 'ep_bp_show_network_facet_6', '__return_false' ); // UP.
-add_filter( 'ep_bp_show_network_facet_7', '__return_false' ); // MSU.
+add_filter( 'ep_bp_show_network_facet_3', '__return_false' ); // AJS.
+add_filter( 'ep_bp_show_network_facet_5', '__return_false' ); // CAA.
+// add_filter( 'ep_bp_show_network_facet_6', '__return_false' ); // UP.
+// add_filter( 'ep_bp_show_network_facet_7', '__return_false' ); // MSU.
 add_filter( 'ep_bp_show_network_facet_8', '__return_false' ); // ARLIS.
-add_filter( 'ep_bp_show_network_facet_10', '__return_false' ); // SAH.
+// add_filter( 'ep_bp_show_network_facet_10', '__return_false' ); // SAH.
 add_filter( 'ep_bp_show_network_facet_11', '__return_false' ); // HUB.
 add_filter( 'ep_bp_show_network_facet_12', '__return_false' ); // SOCSCI.
 add_filter( 'ep_bp_show_network_facet_13', '__return_false' ); // STEM.
@@ -183,6 +201,7 @@ add_filter( 'ep_bp_show_post_type_facet_bp_doc', '__return_false' );
 add_filter( 'ep_bp_show_post_type_facet_event', '__return_false' );
 add_filter( 'ep_bp_show_post_type_facet_bp_docs_folder', '__return_false' );
 add_filter( 'ep_bp_show_post_type_facet_elementor_library', '__return_false' );
+add_filter( 'ep_bp_show_post_type_facet_e-landing-page', '__return_false' );
 
 /**
  * If query contains quotes, no fuzziness.
