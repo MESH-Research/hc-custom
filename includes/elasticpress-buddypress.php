@@ -186,10 +186,7 @@ add_filter( 'ep_post_sync_kill', 'hcommons_filter_ep_post_sync_kill', 10, 3 );
 // Hide some networks & post types from search facets.
 add_filter( 'ep_bp_show_network_facet_3', '__return_false' ); // AJS.
 add_filter( 'ep_bp_show_network_facet_5', '__return_false' ); // CAA.
-// add_filter( 'ep_bp_show_network_facet_6', '__return_false' ); // UP.
-// add_filter( 'ep_bp_show_network_facet_7', '__return_false' ); // MSU.
 add_filter( 'ep_bp_show_network_facet_8', '__return_false' ); // ARLIS.
-// add_filter( 'ep_bp_show_network_facet_10', '__return_false' ); // SAH.
 add_filter( 'ep_bp_show_network_facet_11', '__return_false' ); // HUB.
 add_filter( 'ep_bp_show_network_facet_12', '__return_false' ); // SOCSCI.
 add_filter( 'ep_bp_show_network_facet_13', '__return_false' ); // STEM.
