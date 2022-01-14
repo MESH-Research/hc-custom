@@ -509,3 +509,67 @@ function hc_custom_bypass_moderation( $false, $anonymous_data, $author_id, $titl
 	return True;
 }
 add_filter( 'bbp_bypass_check_for_moderation', 'hc_custom_bypass_moderation', 10, 6 );
+
+/**
+ * Avoid iterating through every group to update latest topics and replies when
+ * making a discussion post.
+ */
+function hc_custom_calc_parent_latest_topic( $r, $args, $defaults ) {
+	$forum_id = $r['forum_id'];
+
+	$latest_topic_id = wp_cache_get( 'hc_custom_calc_parent_latest_topic_id' );
+	if ( $latest_topic_id === false ) {
+		$latest_topic_id = 0;
+	}
+
+	$latest_reply_id = wp_cache_get( 'hc_custom_calc_parent_latest_reply_id' );
+	if ( $latest_reply_id === false ) {
+		$latest_reply_id = 0;
+	}
+
+	// If this forum has topics...
+	$topic_ids = bbp_forum_query_topic_ids( $forum_id );
+	if ( ! empty( $topic_ids ) ) {
+
+		// ...get the most recent reply from those topics...
+		$reply_id = bbp_forum_query_last_reply_id( $forum_id, $topic_ids );
+
+		// ...and compare it to the most recent topic id...
+		$reply_id = ( $reply_id > max( $topic_ids ) )
+			? $reply_id
+			: max( $topic_ids );
+	}
+
+	if ( 
+		array_key_exists( 'last_topic_id', $r ) && 
+		$r['last_topic_id'] !== 0 && 
+		$r['last_topic_id'] > $latest_topic_id 
+	) {
+		wp_cache_set( 'hc_custom_calc_parent_latest_topic_id', $r['last_topic_id'] );
+		if ( $reply_id > $latest_reply_id ) {
+			wp_cache_set( 'hc_custom_calc_parent_latest_reply_id', $reply_id );
+		}
+	} else {
+		$latest_post_meta = (int) get_post_meta( $forum_id, '_bbp_last_topic_id', true );
+		if ( $latest_topic_id > $latest_post_meta ) {
+			$r['last_topic_id'] = $latest_topic_id;
+		}
+
+		/*
+		 * The logic used to calculate last_reply_id and last_active_id is
+		 * exactly the same, so when one is set the other can be without
+		 * checking.
+		 *
+		 * @see bbp_update_forum_last_reply_id() and
+		 * bbp_update_forum_last_active_id() in
+		 * plugins/bbpress/includes/forums/functions.php
+		 */
+		if ( $reply_id < $latest_reply_id ) {
+			$r['last_reply_id'] = $latest_reply_id;
+			$r['last_active_id'] = $latest_reply_id;
+		}
+	}
+
+	return $r;
+}
+add_filter( 'bbp_after_update_forum_parse_args', 'hc_custom_calc_parent_latest_topic', 10, 3 );
