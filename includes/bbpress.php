@@ -513,18 +513,50 @@ add_filter( 'bbp_bypass_check_for_moderation', 'hc_custom_bypass_moderation', 10
 /**
  * Avoid iterating through every group to update latest topics and replies when
  * making a discussion post.
+ *
+ * The bbpress functions bbp_update_forum_last_topic_id,
+ * bbp_update_forum_last_reply_id, and bbp_update_forum_last_active_id are
+ * called whenever a discussion post is added. These functions are intended to
+ * update the post id of the latest discussion post, for both the current group
+ * and its parent. When the parent is updated, the default behavior is not to
+ * compare the post being added with the previous latest post, but to iterate
+ * through every child form and find the latest post. When there are a large
+ * number of groups, this takes a long time.
+ *
+ * This function short circuits this behavior and only compares the discussion
+ * post being added with the previous latest post stored by the parent forum.
+ * This is much more efficient and seems safe, though there is possibly some
+ * race condition that the default behavior would catch and this would not.
+ *
+ * This function operates by setting a value for topic_id, reply_id, and
+ * active_id when arguments are being parsed, taking advantage of the fact that
+ * child forums are only iterated through if the topic_id or reply_id are not
+ * set.
+ *
+ * @see bbpress/includes/forums/functions.php::bbp_update_forum_last_topic_id
+ * @see bbpress/includes/forums/functions.php::bbp_update_forum_last_reply_id
+ * @see bbpress/includes/forums/functions.php::bbp_update_forum_last_active_id
+ * @see bbpress/includes/common/functions.php::bbp_parse_args
+ * 
+ * @author Mike Thicke
+ *
+ * @param Array $r        The current arguments
+ * @param Array $args     The initial arguments before filtering
+ * @param Array $defualts The default arguments
+ *
+ * @return Array Filtered arguments with topic_id, reply_id, active_id set if not already.
  */
 function hc_custom_calc_parent_latest_topic( $r, $args, $defaults ) {
 	$forum_id = $r['forum_id'];
 
 	$latest_topic_id = wp_cache_get( 'hc_custom_calc_parent_latest_topic_id' );
 	if ( $latest_topic_id === false ) {
-		$latest_topic_id = 0;
+		$latest_topic_id = (int) get_post_meta( $forum_id, '_bbp_last_topic_id', true );
 	}
 
 	$latest_reply_id = wp_cache_get( 'hc_custom_calc_parent_latest_reply_id' );
 	if ( $latest_reply_id === false ) {
-		$latest_reply_id = 0;
+		$latest_reply_id = (int) get_post_meta( $forum_id, '_bbp_last_reply_id', true );
 	}
 
 	// If this forum has topics...
