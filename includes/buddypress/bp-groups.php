@@ -6,7 +6,12 @@
  */
 
 /**
- * Adds new button labels for society members. For non society see hcommons_add_non_society_member_join_group_button()
+ * Adds new button labels for joining groups.
+ *
+ * Society membership is not checked by this function.
+ * hcommons_filter_groups_button_lables_for_non_member checks for society
+ * membership and replaces the button with an inactive pseudo button for
+ * non-society members.
  *
  * @param string $button HTML button for joining a group.
  * @param object $group BuddyPress group object.
@@ -15,13 +20,8 @@
  */
 function hcommons_filter_groups_button_labels( $button, $group ) {
 	$status = $group->status;
-
-	$user              = bp_loggedin_user_id();
 	$group_auto_accept = groups_get_groupmeta( $group->id, 'auto_accept' );
 
-	if ( ! is_super_admin() && hcommons_check_non_member_active_session() ) {
-		$button['link_class'] = 'disabled-button';
-	}
 	if ( empty( BP_Groups_Member::check_is_member( get_current_user_id(), $group->id ) ) ) {
 		switch ( $status ) {
 			case 'public':
@@ -44,6 +44,48 @@ function hcommons_filter_groups_button_labels( $button, $group ) {
 add_filter( 'bp_get_group_join_button', 'hcommons_filter_groups_button_labels', 10, 2 );
 
 /**
+ * Replaces Join Group button with inactive pseudo button for non-society
+ * members.
+ * 
+ * @author Mike Thicke
+ *
+ * @param string    $contents The HTML of the button.
+ * @param Array     $args     Button arguments (unused)
+ * @param BP_Button $button   The button object
+ *
+ * @return string Original contents if not a group button or a society member,
+ *                or disabled pseudo button if a non-member.
+ */
+function hcommons_filter_groups_button_lables_for_non_member( $contents, $args, $button ) {
+	global $groups_template;
+
+	// Only filter Join Group buttons
+	if ( $button->id !== 'join_group' ) { 
+		return $contents;
+	}
+
+	// Don't filter for super admins or society members
+	if ( is_super_admin() || Humanities_Commons::hcommons_user_in_current_society() ) {
+		return $contents;
+	}
+
+	// If the group is a committee, there should be no join button.
+	if ( hc_custom_get_group_type() !== 'committee' ) {
+		if ( 'private' === $groups_template->group->status ) {
+			$message = 'Request Membership';
+		} else {
+			$message = 'Join Group';
+		}
+		$contents = '<div class="disabled-button">' . $message . '</div>';
+	} else {
+		$contents = '';
+	}
+
+	return $contents;
+}
+add_filter( 'bp_get_button', 'hcommons_filter_groups_button_lables_for_non_member', 10, 3 );
+
+/**
  * Filters the action for the new group activity update.
  *
  * @param string $activity_action The new group activity update.
@@ -53,29 +95,6 @@ function hcommons_filter_groups_activity_new_update_action( $activity_action ) {
 	return $activity_action;
 }
 add_filter( 'groups_activity_new_update_action', 'hcommons_filter_groups_activity_new_update_action' );
-
-/**
- * Adds join group button for non-society members
- */
-function hcommons_add_non_society_member_join_group_button() {
-	if ( ! is_super_admin() && hcommons_check_non_member_active_session() ) {
-		global $groups_template;
-		// Set group to current loop group if none passed.
-		if ( empty( $group ) ) {
-			$group =& $groups_template->group;
-		}
-		$is_not_committee = hc_custom_get_group_type() !== 'committee';
-
-		if ( $is_not_committee ) {
-			$message = 'Join Group';
-			if ( 'private' === $group->status ) {
-				$message = 'Request Membership';
-			}
-			echo '<div class="disabled-button">' . $message . '</div>';
-		}
-	}
-}
-add_action( 'bp_directory_groups_actions', 'hcommons_add_non_society_member_join_group_button' );
 
 /**
  * Adds disclaimer notice for non society members
@@ -262,7 +281,6 @@ function update_group_forum_visibility( BP_Groups_Group $group ) {
 			break;
 	}
 }
-
 add_action( 'groups_group_after_save', 'update_group_forum_visibility' );
 
 /**
