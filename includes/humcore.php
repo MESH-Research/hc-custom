@@ -62,3 +62,14 @@ function hcommons_filter_post_type_labels_humcore_deposit( $labels ) {
 	return $labels;
 }
 add_filter( 'post_type_labels_humcore_deposit', 'hcommons_filter_post_type_labels_humcore_deposit' );
+
+/**
+ * Ensure that the 'All Deposits' facet is selected through settings cookie if
+ * nothing is selected.
+ */
+function hcommons_enqueue_all_deposits_script() {
+	$js_path    = 'includes/js/humcore-select-all-deposits.js';
+	$js_version = filemtime( trailingslashit( plugin_dir_path( __DIR__ ) ) . $js_path );
+	wp_enqueue_script( 'hc-humcore-add-all-deposits-cookie', plugins_url( $js_path, __DIR__ ), [], $js_version, true );
+}
+add_action( 'bp_before_deposits_loop', 'hcommons_enqueue_all_deposits_script', 10, 0 );
