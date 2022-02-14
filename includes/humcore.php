@@ -68,6 +68,17 @@ add_filter( 'post_type_labels_humcore_deposit', 'hcommons_filter_post_type_label
  * nothing is selected.
  */
 function hcommons_enqueue_all_deposits_script() {
+	
+	if ( array_key_exists( 'scope', $_POST ) ) {
+		$scope = sanitize_key( $_POST['scope'] );
+		setcookie( 'bp-deposits-scope', $scope, time() + 60*60*24*30, '/' );
+		// unless the $_COOKIE global is updated in addition to the actual cookie above,
+		// bp will not use the value for the first pageload.
+		$_COOKIE[ 'bp-deposits-scope' ] = $scope;
+		setcookie( 'ssss', $scope, time() + 60*60*24*30, '/' );
+	}
+	
+	
 	$js_path    = 'includes/js/humcore-select-all-deposits.js';
 	$js_version = filemtime( trailingslashit( plugin_dir_path( __DIR__ ) ) . $js_path );
 	wp_enqueue_script( 'hc-humcore-add-all-deposits-cookie', plugins_url( $js_path, __DIR__ ), [], $js_version, true );

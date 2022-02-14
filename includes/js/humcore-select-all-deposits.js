@@ -22,9 +22,7 @@ jQuery(function(){
 	var current_cookie = jQuery.cookie('bp-deposits-scope');
 	if ( typeof current_cookie == 'undefined' ) {
 		jQuery.cookie( 'bp-deposits-scope', 'all' );
-	}
-
-	if ( 
+	} else if ( 
 		typeof bp_get_directory_preference !== 'undefined' && 
 		! directoryPreferences.hasOwnProperty( 'deposits' ) 
 	) {
