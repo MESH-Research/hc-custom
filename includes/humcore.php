@@ -83,4 +83,4 @@ function hcommons_enqueue_all_deposits_script() {
 	$js_version = filemtime( trailingslashit( plugin_dir_path( __DIR__ ) ) . $js_path );
 	wp_enqueue_script( 'hc-humcore-add-all-deposits-cookie', plugins_url( $js_path, __DIR__ ), [], $js_version, true );
 }
-add_action( 'bp_before_deposits_loop', 'hcommons_enqueue_all_deposits_script', 10, 0 );
+add_action( 'wp_enqueue_scripts', 'hcommons_enqueue_all_deposits_script', 10, 0 );
