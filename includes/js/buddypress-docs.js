@@ -12,13 +12,13 @@
     };
 	
 	$(function() {
-		if ( typeof( doc_id ) == 'undefined' || doc_id == 0 ) {
+		if ( typeof( $('#doc_id').val() ) == 'undefined' || $('#doc_id').val() == 0 ) {
 			$('#insert-media-button').addClass('disabled');
 		}
 
 		$(document).on('change', 'input#doc_id', function() {
 			var doc_id = $(this).val();
-			console.log( doc_id );
+			console.log( 'doc_id: ' + doc_id );
 			if ( doc_id ) {
 				$('#insert-media-button').removeClass('disabled');
 			}
