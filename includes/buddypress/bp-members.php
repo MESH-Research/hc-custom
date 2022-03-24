@@ -9,7 +9,7 @@
  * Disable follow button for non-society-members.
  */
 function hcommons_add_non_society_member_follow_button() {
-	if ( ! is_super_admin() && hcommons_check_non_member_active_session() ) {
+	if ( ! is_super_admin() && ! Humanities_Commons::hcommons_user_in_current_society() ) {
 		echo '<div class="disabled-button">Follow</div>';
 	}
 }
@@ -19,7 +19,7 @@ add_action( 'bp_directory_members_actions', 'hcommons_add_non_society_member_fol
  * Add follow disclaimer for non-society-members.
  */
 function hcommons_add_non_society_member_disclaimer_member() {
-	if ( ! is_super_admin() && hcommons_check_non_member_active_session() ) {
+	if ( ! is_super_admin() && ! Humanities_Commons::hcommons_user_in_current_society() ) {
 		printf(
 			'<div class="non-member-disclaimer">Only %s members can follow others from here.<br>To follow these members, go to <a href="%s">Humanities Commons</a>.</div>',
 			strtoupper( Humanities_Commons::$society_id ),

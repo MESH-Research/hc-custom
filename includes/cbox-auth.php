@@ -70,7 +70,7 @@ function hc_custom_hide_join_button( $group ) {
 
 	// If a user is a non-society member, then the join button logic is handled
 	// by bp-groups.php::hcommons_add_non_society_member_join_group_button
-	if ( ! is_super_admin() && hcommons_check_non_member_active_session() ) {
+	if ( ! is_super_admin() && Humanities_Commons::hcommons_user_in_current_society() ) {
 		return;
 	}
 

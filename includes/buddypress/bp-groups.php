@@ -100,7 +100,7 @@ add_filter( 'groups_activity_new_update_action', 'hcommons_filter_groups_activit
  * Adds disclaimer notice for non society members
  */
 function hcommons_add_non_society_member_disclaimer_group() {
-	if ( ! is_super_admin() && hcommons_check_non_member_active_session() ) {
+	if ( ! is_super_admin() && ! Humanities_Commons::hcommons_user_in_current_society() ) {
 		printf(
 			'<div class="non-member-disclaimer">Only %1$s members can join these groups.<br><a href="/register">Join %1$s now</a>!</div>',
 			strtoupper( Humanities_Commons::$society_id )
@@ -724,7 +724,7 @@ function hc_custom_bp_legacy_theme_ajax_joinleave_group() {
 	$member_types = bp_get_member_type( $user, false );
 
 	// If the user isn't a member of the society, they can't join a group in that society.
-	if ( hcommons_check_non_member_active_session() ) {
+	if ( ! Humanities_Commons::hcommons_user_in_current_society() ) {
 		wp_die();
 	}
 
@@ -858,7 +858,7 @@ function hc_custom_groups_action_join_group() {
 	}
 
 	// If a user is not a member of a society, they cannot join a group in that society.
-	if ( hcommons_check_non_member_active_session() ) {
+	if ( ! Humanities_Commons::hcommons_user_in_current_society() ) {
 		bp_core_redirect( bp_get_group_permalink( $bp->groups->current_group ) );
 	}
 
@@ -937,7 +937,7 @@ function hc_custom_group_creation_only_for_society_members( $can_create, $restri
 		return false;
 	}
 
-	if ( hcommons_check_non_member_active_session() && ! is_super_admin() ) {
+	if ( ! Humanities_Commons::hcommons_user_in_current_society() && ! is_super_admin() ) {
 		return false;
 	}
 
