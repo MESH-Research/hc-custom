@@ -20,7 +20,7 @@
  */
 jQuery(function(){
 	var current_cookie = jQuery.cookie('bp-deposits-scope');
-	if ( current_cookie == 'undefined' ) {
+	if ( typeof current_cookie == 'undefined' ) {
 		jQuery.cookie( 'bp-deposits-scope', 'all' );
 	} else if ( 
 		typeof bp_get_directory_preference !== 'undefined' && 
