@@ -423,6 +423,79 @@ function hcommons_prevent_bp_message_duplicates() {
 }
 add_action( 'bp_core_render_message', 'hcommons_prevent_bp_message_duplicates', 10 );
 
+/**
+ * Ensure that when a doc is edited or created through a POST request, it is returned as
+ * the current doc, or if it is an autosave / not in a group, return null.
+ *
+ * This addresses @link
+ * https://github.com/MESH-Research/hc-admin-docs-support/issues/202
+ *
+ * There seems to be a caching issue with buddypress-docs returning the wrong
+ * doc in the functions.php::bp_docs_get_current_doc() function. This results in
+ * the user not having permission to save or create the doc becuase the returned
+ * doc might be from a group in which they are not a member.
+ *
+ * @see functions.php::bp_docs_get_current_doc() for the 'bp_docs_get_current_doc' filter.
+ * @see component.php::catch_page_load() for the failed permission check that results.
+ *
+ * @author Mike Thicke
+ *
+ * @param  $current_doc The doc returned by the bp_docs_get_current_doc() function.
+ */
+function hcommons_correct_bp_docs_get_current_doc( $current_doc ) {
+	if ( empty( $_POST['doc-edit-submit'] ) && empty( $_POST['doc-edit-submit-continue'] ) ) {
+		return $current_doc;
+	}
+
+	if ( empty( $_POST['doc_id'] ) ) {
+		return $current_doc;
+	}
+
+	$correct_current_doc = get_post( intval( $_POST['doc_id'] ) );
+	if ( bp_docs_get_post_type_name() === $correct_current_doc->post_type ) {
+		$group_id = bp_docs_get_associated_group_id( $correct_current_doc->ID, $correct_current_doc );
+		if ( ! $group_id ) {
+			return null;
+		}
+		return $correct_current_doc;
+	}
+
+	return $current_doc;
+}
+add_filter( 'bp_docs_get_current_doc', 'hcommons_correct_bp_docs_get_current_doc', 10, 1 );
+
+/**
+ * Ensure that when a doc is created or edited through a POST request, the
+ * associated group is set as the associated group in the POST request.
+ *
+ * This addresses @link
+ * https://github.com/MESH-Research/hc-admin-docs-support/issues/202
+ *
+ * When a doc is created through a POST request, bp_get_current_group_id()
+ * sometimes (?) returns 0 rather than the correct group.
+ *
+ * @see buddypress/bp-groups/bp-groups-template.php::bp_get_current_group_id()
+ * for the 'bp_get_current_group_id' filter.
+ * 
+ * @see integration-groups.php::bp_docs_groups_map_meta_caps() for the failed
+ * permission check that results.
+ *
+ * @param int    $current_group_id ID of the current group
+ * @param object $current_group    Instance holding the current group.
+ */
+function hcommons_correct_bp_get_current_group_id( $current_group_id, $current_group ) {
+	if ( empty( $_POST['doc-edit-submit'] ) && empty( $_POST['doc-edit-submit-continue'] ) ) {
+		return $current_group_id;
+	}
+	
+	if ( empty( $_POST['associated_group_id'] ) ) {
+		return $current_group_id;
+	}
+
+	return intval( $_POST['associated_group_id'] );
+}
+add_filter( 'bp_get_current_group_id', 'hcommons_correct_bp_get_current_group_id', 10, 2 );
+
 function hcommons_restricted_comment_terms_doc_fallback( $terms, $term_query ) {
 	if (
 		isset( $term_query->query_vars['taxonomy'] ) && 
