@@ -35,4 +35,7 @@ function hc_custom_society_to_twitter( $society_id ) {
 }    
 	
 
-add_filter('wpt_cache_expire', 180 );
+add_filter('wpt_cache_expire', function( $value ) {
+	return 180;
+ }
+);
