@@ -100,7 +100,7 @@ function hc_custom_validate_gravatar( $email = '', $age = 0, &$mimetype = null )
 	// change, but a NO might change when the user signs up with gravatar.com).
 	$duration = WEEK_IN_SECONDS;
 	if ( empty( $result ) ) {
-		$duration = $age < HOUR_IN_SECONDS ? 10 * MINUTE_IN_SECONDS : $age < DAY_IN_SECONDS ? HOUR_IN_SECONDS : $age < WEEK_IN_SECONDS ? DAY_IN_SECONDS : $duration;
+		$duration = ( $age < HOUR_IN_SECONDS  ? 10 * MINUTE_IN_SECONDS : ( $age < DAY_IN_SECONDS ? HOUR_IN_SECONDS : ( $age < WEEK_IN_SECONDS ? DAY_IN_SECONDS : $duration ) ) );
 	}
 
 	/**
