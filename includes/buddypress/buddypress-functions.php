@@ -34,6 +34,12 @@ add_filter( 'bp_legacy_object_template_path', 'hc_custom_bp_legacy_object_templa
 function hc_custom_bp_show_blog_signup_form($blogname = '', $blog_title = '', $errors = '') {
  global $current_user;
 
+    if ( ! Humanities_Commons::hcommons_user_in_current_society() && ! is_super_admin() ) {
+        $society_name = Humanities_Commons::society_name();
+        echo "<p>Only members of $society_name can create a new site on this network.</p>";
+        return;
+    }
+
     if ( isset($_POST['submit']) ) {
         // Updated for BP 9.0.0 compatibility, following /srv/www/commons/current/web/app/plugins/buddypress/bp-blogs/bp-blogs-template.php
         $blog_id = bp_blogs_validate_blog_signup();

@@ -55,3 +55,25 @@ function hcommons_constrain_activity_comments( $comment_id, $r, $activity ) {
 }
 // Priority 5 to run before bp_blogs_sync_add_from_activity_comment().
 add_action( 'bp_activity_comment_posted', 'hcommons_constrain_activity_comments', 5, 3 );
+
+/**
+ * Ensure that the 'Create a site' button on the sites page is only visible to
+ * users who are able to create a site on the network.
+ * 
+ * This addresses @link https://github.com/MESH-Research/hc-admin-docs-support/issues/237
+ *
+ * @see
+ * buddypress/src/bp-blogs/bp-blogs-template.php::bp_get_blog_create_nav_item()
+ * for 'bp_get_blog_create_nav_item' filter.
+ * 
+ * @param string $output The HTML for the create a site button list item.
+ * 
+ * @return string New HTML for the button (empty string if user cannot create site)
+ */
+function hcommons_filter_blog_create_nav_item( $output ) {
+	if ( Humanities_Commons::hcommons_user_in_current_society() || is_super_admin() ) {
+		return $output;
+	}
+	return '';
+}
+add_filter( 'bp_get_blog_create_nav_item', 'hcommons_filter_blog_create_nav_item', 10, 1 );
