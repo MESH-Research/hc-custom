@@ -605,3 +605,16 @@ function hc_custom_calc_parent_latest_topic( $r, $args, $defaults ) {
 	return $r;
 }
 add_filter( 'bbp_after_update_forum_parse_args', 'hc_custom_calc_parent_latest_topic', 10, 3 );
+
+function hc_bbp_get_post_types( $r, $args, $defaults ) {
+	if ( empty( $r['post_type'] ) ) {
+		$r['post_type'] = [
+			bbp_get_reply_post_type(),
+			bbp_get_topic_post_type(),
+			bbp_get_forum_post_type(),
+		];
+	}
+
+	return $r;
+}
+add_filter( 'bbp_after_has_search_results_parse_args', 'hc_bbp_get_post_types', 10, 3 );
