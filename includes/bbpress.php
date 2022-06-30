@@ -605,14 +605,3 @@ function hc_custom_calc_parent_latest_topic( $r, $args, $defaults ) {
 	return $r;
 }
 add_filter( 'bbp_after_update_forum_parse_args', 'hc_custom_calc_parent_latest_topic', 10, 3 );
-
-/**
- * Make bbPress post types accessible through the REST API.
- */
-function hc_enable_bbpress_rest() {
-	register_post_type( bbp_get_reply_post_type(), ['show_in_rest' => true ] );
-	register_post_type( bbp_get_topic_post_type(), ['show_in_rest' => true ] );
-	register_post_type( bbp_get_forum_post_type(), ['show_in_rest' => true ] );
-
-}
-add_action( 'bbp_register_post_types', 'hc_enable_bbpress_rest', 11 );
