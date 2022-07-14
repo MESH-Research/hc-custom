@@ -194,8 +194,8 @@ add_filter( 'ep_bp_show_network_facet_8', '__return_false' ); // ARLIS.
 add_filter( 'ep_bp_show_network_facet_11', '__return_false' ); // HUB.
 add_filter( 'ep_bp_show_network_facet_12', '__return_false' ); // SOCSCI.
 add_filter( 'ep_bp_show_network_facet_13', '__return_false' ); // STEM.
-add_filter( 'ep_bp_show_post_type_facet_post', '__return_false' );
-add_filter( 'ep_bp_show_post_type_facet_page', '__return_false' );
+//add_filter( 'ep_bp_show_post_type_facet_post', '__return_false' );
+//add_filter( 'ep_bp_show_post_type_facet_page', '__return_false' );
 add_filter( 'ep_bp_show_post_type_facet_attachment', '__return_false' );
 add_filter( 'ep_bp_show_post_type_facet_forum', '__return_false' );
 add_filter( 'ep_bp_show_post_type_facet_bp_doc', '__return_false' );
