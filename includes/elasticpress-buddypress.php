@@ -160,6 +160,10 @@ add_filter( 'ep_search_results_array', 'hcommons_filter_ep_search_results_array'
 function hcommons_filter_ep_post_sync_kill( bool $skip, int $object_id, int $__ ) {
 	$the_post = get_post( $object_id );
 
+	if ( ! $the_post ) {
+		return $skip;
+	}
+
 	if ( 'humcore_deposit' === $the_post->post_type && false !== (bool) $the_post->post_parent ) {
 		$skip = true;
 	}
