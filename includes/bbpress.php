@@ -585,6 +585,8 @@ function hc_custom_calc_parent_latest_topic( $r, $args, $defaults ) {
 		$latest_post_meta = (int) get_post_meta( $forum_id, '_bbp_last_topic_id', true );
 		if ( $latest_topic_id > $latest_post_meta ) {
 			$r['last_topic_id'] = $latest_topic_id;
+		} else {
+			$r['last_topic_id'] = $latest_post_meta;
 		}
 
 		/*
