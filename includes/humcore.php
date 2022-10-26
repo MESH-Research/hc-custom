@@ -45,7 +45,7 @@ function hcommons_core_member_groups_with_authorship( $current_groups = array() 
 			1004001, 
 			1020814, 
 			1004014, 
-			1051267, // bmyb 
+			1004097, // Intaglio Journal
 		) 
 	);
 
