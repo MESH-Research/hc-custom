@@ -123,50 +123,49 @@ function hc_custom_bp_show_blog_signup_form($blogname = '', $blog_title = '', $e
  * This creates a custom site privacy form. 
  *
  * It replaces the one created by the More Privacy Options plugin. This form
- * appears in two places: on the 'Create a Site' page and on the group site
- * creation page. A separate function (@see admin-mpo.js) is used to create the
- * form in the WordPress admin.
+ * appears on the 'Create a Site' page. It formerly appeared on the group site
+ * page and was removed. It was formerly triggered by the 'signup_blogform'
+ * action but is now called directly.
  *
  * @author Mike Thicke
  */
-function hc_custom_signup_blogform() {
+function hc_custom_site_creation_privacy_form() {
     global $details,$options;
-        $society_id = strtoupper( Humanities_Commons::$society_id );
-		?>
-        <p><strong>Site Privacy</strong></p>
-        <p>These settings may be changed in your admin panel under "Settings/Reading/Site Visibility."</p>
-        <fieldset class="create-site">
-            <label class="checkbox">
-                <input type="radio" name="blog_public" value="1" <?php if( !isset( $_POST['blog_public'] ) || '1' == $_POST['blog_public'] ) { ?>checked="checked"<?php } ?> />
-                <?php _e( 'Public and allow search engines to index this site. (Note: It is up to search engines to honor your request. The site will appear in public listings around Humanities Commons.)' , 'buddyboss'); ?>
-            </label>
-            <label class="checkbox">
-                <input type="radio" name="blog_public" value="0" <?php if( !isset( $_POST['blog_public'] ) || '0' == $_POST['blog_public'] ) { ?>checked="checked"<?php } ?> />
-                <?php _e( 'Public but discourage search engines from index this site. (Note: This option does not block access to your site — it is up to search engines to honor your request. The site will appear in public listings around Humanities Commons.)' , 'buddyboss'); ?>
-            </label>
-            <label class="checkbox">
-                <input type="radio" name="blog_public" value="-1" <?php if( !isset( $_POST['blog_public'] ) || '-1' == $_POST['blog_public'] ) { ?>checked="checked"<?php } ?> />
-                <?php 
-                _e( 'Visible only to registered users of ' , 'buddyboss'); 
-                echo( $society_id );
-                ?>
-            </label>
-            <label class="checkbox">
-                <input type="radio" name="blog_public" value="-2" <?php if( !isset( $_POST['blog_public'] ) || '-2' == $_POST['blog_public'] ) { ?>checked="checked"<?php } ?> />
-                <?php _e( 'Visible only to registered users of this site' , 'buddyboss'); ?>
-            </label>
-            <label class="checkbox">
-                <input type="radio" name="blog_public" value="-3" <?php if( !isset( $_POST['blog_public'] ) || '-3' == $_POST['blog_public'] ) { ?>checked="checked"<?php } ?> />
-                <?php _e( 'Visible only to administrators of this site' , 'buddyboss'); ?>
-            </label>
-        </fieldset>
-		<?php
+    $society_id = strtoupper( Humanities_Commons::$society_id );
+    ?>
+    <p><strong>Site Privacy</strong></p>
+    <p>These settings may be changed in your admin panel under "Settings/Reading/Site Visibility."</p>
+    <fieldset class="create-site">
+        <label class="checkbox">
+            <input type="radio" name="blog_public" value="1" <?php if( !isset( $_POST['blog_public'] ) || '1' == $_POST['blog_public'] ) { ?>checked="checked"<?php } ?> />
+            <?php _e( 'Public and allow search engines to index this site. (Note: It is up to search engines to honor your request. The site will appear in public listings around Humanities Commons.)' , 'buddyboss'); ?>
+        </label>
+        <label class="checkbox">
+            <input type="radio" name="blog_public" value="0" <?php if( !isset( $_POST['blog_public'] ) || '0' == $_POST['blog_public'] ) { ?>checked="checked"<?php } ?> />
+            <?php _e( 'Public but discourage search engines from index this site. (Note: This option does not block access to your site — it is up to search engines to honor your request. The site will appear in public listings around Humanities Commons.)' , 'buddyboss'); ?>
+        </label>
+        <label class="checkbox">
+            <input type="radio" name="blog_public" value="-1" <?php if( !isset( $_POST['blog_public'] ) || '-1' == $_POST['blog_public'] ) { ?>checked="checked"<?php } ?> />
+            <?php 
+            _e( 'Visible only to registered users of ' , 'buddyboss'); 
+            echo( $society_id );
+            ?>
+        </label>
+        <label class="checkbox">
+            <input type="radio" name="blog_public" value="-2" <?php if( !isset( $_POST['blog_public'] ) || '-2' == $_POST['blog_public'] ) { ?>checked="checked"<?php } ?> />
+            <?php _e( 'Visible only to registered users of this site' , 'buddyboss'); ?>
+        </label>
+        <label class="checkbox">
+            <input type="radio" name="blog_public" value="-3" <?php if( !isset( $_POST['blog_public'] ) || '-3' == $_POST['blog_public'] ) { ?>checked="checked"<?php } ?> />
+            <?php _e( 'Visible only to administrators of this site' , 'buddyboss'); ?>
+        </label>
+    </fieldset>
+    <?php
 }
-add_action( 'signup_blogform', 'hc_custom_signup_blogform', 10, 0 );
 
 /**
  * This removes the More Privacy Options blog signup form, which is then
- * replaced by hc_custom_signup_blogform().
+ * replaced by hc_custom_site_creation_privacy_form().
  *
  * @author Mike Thicke
  */
@@ -236,15 +235,8 @@ function hc_custom_bp_blogs_signup_blog( $blogname = '', $blog_title = '', $erro
     <?php do_action( 'signup_hidden_fields' ); ?>
 
     <?php
- 
-    /**
-     * Fires at the end of all of the default input fields for blog creation form.
-     *
-     * @since BuddyPress 1.0.0
-     *
-     * @param WP_Error $errors WP_Error object if any present.
-     */
-    do_action('signup_blogform', $errors);
+
+    hc_custom_signup_blogform();
 }
 
 /**
