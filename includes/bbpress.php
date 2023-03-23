@@ -532,6 +532,9 @@ add_filter( 'bbp_bypass_check_for_moderation', 'hc_custom_bypass_moderation', 10
  * active_id when arguments are being parsed, taking advantage of the fact that
  * child forums are only iterated through if the topic_id or reply_id are not
  * set.
+ * 
+ * @see https://github.com/MESH-Research/commons/issues/242
+ * @see https://github.com/MESH-Research/commons/issues/434
  *
  * @see bbpress/includes/forums/functions.php::bbp_update_forum_last_topic_id
  * @see bbpress/includes/forums/functions.php::bbp_update_forum_last_reply_id
