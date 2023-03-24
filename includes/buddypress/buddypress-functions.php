@@ -236,7 +236,7 @@ function hc_custom_bp_blogs_signup_blog( $blogname = '', $blog_title = '', $erro
 
     <?php
 
-    hc_custom_signup_blogform();
+    hc_custom_site_creation_privacy_form();
 }
 
 /**
