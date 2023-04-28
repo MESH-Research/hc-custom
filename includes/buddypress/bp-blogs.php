@@ -77,3 +77,21 @@ function hcommons_filter_blog_create_nav_item( $output ) {
 	return '';
 }
 add_filter( 'bp_get_blog_create_nav_item', 'hcommons_filter_blog_create_nav_item', 10, 1 );
+
+/**
+ * Forces bp_blog_signup_enabled to return true, as caching issues seem to sometimes
+ * get it stuck returning false.
+ * 
+ * This addresses @link https://github.com/MESH-Research/commons/issues/572 and subsequent
+ * failures of the 'Create a Site' button to appear on the Sites page.
+ * 
+ * @see buddypress/bp-blogs/bp-blogs-template.php::bp_blog_create_button() for enabled check.
+ * @see buddypress/bp-blogs/bp-blogs-functions.php::bp_blog_signup_enabled() for filter.
+ *
+ * @param string $active_signup all | none | blog | user
+ * @return string 'all' as new value for $active_signup
+ */
+function hcommons_filter_bp_blog_signup_enabled( $active_signup ) {
+	return 'all';
+}
+add_filter( 'wpmu_active_signup', 'hcommons_filter_bp_blog_signup_enabled', 10, 1 );
