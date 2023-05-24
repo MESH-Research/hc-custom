@@ -1,0 +1,272 @@
+/**
+ * Custom styles for header section of pages.
+ */
+
+.navigation-button {
+	display: block;
+	border-style: solid;
+	border-width: 1px;
+	border-radius: 5px;
+	padding: 0.4em 0.8em;
+}
+
+#hc-navigation-block-wrapper {
+	display: flex;
+	flex-direction: row;
+	column-gap: 24px;
+	justify-content: flex-start;
+}
+
+/**
+ * Search
+ */
+
+#search-modal-wrapper {
+	position: relative;
+}
+
+#search-modal-wrapper .modal {
+	display: none;
+}
+
+#search-modal-wrapper .modal.is-open {
+	display: block;
+}
+
+#search-modal-wrapper #modal-1 {
+	position: absolute;
+	right: 0;
+	top: 3rem;
+	width: min( 30rem, 60vw );
+	z-index: 5;
+}
+
+#search-modal-wrapper #modal-1-close {
+	position: absolute;
+	right: 0;
+	top: -3rem;
+	background-color: white;
+	padding:  0.65rem 0.65rem 0 0.65rem;
+}
+
+#search-modal-wrapper #modal-1-content {
+	width: 100%;
+}
+
+#search-modal-wrapper #searchform {
+	width: 100%;
+	margin-right: 2rem;
+	text-align: left;
+	border-style: solid;
+	border-width: 1px;
+	padding: 0;
+	border-color: black;
+	position: static;
+	background-color: white;
+	border-radius: 0;
+}
+
+#search-modal-wrapper #searchform #s {
+	float: none;
+	margin: 0;
+	width: calc( 100% - 2rem);
+	border-style: none;
+	background-color: transparent;
+	padding-left: 1rem;
+	padding-right: 1rem;
+	font-size: 20px;	
+}
+
+#search-modal-wrapper #searchform #s:focus {
+	outline:none;
+}
+
+#search-modal-wrapper #searchform #searchsubmit {
+	position: absolute;
+	display: inline-flex;
+	flex-direction: row-reverse;
+	align-items: center;
+	right: 1rem;
+	padding: 0;
+	height: 100%;
+	border-radius: 0;
+	top: 0;
+	background-color: transparent;
+}
+
+#search-modal-wrapper button {
+	background-color: transparent;
+	border-style: none;
+	padding: 0.65rem 0.65rem 0.65rem 0;
+	font-size: 1.5rem;
+	cursor: pointer;
+}
+
+#search-modal-wrapper button:hover span {
+	text-decoration: underline;
+}
+
+/**
+ * User Menu
+ */
+
+.wp-block-navigation__submenu-container .count,
+.wp-block-navigation__submenu-container .no-count {
+	display: none;
+}
+
+#navigation-bp-notifications-wrapper .wp-block-navigation__submenu-container a,
+#navigation-user-menu-wrapper .wp-block-navigation__submenu-container a {
+	display: inline-block;
+	padding: 0.5em 1em;
+	width: 100%;
+}
+
+#navigation-bp-notifications-wrapper ul,
+#navigation-user-menu-wrapper ul {
+	min-width: 200px;
+}
+
+.wp-block-navigation__submenu-container>li {
+	font-size: 0.75em !important; /* Need to override inline style from the block */
+}
+
+#navigation-bp-notifications-list {
+	display: none;
+	position: absolute;
+	z-index: 2;
+	visibility: hidden;
+}
+
+#navigation-bp-notifications-wrapper:hover #navigation-bp-notifications-list,
+#navigation-bp-notifications-wrapper button[aria-expanded="true"] ~ #navigation-bp-notifications-list {
+	display: block;
+	visibility: visible;
+}
+
+#navigation-user-menu-wrapper .menu-bp-container #menu-bp {
+	position: absolute;
+	z-index: 2;
+	display: none;
+	visibility: hidden;
+	opacity: 1;
+	transition: none;
+	width: auto;
+	height: auto;
+	overflow: visible;
+}
+
+#navigation-user-menu-wrapper:hover .menu-bp-container #menu-bp,
+#navigation-user-menu-wrapper button[aria-expanded="true"] ~ div #menu-bp {
+	display: block;
+	visibility: visible;
+}
+
+#navigation-user-menu-wrapper .menu-bp-container .menu-parent .sub-menu {
+	position: absolute;
+	transform-origin: top right;
+	transform: translate( -100%, -2em );
+	background-color: #fff;
+	color: #000;
+	border-width: 1px;
+	border-style: solid;
+	border-color: rgba( 0, 0, 0, 0.15 );
+	display: none;
+}
+
+#navigation-user-menu-wrapper .menu-bp-container .menu-parent:hover .sub-menu,
+#navigation-user-menu-wrapper .menu-bp-container .menu-parent:focus-within .sub-menu {
+	display: block;
+}
+
+#hc-nav-logout-personal-li {
+	display: none;
+}
+
+.wp-block-navigation__container #hc-nav-logout-personal-li {
+	display: list-item;
+}
+
+
+
+/**
+ * Responsive
+ */
+
+ @media (max-width: 1100px) {
+	#search-modal-wrapper #modal-1 {
+		width: min( 30rem, 25vw );
+	}
+ }
+
+ @media (max-width: 600px) {
+	.fa {
+		text-rendering: unset;
+		-webkit-font-smoothing: unset;
+		-moz-osx-font-smoothing: unset;
+	}
+
+	#search-modal-wrapper #modal-1 {
+		width: min( 40rem, 70vw );
+	}
+
+	#modal-2-content.wp-block-navigation__responsive-container-content {
+		flex-direction: column-reverse;
+	}
+	
+	.wp-block-navigation__submenu-container>li {
+		font-size: 1em !important; /* Need to override inline style from the block */
+	}
+
+	#hc-navigation-block-wrapper {
+		flex-direction: column;
+		row-gap: 24px;
+	}
+
+	#search-modal-wrapper {
+		display: flex;
+		flex-direction: row;
+	}
+
+	#search-modal-wrapper span.fa-search::before {
+		content: "Search:";
+		font-family: var(--wp--preset--font-family--system-font);
+		font-size: 18px;
+	}
+
+	#search-modal-wrapper #modal-1 {
+		display: block;
+		position: static;
+		padding: 0.65rem;
+	}
+
+	#search-modal-wrapper #modal-1-close {
+		display: none;
+	}
+
+	#navigation-bp-notifications-wrapper a::before {
+		content: "Notifications:";
+		font-family: var(--wp--preset--font-family--system-font);
+	}
+
+	#navigation-bp-notifications-wrapper:hover #navigation-bp-notifications-list,
+	#navigation-bp-notifications-wrapper button[aria-expanded="true"] ~ #navigation-bp-notifications-list {
+		display: none;
+		visibility: hidden;
+	}
+
+	#navigation-user-menu-wrapper:hover .menu-bp-container #menu-bp,
+	#navigation-user-menu-wrapper button[aria-expanded="true"] ~ div #menu-bp {
+		display: none;
+		visibility: hidden;
+	}
+
+	#navigation-user-menu-wrapper .menu-bp-container .menu-parent:hover .sub-menu,
+	#navigation-user-menu-wrapper .menu-bp-container .menu-parent:focus-within .sub-menu {
+		display: none;
+	}
+
+	#hc-navigation-block-wrapper .navigation-button {
+		width: fit-content;
+	}
+ }
