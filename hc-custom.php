@@ -57,14 +57,6 @@ require_once trailingslashit( __DIR__ ) . 'includes/user-functions.php';
 require_once trailingslashit( __DIR__ ) . 'includes/header.php';
 require_once trailingslashit( __DIR__ ) . 'includes/buddypress-nouveau.php';
 
-/* Queue Font Awesome to load in wp_head */
-add_action('wp_head','hc_font_awesome');
-function hc_font_awesome() {
-    ?>
-        <script src="https://kit.fontawesome.com/554b5e32e0.js" crossorigin="anonymous"></script>
-    <?php
-}
-
 /**
  *  BuddyPress Action & Filter Functions
  *  @author Dave Ventresca
