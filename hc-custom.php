@@ -11,7 +11,7 @@
  *
  * @package         Hc_Custom
  */
-
+function load_hc_custom() {
 /**
  * BuddyPress actions & filters.
  */
@@ -56,6 +56,8 @@ require_once trailingslashit( __DIR__ ) . 'includes/user-functions.php';
  */
 require_once trailingslashit( __DIR__ ) . 'includes/header.php';
 require_once trailingslashit( __DIR__ ) . 'includes/buddypress-nouveau.php';
+}
+add_action('bp_init','load_hc_custom',10,1);
 
 /**
  *  BuddyPress Action & Filter Functions
@@ -114,4 +116,32 @@ require_once trailingslashit( __DIR__ ) . 'includes/buddypress-nouveau.php';
     echo $user_meta;
 }
 add_action( 'bp_profile_header_meta', 'hc_profile_header_meta' );
+
+/*
+ * Function to add Groups Directory Filter buttons for current society
+ * Note: this works only with BP Nouveau would need to hook into 'bp_groups_directory_group_filter'
+**/
+
+function society_filter_groups_directory($nav_items) { //BP Nouveau filter function
+  $society_id = Humanities_Commons::$society_id;
+  if ($society_id == 'hc') {
+    $class = '';
+  }
+  else { 
+    array_shift($nav_items);
+    $class = 'selected'; 
+  }
+  $societygroups = strtoupper($society_id) . ' Groups';
+  $nav_items['society'] = array(
+    'component' => 'groups',
+    'slug' => 'society',
+    'li_class' => array($class), //this isn't working for some reason... but the functionality of the button tab works just fine (odd) !???
+    'link' => '#',
+    'text' => __($societygroups,'buddypress'),
+    'count' => false,
+    'position' => 10,
+  );
+  return $nav_items;
+}
+add_filter('bp_nouveau_get_groups_directory_nav_items','society_filter_groups_directory');
 
