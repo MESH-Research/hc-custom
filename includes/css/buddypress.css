@@ -4,6 +4,12 @@
 	display: none;
 }
 
+/* quick fix for groups archive on hcdev3, not present on hcommons-dev.org, so not sure this change needs to be committed, but I decided to fix it quickly.
+*/
+#groups-dir-list .bp-list::before {
+	display: none;
+} 
+
 /**
  * Profiles
  */
