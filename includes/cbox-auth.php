@@ -48,9 +48,12 @@ function hc_custom_get_group_type() {
  *
  * @param BP_Groups_Group $group BuddyPress group.
  */
-function hc_custom_hide_join_button( $group ) {
+function hc_custom_hide_join_button( ) {
+	global $groups_template;
+	
 	$user_id    = \bp_loggedin_user_id();
 	$group_type = hc_custom_get_group_type();
+	$group = $groups_template->group;
 
 	// Remove the other actions that would create this button.
 	$actions = array(
@@ -63,8 +66,9 @@ function hc_custom_hide_join_button( $group ) {
 
 	$is_committee   = ( 'committee' === $group_type );
 	$is_forum_admin = ( 'forum' === $group_type && \groups_is_user_admin( $user_id, \bp_get_group_id() ) );
+	$is_managed = ( 'Y' === \groups_get_groupmeta( $group->id, 'autopopulate', true ) );
 
-	if ( $is_committee || $is_forum_admin ) {
+	if ( $is_committee || $is_forum_admin || $is_managed ) {
 		return;
 	}
 
@@ -74,13 +78,13 @@ function hc_custom_hide_join_button( $group ) {
 		return;
 	}
 
-	if ( class_exists( 'Humanities_Commons' ) && 'mla' !== Humanities_Commons::$society_id ) {
+	if ( class_exists( 'Humanities_Commons' ) ) {
 		return \bp_group_join_button( $group );
 	}
 }
 
-add_action( 'bp_group_header_actions', 'hc_custom_hide_join_button', 1 );
-add_action( 'bp_directory_groups_actions', 'hc_custom_hide_join_button', 1 );
+add_action( 'bp_group_header_actions', 'hc_custom_hide_join_button', 0 );
+add_action( 'bp_directory_groups_actions', 'hc_custom_hide_join_button', 0 );
 
 /**
  * Hide the request membership tab for committees.
