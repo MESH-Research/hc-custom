@@ -46,7 +46,7 @@ function hcommons_core_member_groups_with_authorship( $current_groups = array() 
 			1020814, 
 			1004014, 
 			1004097, // Intaglio Journal
-			1004219, // MSU EDA University Center: Regional Economic Innovation
+			//1004219, // MSU EDA University Center: Regional Economic Innovation
 		) 
 	);
 
