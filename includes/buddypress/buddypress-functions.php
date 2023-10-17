@@ -258,3 +258,35 @@ function hc_custom_ensure_site_has_domain( $result ) {
     return $result;
 }
 add_filter( 'wpmu_validate_blog_signup', 'hc_custom_ensure_site_has_domain', 10, 1 );
+
+
+function hc_custom_override_settings_general_menu() {
+    global $wp_admin_bar;
+
+    if ( ! is_user_logged_in() ) {
+        return;
+    }
+
+    $society_id = Humanities_Commons::$society_id;
+    $dashboard_url_constant = strtoupper( $society_id ) . '_DASHBOARD_URL';
+    $dashboard_url = constant( $dashboard_url_constant );
+    if ( ! $dashboard_url ) {
+        $dashboard_url = constant( 'HC_DASHBOARD_URL' );
+    }
+    
+    if ( ! $dashboard_url ) {
+      return;
+    }
+
+    $settings_node = $wp_admin_bar->get_node( 'my-account-settings' );
+    $wp_admin_bar->add_node( array(
+        'id'     => 'my-account-settings-manage-my-account',
+        'parent' => 'my-account-buddypress',
+        'title'  => __( 'Manage My Account', 'buddypress' ),
+        'href'   => $dashboard_url
+    ) );
+
+    $wp_admin_bar->remove_node( 'my-account-settings-general' );
+
+}
+add_filter( 'admin_bar_menu', 'hc_custom_override_settings_general_menu', 1010 );
