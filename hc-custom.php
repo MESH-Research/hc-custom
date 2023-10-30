@@ -51,3 +51,9 @@ require_once trailingslashit( __DIR__ ) . 'includes/wp-to-twitter.php';
  */
 require_once trailingslashit( __DIR__ ) . 'includes/mla-groups.php';
 require_once trailingslashit( __DIR__ ) . 'includes/user-functions.php';
+
+/**
+ * API endpoints for Invenio integration.
+ */
+require_once trailingslashit( __DIR__ ) . 'includes/class-invenio-user-rest-controller.php';
+require_once trailingslashit( __DIR__ ) . 'includes/class-invenio-groups-rest-controller.php';
